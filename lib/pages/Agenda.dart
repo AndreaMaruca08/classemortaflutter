@@ -1,4 +1,4 @@
-import 'package:ClasseMorta/models/GestionInfo.dart';
+import 'package:ClasseMorta/models/Info.dart';
 import 'package:ClasseMorta/widgets/CompitoWidget.dart';
 import 'package:flutter/material.dart';
 import '../service/ApiService.dart';

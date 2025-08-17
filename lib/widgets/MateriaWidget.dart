@@ -43,13 +43,21 @@ class Materiawidget extends StatelessWidget {
               // SizedBox(width: 15), // Spazio iniziale, può essere gestito dal padding del Container o da un Expanded vuoto se necessario
 
               // NOME MATERIA
-              Expanded( // NOME MATERIA occupa lo spazio flessibile
-                flex: 2, // Dà più spazio al nome materia rispetto al prof (es. 2/3 vs 1/3)
+              Expanded(
+                flex: 2,
                 child: Text(
                   materia.nomeInteroMateria,
-                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    shadows: <Shadow>[Shadow(
+                      offset: Offset(2.0, 2.0),
+                      blurRadius: 3.0,
+                      color: Colors.black,
+                    ),]),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
+
                 ),
               ),
               const SizedBox(width: 16),
@@ -60,7 +68,11 @@ class Materiawidget extends StatelessWidget {
                 child: Text(
                   textAlign: TextAlign.end,
                   materia.nomeProf,
-                  style: TextStyle(fontSize: 14, color: textColor),
+                  style: TextStyle(fontSize: 14, color: textColor, shadows: [Shadow(
+                    offset: Offset(2.0, 2.0),
+                    blurRadius: 3.0,
+                    color: Colors.black,
+                  ),]),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
                 ),
@@ -75,11 +87,38 @@ class Materiawidget extends StatelessWidget {
           ),
           Row(
               children: [
-                Text("        Totale", style: TextStyle(fontSize: 12),),
+                Text("        Totale", style: TextStyle(
+                  fontSize: 12,
+                    shadows: <Shadow>[
+                    Shadow(
+                    offset: Offset(2.0, 2.0),
+                    blurRadius: 3.0,
+                    color: Colors.black,
+                    ),
+                    ]),
+                ),
                 SizedBox(width: 45,),
-                Text("1° quadrimestre", style: TextStyle(fontSize: 12),),
+                Text("1° quadrimestre", style: TextStyle(
+                    fontSize: 12,
+                    shadows: <Shadow>[
+                      Shadow(
+                        offset: Offset(2.0, 2.0),
+                        blurRadius: 3.0,
+                        color: Colors.black,
+                      ),
+                    ]),
+                ),
                 SizedBox(width: 15,),
-                Text("2° quadrimestre", style: TextStyle(fontSize: 12),),
+                Text("2° quadrimestre", style: TextStyle(
+                    fontSize: 12,
+                    shadows: <Shadow>[
+                      Shadow(
+                        offset: Offset(2.0, 2.0),
+                        blurRadius: 3.0,
+                        color: Colors.black,
+                      ),
+                    ]),
+                ),
               ]
           ),
 

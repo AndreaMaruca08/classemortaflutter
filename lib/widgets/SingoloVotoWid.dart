@@ -35,7 +35,14 @@ class VotoSingolo extends StatelessWidget {
             // Potresti voler usare FittedBox o TextOverflow.ellipsis
             "${voto.codiceMateria} - ${voto.displayValue}",
             textAlign: TextAlign.center, // Utile se il testo va a capo
-            style: TextStyle(fontSize: grandezza * 0.15), // Esempio di dimensione testo scalabile
+            style: TextStyle(fontSize: grandezza * 0.15,
+                shadows: <Shadow>[
+                  Shadow(
+                    offset: Offset(1.0, 2.0), // Spostamento orizzontale e verticale dell'ombra
+                    blurRadius: 3.0,         // Quanto deve essere sfocata l'ombra
+                    color: Colors.black, // Colore dell'ombra con opacità
+                  ),
+                ]), // Esempio di dimensione testo scalabile
           ),
         ),
       ),

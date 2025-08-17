@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:ClasseMorta/models/GestionInfo.dart';
+import 'package:ClasseMorta/models/Info.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../models/Login.dart';
 import '../models/Materia.dart';
+import '../models/Nota.dart';
 import '../models/Notizia.dart';
 import '../models/StudentCard.dart';
 import '../models/Voto.dart';
@@ -80,7 +81,7 @@ class Apiservice {
     token = '';
     card = "${base}students/$code/card";
     grades = "${base}students/$code/grades";
-    notes = "${base}students/$code/notes";
+    notes = "${base}students/$code/notes/all";
     absences = "${base}students/$code/absences";
     lessonsToday = "${base}students/$code/lessons/today";
     calendarAll = "${base}students/$code/calendar/all";
@@ -466,6 +467,20 @@ class Apiservice {
     } else {
       throw Exception("Errore durante il download: ${response.statusCode}");
     }
+  }
+
+  Future<List<List<Nota>>> getNote() async {
+    final response = await http.get(
+      Uri.parse(notes),
+      headers: otherHeaders,
+    );
+    if(response.statusCode == 200){
+      final json = jsonDecode(response.body);
+      return Nota.getNote(json);
+    }else{
+      return [];
+    }
+
   }
 
 

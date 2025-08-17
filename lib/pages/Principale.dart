@@ -2,11 +2,13 @@ import 'dart:async'; // Aggiunto per Future
 import 'package:ClasseMorta/models/Voto.dart';
 import 'package:ClasseMorta/pages/Agenda.dart';
 import 'package:ClasseMorta/pages/Materie.dart';
+import 'package:ClasseMorta/pages/NotePagina.dart';
 import 'package:ClasseMorta/pages/Notizie.dart';
 import 'package:ClasseMorta/widgets/SingoloVotoWid.dart';
 import 'package:ClasseMorta/widgets/VotoDisplay.dart';
 import 'package:flutter/material.dart';
 
+import '../models/Nota.dart';
 import '../models/Notizia.dart';
 import '../models/Streak.dart';
 import '../models/StudentCard.dart';
@@ -26,6 +28,7 @@ class _MainPageState extends State<MainPage> {
   late Future<List<Voto>?> _lastVotiFuture; // Stato per il Future
   late Future<List<Voto>?> _voti;
   late Future<List<List<Notizia>?>> _notizie;
+  late Future<List<List<Nota>>> _note;
   @override
   void initState() {
     super.initState();
@@ -34,6 +37,7 @@ class _MainPageState extends State<MainPage> {
     _lastVotiFuture = _service.getLastVoti(100);
     _voti = _service.getAllVoti();
     _notizie = _service.getNotizie();
+    _note = _service.getNote();
   }
 
   Future<void> _handleRefresh() async {
@@ -42,11 +46,13 @@ class _MainPageState extends State<MainPage> {
       _lastVotiFuture = (_service.getLastVoti(100));
       _voti = _service.getAllVoti();
       _notizie = _service.getNotizie();
+      _note = _service.getNote();
     });
     await _medieGeneraliFuture;
     await _lastVotiFuture;
     await _voti;
     await _notizie;
+    await _note;
   }
 
   @override
@@ -85,6 +91,13 @@ class _MainPageState extends State<MainPage> {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
+                              shadows: <Shadow>[
+                                Shadow(
+                                  offset: Offset(2.0, 2.0), // Spostamento orizzontale e verticale dell'ombra
+                                  blurRadius: 3.0,         // Quanto deve essere sfocata l'ombra
+                                  color: Colors.black.withOpacity(0.5), // Colore dell'ombra con opacità
+                                ),
+                              ]
                           ),
                         ),
                         const SizedBox(width: 5),
@@ -118,8 +131,6 @@ class _MainPageState extends State<MainPage> {
                         child: Text('Errore nel caricamento: ${snapshot.error}'),
                       );
                     } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                      // Usa snapshot.data! direttamente invece di assegnare a medieGenerali
-                      // per evitare chiamate setState non necessarie all'interno del builder.
                       final List<Voto> loadedMedie = snapshot.data!;
                       return Container(
                         decoration: BoxDecoration(
@@ -136,14 +147,53 @@ class _MainPageState extends State<MainPage> {
                         ),
                         child: Column(
                           children: [
-                            const Row(
+                             Row(
                               children: [
                                 SizedBox(width: 1),
-                                Text("Media Totale", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                Text(
+                                    "Media Totale",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                        shadows: <Shadow>[
+                                          Shadow(
+                                            offset: Offset(2.0, 2.0), // Spostamento orizzontale e verticale dell'ombra
+                                            blurRadius: 3.0,         // Quanto deve essere sfocata l'ombra
+                                            color: Colors.black, // Colore dell'ombra con opacità
+                                          ),
+                                        ]
+                                    )
+                                ),
                                 SizedBox(width: 33),
-                                Text("Primo", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                Text(
+                                    "Primo",
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        shadows: <Shadow>[
+                                          Shadow(
+                                            offset: Offset(2.0, 2.0), // Spostamento orizzontale e verticale dell'ombra
+                                            blurRadius: 3.0,         // Quanto deve essere sfocata l'ombra
+                                            color: Colors.black, // Colore dell'ombra con opacità
+                                          ),
+                                        ]
+                                    )
+                                ),
                                 SizedBox(width: 35),
-                                Text("Secondo", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                Text(
+                                    "Secondo",
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        shadows: <Shadow>[
+                                          Shadow(
+                                            offset: Offset(2.0, 2.0), // Spostamento orizzontale e verticale dell'ombra
+                                            blurRadius: 3.0,         // Quanto deve essere sfocata l'ombra
+                                            color: Colors.black, // Colore dell'ombra con opacità
+                                          ),
+                                        ]
+                                    )
+                                ),
                               ],
                             ),
                             const SizedBox(height: 20),
@@ -195,7 +245,8 @@ class _MainPageState extends State<MainPage> {
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 25,
-                                  color: streak.isGoat(loadedVoti)? Colors.yellow : streak.getStreakColor()
+                                  color: streak.isGoat(loadedVoti)? Colors.yellow : streak.getStreakColor(),
+
                               ),
                             )
                           ],
@@ -272,7 +323,7 @@ class _MainPageState extends State<MainPage> {
                         final List<List<Notizia>?> loadedNotizie = snapshot.data!;
                         return passaggio(
                             context,
-                            "  Notizie            ",
+                            "  Notizie             ",
                             "Notizie/assenze prof",
                             NotiziePage(
                               circolari: loadedNotizie[0],
@@ -288,7 +339,30 @@ class _MainPageState extends State<MainPage> {
                         return const Center(child: Text("Nessuna materia con voto"));
                       }
                     }),
-                     SizedBox(width: 10),
+                    SizedBox(width: 12),
+                    FutureBuilder(future: _note, builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(
+                          child: Text('Errore nel caricamento: ${snapshot.error}'),
+                        );
+                      } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                        final List<List<Nota>> loadedNote = snapshot.data!;
+                        return passaggio(
+                            context,
+                            "  Note                ",
+                            "Note/Annotazioni/",
+                            Notepagina(
+                              note: loadedNote,
+                            ),
+                            Icon(Icons.edit_note_outlined)
+                        );
+
+                      }else{
+                        return const Center(child: Text("Nessuna materia con voto"));
+                      }
+                    }),
                   ],
                 )
               ],
@@ -327,7 +401,17 @@ class _MainPageState extends State<MainPage> {
             icon: icon,
             tooltip: tooltip,
           ),
-          Text(mess)
+          Text(mess , style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+            shadows: <Shadow>[
+              Shadow(
+                offset: Offset(2.0, 2.0), // Spostamento orizzontale e verticale dell'ombra
+                blurRadius: 3.0,         // Quanto deve essere sfocata l'ombra
+                color: Colors.black.withOpacity(0.5), // Colore dell'ombra con opacità
+              ),
+            ]
+          ),)
         ],
       ),
     );
