@@ -85,8 +85,8 @@ class CircularProgressBar extends StatelessWidget {
     // Calcola il progresso normalizzato da 0.0 a 1.0
     final double progress = (currentValue / maxValue).clamp(0.0, 1.0);
 
-    final Color coloreEffettivo = currentValue >= 6 ?  Colors.green : currentValue <= 4 ? Colors.red : Colors.yellow;
-    final Color coloreSfondo = currentValue >= 6 ?  Colors.green[100]! : currentValue <= 4 ? Colors.red[100]! : Colors.yellow[100]!;
+    final Color coloreEffettivo = currentValue >= 6 ?  Colors.green : currentValue < 5 ? Colors.red : Colors.yellow;
+    final Color coloreSfondo = currentValue >= 6 ?  Colors.green[100]! : currentValue < 5 ? Colors.red[100]! : Colors.yellow[100]!;
     return SizedBox(
       width: size,
       height: size,

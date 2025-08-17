@@ -97,8 +97,6 @@ class Login extends StatelessWidget {
           // Tuttavia, è bene averlo definito.
           primarySwatch: Colors.grey, // o Colors.blue, o altro
         ).copyWith(
-          background: Colors.black,        // Sfondo generale
-          onBackground: Colors.white,     // Testo/icone su sfondo
           surface: Colors.grey[850],    // Sfondo per Card, Dialog, ecc. (leggermente più chiaro del nero puro)
           onSurface: Colors.white,        // Testo/icone su surface
           primary: Colors.grey[900],      // Colore primario (es. header Drawer)
@@ -187,7 +185,7 @@ class _LoginPageState extends State<LoginPage> {
                   final codice = codiceController.text;
                   final password = passwordController.text;
 
-                  if(!areInputsValid(codice, password)){return;};
+                  if(!areInputsValid(codice, password)){return;}
 
                   Apiservice apiService = Apiservice(codice, true);
 

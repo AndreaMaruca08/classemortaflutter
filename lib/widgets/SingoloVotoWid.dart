@@ -23,7 +23,7 @@ class VotoSingolo extends StatelessWidget {
             MaterialPageRoute(builder: (context) => Dettaglivoto(voto: voto)), // Sostituisci con la tua pagina
           );
         }, // Assegna la callback onTap
-        splashColor: Colors.red.withAlpha(100),
+        splashColor: voto.voto >= 6 ? Colors.green : voto.voto >= 5 ? Colors.yellow : Colors.red, // Cambia il colore del ripple in base al voto,
         highlightColor: Colors.transparent, // Se non vuoi l'highlight prima del ripple
         borderRadius: BorderRadius.circular(grandezza / 2), // Per far sì che il ripple sia circolare come la barra
         child: CircularProgressBar(

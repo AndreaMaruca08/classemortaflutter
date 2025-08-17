@@ -63,7 +63,7 @@ class Voto{
       voto: json['decimalValue'].toDouble() ,
       displayValue: json['displayValue'],
       descrizione: json['notesForFamily'] ?? "",
-      periodo: json['periodPos'] ?? "",
+      periodo: json['periodPos'] == 3 ? 2 : json['periodPos'],
       cancellato: json['canceled'],
       nomeProf: json['teacherName'] ?? "",
     );

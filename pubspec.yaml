@@ -37,6 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_launcher_icons: ^0.13.1 # Controlla l'ultima versione su pub.dev
   fl_chart: ^0.68.0
+  path_provider: ^2.1.2
+  open_filex: ^4.3.2
 
 
 dev_dependencies:

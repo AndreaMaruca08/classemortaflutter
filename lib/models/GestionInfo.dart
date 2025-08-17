@@ -29,7 +29,7 @@ class Info {
         return false;
       }
       String descrizione = notesValue.toString().toLowerCase();
-      bool con1 = descrizione.contains("es.");
+      bool con1 = descrizione.contains("es");
       bool con2 = descrizione.contains("compit");
       bool con3 = descrizione.contains("consegna");
       return con1 || con2 || con3;
