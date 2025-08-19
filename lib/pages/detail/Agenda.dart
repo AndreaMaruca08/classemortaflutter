@@ -1,7 +1,7 @@
 import 'package:ClasseMorta/models/Info.dart';
 import 'package:ClasseMorta/widgets/CompitoWidget.dart';
 import 'package:flutter/material.dart';
-import '../service/ApiService.dart';
+import '../../service/ApiService.dart';
 
 class Agenda extends StatefulWidget {
   final Apiservice apiService;

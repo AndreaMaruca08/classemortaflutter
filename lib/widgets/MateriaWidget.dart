@@ -1,5 +1,5 @@
 import 'package:ClasseMorta/models/Voto.dart';
-import 'package:ClasseMorta/pages/DettagliMateria.dart';
+import 'package:ClasseMorta/pages/detail/DettagliMateria.dart';
 import 'package:ClasseMorta/service/ApiService.dart';
 import 'package:ClasseMorta/widgets/SingoloVotoWid.dart';
 import 'package:flutter/material.dart';
@@ -154,25 +154,25 @@ class Materiawidget extends StatelessWidget {
                   onPressed: (){
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Dettaglimateria(materia: materia, periodo: 3,)),
+                      MaterialPageRoute(builder: (context) => Dettaglimateria(materia: materia, periodo: 3, dotted: true,)),
                     );
                   },
                   icon: Icon(Icons.auto_graph_sharp, color: Colors.white,)),
-                SizedBox(width: 70,),
+                SizedBox(width: 60,),
                 IconButton(
                     onPressed: (){
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Dettaglimateria(materia: materia, periodo: 1,)),
+                        MaterialPageRoute(builder: (context) => Dettaglimateria(materia: materia, periodo: 1, dotted: true)),
                       );
                     },
                     icon: Icon(Icons.auto_graph_sharp, color: Colors.white,)),
-                SizedBox(width: 75,),
+                SizedBox(width: 55,),
                 IconButton(
                     onPressed: (){
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Dettaglimateria(materia: materia, periodo: 2,)),
+                        MaterialPageRoute(builder: (context) => Dettaglimateria(materia: materia, periodo: 2, dotted: true)),
                       );
                     },
                     icon: Icon(Icons.auto_graph_sharp, color: Colors.white,)),

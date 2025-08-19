@@ -54,15 +54,16 @@ class Ipotetiche extends StatelessWidget {
                 List<Voto> votiTemporanei = List.from(this.voti); // Crea sempre una nuova lista per il calcolo
 
                 Voto votoIpotetico = Voto(
-                  codiceMateria: this.voti[0].codiceMateria,
-                  nomeInteroMateria: this.voti[0].nomeInteroMateria,
+                  codiceMateria: voti[0].codiceMateria,
+                  nomeInteroMateria: voti[0].nomeInteroMateria,
                   dataVoto: DateTime.now().toIso8601String(),
                   voto: prossimoVotoValore,
                   displayValue: prossimoVotoValore.toStringAsFixed(1),
                   descrizione: "Voto ipotetico",
-                  periodo: this.voti[0].periodo,
+                  periodo: voti[0].periodo,
                   cancellato: false,
-                  nomeProf: this.voti[0].nomeProf,
+                  nomeProf: voti[0].nomeProf,
+                    tipo: "Voto ipotetico"
                 );
                 votiTemporanei.add(votoIpotetico);
 
@@ -78,7 +79,9 @@ class Ipotetiche extends StatelessWidget {
                     descrizione: "",
                     periodo: 0,
                     cancellato: false,
-                    nomeProf: "");
+                    nomeProf: "",
+                    tipo: ""
+                );
 
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 15.0),

@@ -42,6 +42,7 @@ class Voto{
   String displayValue;
   String descrizione;
   int periodo;
+  String tipo;
   bool cancellato;
   String nomeProf;
   Voto({
@@ -52,6 +53,7 @@ class Voto{
     required this.displayValue,
     required this.descrizione,
     required this.periodo,
+    required this.tipo,
     required this.cancellato,
     required this.nomeProf,
   });
@@ -64,6 +66,7 @@ class Voto{
       displayValue: json['displayValue'],
       descrizione: json['notesForFamily'] ?? "",
       periodo: json['periodPos'] == 3 ? 2 : json['periodPos'],
+      tipo: json['componentDesc'],
       cancellato: json['canceled'],
       nomeProf: json['teacherName'] ?? "",
     );

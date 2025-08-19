@@ -11,7 +11,6 @@ class Notiziawidget extends StatelessWidget {
     required this.service,
   });
 
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -27,65 +26,60 @@ class Notiziawidget extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              SizedBox(width: 10),
-              SizedBox(
-                width: 300,
-                child:Expanded(
+      child: Padding( // Aggiunto Padding per non far toccare il contenuto ai bordi del Container
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start, // Allinea i figli a sinistra
+          mainAxisSize: MainAxisSize.min, // Fa sì che la Column occupi solo lo spazio verticale necessario
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start, // Allinea gli elementi della Row in alto
+              children: [
+                SizedBox(width: 10), // Spazio iniziale
+                Expanded( // <--- CORRETTO: Ora il Text si espande nella Row
                   child: Text(
-                      notizia.title,
-                      style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold)
+                    notizia.title,
+                    style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
+                    // softWrap: true, // Già di default, ma per chiarezza
                   ),
                 ),
-              )
-
-
-            ],
-          ),
-          // Dentro il Widget build di Notiziawidget
-
-// ... altro codice del Notiziawidget ...
-          SizedBox(height: 10),
-          if (notizia.files.isNotEmpty) ...[
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: notizia.files.length, // **DEVI SEMPRE FORNIRE itemCount!**
-              itemBuilder: (context, index) {
-                final file = notizia.files[index];
-                return Padding( // Opzionale: aggiungi padding per ogni riga di file
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          service.downloadAndOpenAttachment(notizia.codiceDocumento, file.attachNum);
-                        },
-                        icon: Icon(Icons.file_copy_outlined),
-                        tooltip: "Apri file",
-                      ),
-                      SizedBox(
-                        width: 300,
-                        child: Expanded(
+              ],
+            ),
+            SizedBox(height: 10),
+            if (notizia.files.isNotEmpty) ...[
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: notizia.files.length,
+                itemBuilder: (context, index) {
+                  final file = notizia.files[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            service.downloadAndOpenAttachment(notizia.codiceDocumento, file.attachNum);
+                          },
+                          icon: Icon(Icons.file_copy_outlined),
+                          tooltip: "Apri file",
+                        ),
+                        SizedBox(width: 8), // Spazio tra icona e testo
+                        Expanded( // <--- CORRETTO: Ora il Text si espande nella Row
                           child: Text(
                             file.fileName,
-                            overflow: TextOverflow.ellipsis, // Gestisce nomi di file lunghi
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      ),
-
-                    ],
-                  ),
-                );
-              },
-            ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ],
+            SizedBox(height: 5),
           ],
-
-          SizedBox(height: 5),
-        ],
+        ),
       ),
     );
   }

@@ -1,19 +1,27 @@
 import 'dart:async'; // Aggiunto per Future
+import 'package:ClasseMorta/models/Materia.dart';
 import 'package:ClasseMorta/models/Voto.dart';
-import 'package:ClasseMorta/pages/Agenda.dart';
+import 'package:ClasseMorta/pages/detail/Agenda.dart';
+import 'package:ClasseMorta/pages/AssenzePage.dart';
+import 'package:ClasseMorta/pages/detail/DettagliMateria.dart';
 import 'package:ClasseMorta/pages/Materie.dart';
 import 'package:ClasseMorta/pages/NotePagina.dart';
 import 'package:ClasseMorta/pages/Notizie.dart';
+import 'package:ClasseMorta/pages/PagellePagina.dart';
 import 'package:ClasseMorta/widgets/SingoloVotoWid.dart';
 import 'package:ClasseMorta/widgets/VotoDisplay.dart';
 import 'package:flutter/material.dart';
 
+import '../models/Assenza.dart';
+import '../models/Lezione.dart';
 import '../models/Nota.dart';
 import '../models/Notizia.dart';
+import '../models/Pagella.dart';
 import '../models/Streak.dart';
 import '../models/StudentCard.dart';
 import '../service/ApiService.dart';
-import 'DettagliPersona.dart';
+import '../widgets/Lezionewidget.dart';
+import 'detail/DettagliPersona.dart';
 
 class MainPage extends StatefulWidget {
   final Apiservice apiService;
@@ -25,34 +33,53 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   late Apiservice _service; // Rinominato per convenzione (_ per privato)
   late Future<List<Voto>?> _medieGeneraliFuture; // Stato per il Future
+  late Future<List<Voto>?> _lastVotiFutureMedie; // Stato per il Future
   late Future<List<Voto>?> _lastVotiFuture; // Stato per il Future
   late Future<List<Voto>?> _voti;
   late Future<List<List<Notizia>?>> _notizie;
   late Future<List<List<Nota>>> _note;
+  late Future<List<Pagella>?> _pagelle;
+  late Future<List<List<Assenza>>> _assenze;
+  late Future<List<Lezione>> _lessonsToday;
+
   @override
+
   void initState() {
     super.initState();
     _service = widget.apiService;
     _medieGeneraliFuture = _service.getMedieGenerali() ; // Caricamento iniziale
-    _lastVotiFuture = _service.getLastVoti(100);
+    _lastVotiFutureMedie = _service.getLastVoti(100);
     _voti = _service.getAllVoti();
+    _lastVotiFuture = _service.getLastVoti(100);
     _notizie = _service.getNotizie();
+    _pagelle = _service.getPagelle() as Future<List<Pagella>?>;
+    _assenze = _service.getAssenze();
     _note = _service.getNote();
+    _lessonsToday = _service.getLezioni();
+
   }
 
   Future<void> _handleRefresh() async {
     setState(() {
       _medieGeneraliFuture = (_service.getMedieGenerali());
-      _lastVotiFuture = (_service.getLastVoti(100));
+      _lastVotiFutureMedie = (_service.getLastVoti(100));
       _voti = _service.getAllVoti();
+      _lastVotiFuture = _service.getLastVoti(100);
       _notizie = _service.getNotizie();
       _note = _service.getNote();
+      _assenze = _service.getAssenze();
+      _lessonsToday = _service.getLezioni();
+      _pagelle = _service.getPagelle() as Future<List<Pagella>?>;
     });
     await _medieGeneraliFuture;
-    await _lastVotiFuture;
+    await _lastVotiFutureMedie;
     await _voti;
+    await _lastVotiFuture;
     await _notizie;
     await _note;
+    await _pagelle;
+    await _lessonsToday;
+    await _assenze;
   }
 
   @override
@@ -74,7 +101,7 @@ class _MainPageState extends State<MainPage> {
             physics: const AlwaysScrollableScrollPhysics(), // Per consentire sempre il pull-to-refresh
             child: Column(
               children: [
-                //
+                //CARTA STUDENTE
                 FutureBuilder(future: _service.getCard(), builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -121,6 +148,8 @@ class _MainPageState extends State<MainPage> {
                   }
                 }),
                 const SizedBox(height: 20),
+
+                //MEDIE
                 FutureBuilder<List<Voto>?>( // Specificato il tipo del FutureBuilder
                   future: _medieGeneraliFuture, // Usa lo stato del Future
                   builder: (context, snapshot) {
@@ -196,6 +225,7 @@ class _MainPageState extends State<MainPage> {
                                 ),
                               ],
                             ),
+
                             const SizedBox(height: 20),
                             Row(
                               children: [
@@ -208,15 +238,100 @@ class _MainPageState extends State<MainPage> {
                               ],
                             ),
                             const SizedBox(height: 10),
+                            FutureBuilder<List<Voto>?>(
+                              future: _lastVotiFutureMedie, // Usa il Future esistente per i voti
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return const Center(child: CircularProgressIndicator());
+                                }
+                                else if (snapshot.hasError) {
+                                  return const Center(child: Text("Errore"));
+                                }
+                                else if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) {
+                                  List<Voto> voti = snapshot.data!;
+                                  return Row(
+                                    children: [
+                                      SizedBox(width: 27,),
+                                      IconButton(
+                                          onPressed: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        Dettaglimateria(materia: Materia(
+                                                            codiceMateria: "Anno intero",
+                                                            nomeInteroMateria: "Anno",
+                                                            nomeProf: "Sistema",
+                                                            voti: voti
+                                                        ),
+                                                          periodo: 3,
+                                                          dotted: false,
+                                                        )
+                                                ));
+                                          },
+                                          icon: Icon(Icons.auto_graph_sharp,
+                                            color: Colors.white,)),
+                                      SizedBox(width: 82,),
+                                      IconButton(
+                                          onPressed: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        Dettaglimateria(materia: Materia(
+                                                            codiceMateria: "1° quadrimestre",
+                                                            nomeInteroMateria: "1° quadrimestre",
+                                                            nomeProf: "Sistema",
+                                                            voti: voti
+                                                        ),
+                                                          periodo: 1,
+                                                          dotted: false,
+                                                        )
+                                                ));
+                                          },
+                                          icon: Icon(Icons.auto_graph_sharp,
+                                            color: Colors.white,)),
+                                      SizedBox(width: 60,),
+                                      IconButton(
+                                          onPressed: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        Dettaglimateria(materia: Materia(
+                                                            codiceMateria: "2° quadrimestre",
+                                                            nomeInteroMateria: "2° quadrimestre",
+                                                            nomeProf: "Sistema",
+                                                            voti: voti
+                                                        ),
+                                                          periodo: 2,
+                                                          dotted: false,
+                                                        )
+                                                ));
+                                          },
+                                          icon: Icon(Icons.auto_graph_sharp,
+                                            color: Colors.white,)),
+                                    ],
+                                  );
+                                }else{
+                                  return const Center(child: Text("Nessun risultato"));
+                                }
+                              },
+                            ),
                           ],
+
                         ),
                       );
                     } else {
                       return const Center(child: Text("Nessun risultato"));
                     }
                   },
+
                 ),
+
                 const SizedBox(height: 20),
+
+                //VOTI
                 FutureBuilder(future: _lastVotiFuture, builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -286,6 +401,7 @@ class _MainPageState extends State<MainPage> {
                 SizedBox(height: 10),
                 Divider(thickness: 1, color: Colors.white,),
                 SizedBox(height: 10),
+
                 Row(
                   children: [
                     FutureBuilder(future: _voti, builder: (context, snapshot) {
@@ -351,7 +467,7 @@ class _MainPageState extends State<MainPage> {
                         final List<List<Nota>> loadedNote = snapshot.data!;
                         return passaggio(
                             context,
-                            "  Note                ",
+                            "  Note               ",
                             "Note/Annotazioni/",
                             Notepagina(
                               note: loadedNote,
@@ -364,7 +480,295 @@ class _MainPageState extends State<MainPage> {
                       }
                     }),
                   ],
-                )
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  children: [
+                    FutureBuilder(future: _pagelle, builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(
+                          child: Text('Errore nel caricamento: ${snapshot.error}'),
+                        );
+                      } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                        final List<Pagella> pag = snapshot.data!;
+                        return passaggio(
+                            context,
+                            "  Pagelle            ",
+                            "Pagelle",
+                            Pagellepagina(pagelle: pag),
+                            Icon(Icons.edit_note_outlined)
+                        );
+
+                      }else{
+                        return const Center(child: Text("Nessuna materia con voto"));
+                      }
+                    }),
+                    SizedBox(width: 10,),
+
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+
+                const Divider(thickness: 1, color: Colors.white,),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  "Lezioni   ${DateTime.now().year}/${DateTime.now().month}/${DateTime.now().day}",
+                  style: const TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 15,
+                    ),
+                    Expanded(
+                      child: SizedBox(
+                        height: 400,
+                        child: FutureBuilder<List<Lezione>>(
+                          future: _lessonsToday,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                child: Text('Errore nel caricamento: ${snapshot.error}'),
+                              );
+                            } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                              final List<Lezione> lezioni = snapshot.data!;
+                              return ListView.builder(
+                                itemCount: lezioni.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  Lezione lezione = lezioni[index];
+                                  return Lezionewidget(lezione: lezione);
+                                },
+                              );
+                            } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                              return const Center(child: Text("Nessuna lezione per oggi"));
+                            } else {
+                              return const Center(child: Text("Le lezioni devono ancora iniziare"));
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 30,
+                    ),
+                  ],
+                ),
+// ...
+
+                const Divider(thickness: 1, color: Colors.white,),
+                FutureBuilder(future: _assenze, builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(
+                      child: Text('Errore nel caricamento: ${snapshot.error}'),
+                    );
+                  } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                    final List<List<Assenza>> ass = snapshot.data!;
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[800],
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color.fromRGBO(240, 240, 240, 0.4),
+                            spreadRadius: 1,
+                            blurRadius: 1,
+                            offset: Offset(2, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 5),
+                          Row(
+                            children: [
+                              SizedBox(width: 5,),
+                              Container(
+                                padding: EdgeInsets.all(10),
+                                height: 70,
+                                width: 160,
+                                decoration: BoxDecoration(
+                                  color: Color.fromRGBO(255, 0, 0, 0.6),
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color.fromRGBO(10, 10, 10, 0.4),
+                                      spreadRadius: 1,
+                                      blurRadius: 1,
+                                      offset: Offset(2, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Text(
+                                  "   Assenze ${ass[0].length}   ",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    shadows: [
+                                      BoxShadow(
+                                        color: Color.fromRGBO(10, 10, 10, 0.4),
+                                        spreadRadius: 1,
+                                        blurRadius: 1,
+                                        offset: Offset(2, 2),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 10,),
+                              Container(
+                                width: 155,
+                                padding: EdgeInsets.all(10),
+                                height: 70,
+                                decoration: BoxDecoration(
+                                  color: Color.fromRGBO(255, 255, 0, 0.6),
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color.fromRGBO(10, 10, 10, 0.4),
+                                      spreadRadius: 1,
+                                      blurRadius: 1,
+                                      offset: Offset(2, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: SizedBox(
+                                  width: 150,
+                                  height: 10,
+                                  child: Text(
+                                    "    Uscite ${ass[1].length}   ",
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        shadows: [
+                                          BoxShadow(
+                                          color: Color.fromRGBO(10, 10, 10, 0.4),
+                                          spreadRadius: 1,
+                                          blurRadius: 1,
+                                          offset: Offset(2, 2),
+                                          ),
+                                        ],
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+
+                          Row(
+                            children: [
+                              SizedBox(width: 5,),
+                              Container(
+                                padding: EdgeInsets.all(10),
+                                height: 75,
+                                width: 160,
+                                decoration: BoxDecoration(
+                                  color: Color.fromRGBO(0, 0, 255, 0.6),
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color.fromRGBO(10, 10, 10, 0.4),
+                                      spreadRadius: 1,
+                                      blurRadius: 1,
+                                      offset: Offset(2, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Text(
+                                  "      Ritardi ${ass[2].length}   ",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    shadows: [
+                                      BoxShadow(
+                                        color: Color.fromRGBO(10, 10, 10, 0.4),
+                                        spreadRadius: 1,
+                                        blurRadius: 1,
+                                        offset: Offset(2, 2),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 10,),
+                              Container(
+                                padding: EdgeInsets.all(10),
+                                height: 75,
+                                width: 155,
+                                decoration: BoxDecoration(
+                                  color: Color.fromRGBO(0, 0, 0, 0.6),
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color.fromRGBO(10, 10, 10, 0.4),
+                                      spreadRadius: 1,
+                                      blurRadius: 1,
+                                      offset: Offset(2, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "Dettagli",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        shadows: [
+                                          BoxShadow(
+                                            color: Color.fromRGBO(10, 10, 10, 0.4),
+                                            spreadRadius: 1,
+                                            blurRadius: 1,
+                                            offset: Offset(2, 2),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    IconButton(
+                                        onPressed: (){
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(builder: (context) => Assenzepage(assenze:ass)), // Sostituisci con la tua pagina
+                                          );
+                                        },
+                                        icon: Icon(Icons.info_outline),
+                                        tooltip: "Dettagli assenze",
+                                    )
+                                  ],
+                                )
+                              ),
+
+                            ],
+                          ),
+                          const SizedBox(height: 5),
+                        ],
+                      ),
+                    );
+
+                  }else{
+                    return const Center(child: Text("Nessuna assenza/ritardo/usccita"));
+                  }
+                }),
+                SizedBox(height: 200,)
+
               ],
             ),
           ),

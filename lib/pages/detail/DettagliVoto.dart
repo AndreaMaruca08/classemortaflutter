@@ -1,6 +1,6 @@
 import 'package:ClasseMorta/widgets/SingoloVotoWid.dart';
 import 'package:flutter/material.dart';
-import '../models/Voto.dart';
+import '../../models/Voto.dart';
 
 class Dettaglivoto extends StatelessWidget {
   final Voto voto;
@@ -72,7 +72,18 @@ class Dettaglivoto extends StatelessWidget {
           ),
           Row(
             children: [
-              Icon(Icons.person, size: 30, color: Colors.white),
+              const Text("Tipologia voto: ", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              Expanded(
+                child: Text(
+                  voto.tipo,
+                  style: const TextStyle(fontSize: 15),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              const Icon(Icons.person, size: 30, color: Colors.white),
               Expanded(
                 child: Text(
                   voto.nomeProf.isEmpty? "Docente sconosciuto" : voto.nomeProf, // Removed the length check and substring logic

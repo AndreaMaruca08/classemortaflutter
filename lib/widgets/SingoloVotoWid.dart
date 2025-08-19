@@ -1,4 +1,4 @@
-import 'package:ClasseMorta/pages/DettagliVoto.dart';
+import 'package:ClasseMorta/pages/detail/DettagliVoto.dart';
 import 'package:ClasseMorta/widgets/Cerchio.dart'; // Assumendo che CircularProgressBar sia qui
 import 'package:flutter/material.dart';
 import '../models/Voto.dart';

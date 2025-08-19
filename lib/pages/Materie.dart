@@ -22,7 +22,7 @@ class MateriePag extends StatelessWidget {
         ),
         body: SingleChildScrollView(
           physics: const ClampingScrollPhysics(), // o rimuovila per il default
-          child: Padding( // Aggiungi padding generale se necessario
+          child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [

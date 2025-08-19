@@ -8,7 +8,7 @@ class NotiziePage extends StatelessWidget {
   final List<Notizia>? variazioni;
   final List<Notizia>? altro;
   final List<Notizia>? variazioniDiClasse;
-  final Apiservice service; // Nota: 'Apiservice' inizia con la maiuscola per convenzione delle classi
+  final Apiservice service;
 
   const NotiziePage({
     super.key,
@@ -37,111 +37,13 @@ class NotiziePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start, // Allinea i titoli delle sezioni a sinistra
             children: [
               // Sezione Variazioni di orario
-              if (variazioni != null && variazioni!.isNotEmpty) ...[
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text(
-                    'Variazioni di orario',
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SizedBox(
-                  height: altezzaBloccoNotizie, // Altezza fissa per questo blocco
-                  child: ListView.builder(
-                    itemCount: variazioni!.length,
-                    itemBuilder: (context, index) {
-                      final notizia = variazioni![index];
-                      return Column(
-                        children: [
-                          Notiziawidget(notizia: notizia, service: service,),
-                          const SizedBox(height: 10),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 20), // Spazio tra i blocchi di notizie
-              ],
-
-              if (variazioniDiClasse != null && variazioniDiClasse!.isNotEmpty) ...[
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text(
-                    'Variazioni di aula',
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SizedBox(
-                  height: altezzaBloccoNotizie,
-                  child: ListView.builder(
-                    itemCount: variazioniDiClasse!.length,
-                    itemBuilder: (context, index) {
-                      final notizia = variazioniDiClasse![index];
-                      return Column(
-                        children: [
-                          Notiziawidget(notizia: notizia, service: service,),
-                          const SizedBox(height: 10),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 20), // Spazio tra i blocchi di notizie
-              ],
-
+              buildBloccoNotizie("Variazioni di orario", variazioni),
+              // Variazioni di aula
+              buildBloccoNotizie("Variazioni di aula", variazioniDiClasse),
               // Sezione Circolari
-              if (circolari != null && circolari!.isNotEmpty) ...[
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text(
-                    'Circolari',
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SizedBox(
-                  height: altezzaBloccoNotizie, // Altezza fissa per questo blocco
-                  child: ListView.builder(
-                    itemCount: circolari!.length,
-                    itemBuilder: (context, index) {
-                      final notizia = circolari![index];
-                      return Column(
-                        children: [
-                          Notiziawidget(notizia: notizia, service: service),
-                          const SizedBox(height: 10),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 20), // Spazio tra i blocchi di notizie
-              ],
-
+              buildBloccoNotizie('Circolari', circolari),
               // Sezione Altro
-              if (altro != null && altro!.isNotEmpty) ...[
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text(
-                    'Altro',
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SizedBox(
-                  height: altezzaBloccoNotizie, // Altezza fissa per questo blocco
-                  child: ListView.builder(
-                    itemCount: altro!.length,
-                    itemBuilder: (context, index) {
-                      final notizia = altro![index];
-                      return Column(
-                        children: [
-                          Notiziawidget(notizia: notizia, service: service,),
-                          const SizedBox(height: 10),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 20), // Spazio alla fine dell'ultima sezione, se necessario
-              ],
+              buildBloccoNotizie('Altro', altro),
 
               // Messaggio se non ci sono notizie di nessun tipo
               if ((variazioni == null || variazioni!.isEmpty) &&
@@ -162,6 +64,39 @@ class NotiziePage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget buildBloccoNotizie(String titolo, List<Notizia>? notizie) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (notizie != null && notizie!.isNotEmpty) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              titolo,
+              style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            ),
+          ),
+          SizedBox(
+            height: 300, // Altezza fissa per questo blocco
+            child: ListView.builder(
+              itemCount: notizie.length,
+              itemBuilder: (context, index) {
+                final notizia = notizie[index];
+                return Column(
+                  children: [
+                    Notiziawidget(notizia: notizia, service: service),
+                    const SizedBox(height: 10),
+                  ],
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 20), // Spazio tra i blocchi di notizie
+        ],
+      ]
     );
   }
 }

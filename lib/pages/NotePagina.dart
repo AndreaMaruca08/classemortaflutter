@@ -26,69 +26,37 @@ class Notepagina extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                  const Text("DISCIPLINARI", style: TextStyle(fontSize: 25)),
-                  SizedBox(
-                    height: 230,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: disciplinari.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: Notasingola(nota: disciplinari[index]),
-                        );
-                      },
-                    ),
-                  ),
-                SizedBox(height: 10),
+                const Text("DISCIPLINARI", style: TextStyle(fontSize: 25)),
+                NotaS(avvisi: disciplinari),
+                const SizedBox(height: 10),
                 const Text("ANNOTAZIONI", style: TextStyle(fontSize: 25)),
-                SizedBox(
-                  height: 230,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: annotazioni.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: Notasingola(nota: annotazioni[index]),
-                      );
-                    },
-                  ),
-                ),
-                SizedBox(height: 10),
+                NotaS(avvisi: annotazioni),
+                const SizedBox(height: 10),
                 const Text("Note di classe", style: TextStyle(fontSize: 25),),
-                SizedBox(
-                  height: 230,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: diClasse.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: Notasingola(nota: diClasse[index]),
-                      );
-                    },
-                  ),
-                ),
-                SizedBox(height: 10),
+                NotaS(avvisi: diClasse),
+                const SizedBox(height: 10),
                 const Text("Avvisi per la famiglia", style: TextStyle(fontSize: 25),),
-                SizedBox(
-                  height: 230,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: avvisi.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: Notasingola(nota: avvisi[index]),
-                      );
-                    },
-                  ),
-                ),
+                NotaS(avvisi: avvisi)
               ],
             ),
           ),
         )
+    );
+  }
+
+  SizedBox NotaS({required List<Nota> avvisi}){
+    return SizedBox(
+      height: 230,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: avvisi.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Notasingola(nota: avvisi[index]),
+          );
+        },
+      ),
     );
   }
 }

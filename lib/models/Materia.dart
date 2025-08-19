@@ -18,6 +18,7 @@ class Materia{
 
     double positivi = 0;
     double negativi = 0;
+    double mid = 0;
     for (Voto voto in votiParam) {
       if (voto.cancellato) {
         continue;
@@ -25,13 +26,16 @@ class Materia{
 
       if (voto.voto >= 6) {
         positivi++;
-      } else {
+      } else if (voto.voto >= 5){
+        mid++;
+      } else{
         negativi++;
       }
     }
     double percPositivi = (positivi / votiParam.length) * 100;
     double percNegativi = (negativi / votiParam.length) * 100;
+    double percMid = (mid / votiParam.length) * 100;
 
-    return [positivi, negativi, percPositivi, percNegativi];
+    return [positivi, negativi, mid, percPositivi, percNegativi, percMid];
   }
 }

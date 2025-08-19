@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:ClasseMorta/models/Assenza.dart';
 import 'package:ClasseMorta/models/Info.dart';
+import 'package:ClasseMorta/models/Pagella.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../models/Lezione.dart';
 import '../models/Login.dart';
 import '../models/Materia.dart';
 import '../models/Nota.dart';
@@ -12,29 +15,42 @@ import '../models/Notizia.dart';
 import '../models/StudentCard.dart';
 import '../models/Voto.dart';
 
+/// A service class for interacting with the Spaggiari API.
+///
+/// This class provides methods to fetch various data related to a student,
+/// such as grades, absences, notes, and more.
+///
+///
+/// ## API Endpoints
+/// The following table lists the API endpoints used by this service:
+///
+/// | **Endpoint Path**                       | **Description**                                             |
+/// | --------------------------------------- | ----------------------------------------------------------- |
+/// | `/auth/login`                           | Authenticate the user and return the session token.         |
+/// | `/students/{id}/grades`                 | Get the student’s grades.                                   |
+/// | `/students/{id}/notes`                  | Get disciplinary notes or annotations.                      |
+/// | `/students/{id}/absences`               | Get the list of recorded absences.                          |
+/// | `/students/{id}/agenda/all/{from}/{to}` | Get agenda items (homework, events) between two dates.      |
+/// | `/students/{id}/lessons/today`          | Get today’s lessons.                                        |
+/// | `/students/{id}/lessons/{date}`         | Get lessons for a specific date.                            |
+/// | `/students/{id}/calendar/all`           | Get the school calendar (holidays, events, etc.).           |
+/// | `/students/{id}/didactics`              | Get didactic materials and programs.                        |
+/// | `/students/{id}/books`                  | Get the list of school books.                               |
+/// | `/students/{id}/card`                   | Get the student’s profile card info.                        |
+/// | `/students/{id}/subjects`               | Get the list of subjects.                                   |
+/// | `/students/{id}/periods`                | Get the list of school periods.                             |
+/// | `/students/{id}/noticeboard`            | Get the noticeboard (general communications).               |
+/// | `/students/{id}/documents`              | Get available documents (report cards, certificates, etc.). |
+///
+///
+/// ATTENTION!!!!!!!!!!!
+/// to use the functions you have to first create an instance of ApiService and
+/// then use the login function to validate this instance because you need the
+/// session token.
+///
+/// *Note: `{date}`, `{from}`, `{to}` must be in `YYYYMMDD` format.*
+
 class Apiservice {
-  /*
-    NOTA: per vedere i dari dell'anno precedente c'è da fare un altro login
-  tabella endpoint API:
-    | **Endpoint Path**                       | **Description**                                             |
-    | --------------------------------------- | ----------------------------------------------------------- |
-    | `/auth/login`                           | Authenticate the user and return the session token.         |
-    | `/students/{id}/grades`                 | Get the student’s grades.                                   |
-    | `/students/{id}/notes`                  | Get disciplinary notes or annotations.                      |
-    | `/students/{id}/absences`               | Get the list of recorded absences.                          |
-    | `/students/{id}/agenda/all/{from}/{to}` | Get agenda items (homework, events) between two dates.      |
-    | `/students/{id}/lessons/today`          | Get today’s lessons.                                        |
-    | `/students/{id}/lessons/{date}`         | Get lessons for a specific date.                            |
-    | `/students/{id}/calendar/all`           | Get the school calendar (holidays, events, etc.).           |
-    | `/students/{id}/didactics`              | Get didactic materials and programs.                        |
-    | `/students/{id}/books`                  | Get the list of school books.                               |
-    | `/students/{id}/card`                   | Get the student’s profile card info.                        |
-    | `/students/{id}/subjects`               | Get the list of subjects.                                   |
-    | `/students/{id}/periods`                | Get the list of school periods.                             |
-    | `/students/{id}/noticeboard`            | Get the noticeboard (general communications).               |
-    | `/students/{id}/documents`              | Get available documents (report cards, certificates, etc.). |
-    {date}, {from}, {to} → must be in format YYYYMMDD.
-   */
   final String year = (DateTime.now().year - 2001).toString();
   late String base = "https://web.spaggiari.eu/rest/v1/";
 
@@ -64,12 +80,6 @@ class Apiservice {
     'User-Agent': 'CVVS/std/4.1.3 Android/14',
   };
 
-  // Per gli endpoint con parametri nel path (come date),
-  // è più pratico creare metodi che costruiscano l'URL completo.
-  // String agendaAll; // es. /students/{id}/agenda/all/{from}/{to}
-  // String lessonsForDate; // es. /students/{id}/lessons/{date}
-
-
   Apiservice(String codiceStudente, bool precedente) {
     if(precedente){
       base = "https://web$year.spaggiari.eu/rest/v1/";
@@ -82,8 +92,8 @@ class Apiservice {
     card = "${base}students/$code/card";
     grades = "${base}students/$code/grades";
     notes = "${base}students/$code/notes/all";
-    absences = "${base}students/$code/absences";
-    lessonsToday = "${base}students/$code/lessons/today";
+    absences = "${base}students/$code/absences/details";
+    lessonsToday = "${base}students/$code/lessons/20250530"; //TODO cambiare
     calendarAll = "${base}students/$code/calendar/all";
     didactics = "${base}students/$code/didactics";
     books = "${base}students/$code/books";
@@ -162,8 +172,10 @@ class Apiservice {
         displayValue: mediaTot.toStringAsFixed(3),
         descrizione: "Media Totale, contando tutti i voti, di tutto l'anno senza contare quelli cancellati e religione",
         periodo: 3,
+
         cancellato: false,
-        nomeProf: "Media Totale"
+        nomeProf: "Media Totale",
+        tipo: "Totale"
     ));
     //primo periodo
     medie.add(Voto(
@@ -177,7 +189,8 @@ class Apiservice {
         descrizione: "Media primo quadrimestre, contando tutti i voti, di tutto il primo quadrimestre senza contare quelli cancellati e religione",
         periodo: 1,
         cancellato: false,
-        nomeProf: "Media 1° periodo"
+        nomeProf: "Media 1° periodo",
+        tipo: "1° periodo"
     ));
     //secondo periodo
     medie.add(Voto(
@@ -191,7 +204,8 @@ class Apiservice {
         descrizione: "Media secondo quadrimestre, contando tutti i voti, di tutto il secondo quadrimestre senza contare quelli cancellati e religione",
         periodo: 2,
         cancellato: false,
-        nomeProf: "Media 2° periodo"
+        nomeProf: "Media 2° periodo",
+        tipo: "2° periodo"
     ));
 
     return medie;
@@ -236,7 +250,8 @@ class Apiservice {
           descrizione: "Media Totale, contando tutti i voti, di tutto l'anno senza contare quelli cancellati",
           periodo: 3,
           cancellato: false,
-          nomeProf: "Media Totale"
+          nomeProf: "Media Totale",
+          tipo: "Totale"
       ));
 
       //primo periodo
@@ -251,7 +266,8 @@ class Apiservice {
           descrizione: "Media primo quadrimestre, contando tutti i voti, di tutto il primo quadrimestre senza contare quelli cancellati e religione",
           periodo: 1,
           cancellato: false,
-          nomeProf: "Media 1° periodo"
+          nomeProf: "Media 1° periodo",
+          tipo: "1° periodo"
       ));
       //secondo periodo
       medie.add(Voto(
@@ -265,180 +281,177 @@ class Apiservice {
           descrizione: "Media secondo quadrimestre, contando tutti i voti, di tutto il secondo quadrimestre senza contare quelli cancellati e religione",
           periodo: 2,
           cancellato: false,
-          nomeProf: "Media 2° periodo"
+          nomeProf: "Media 2° periodo",
+          tipo: "2° periodo"
       ));
       return medie;
     }
 
-    Future<List<Voto>?> getLastVoti(int numberOfVotes) async {
-      final tuttiIVoti = await getAllVoti();
+  Future<List<Voto>?> getLastVoti(int numberOfVotes) async {
+    final tuttiIVoti = await getAllVoti();
 
-      if (tuttiIVoti == null || tuttiIVoti.isEmpty) {
-        return null;
-      }
-
-      List<Voto> votiOrdinabili = List<Voto>.from(tuttiIVoti);
-
-      votiOrdinabili.sort((a, b) {
-        bool aIsValid = a.dataVoto.length == 10; // Adattato per "AAAA-MM-GG"
-        bool bIsValid = b.dataVoto.length == 10; // Adattato per "AAAA-MM-GG"
-        if (aIsValid && !bIsValid)
-          return -1; // 'a' valida, 'b' no -> 'a' (più recente) viene prima
-        if (!aIsValid && bIsValid)
-          return 1; // 'b' valida, 'a' no -> 'b' (più recente) viene prima
-        if (!aIsValid && !bIsValid)
-          return 0; // Entrambe non valide per lunghezza, ordine invariato
-        return b.dataVoto.compareTo(a.dataVoto);
-      });
-
-      if (votiOrdinabili.length > numberOfVotes) {
-        return votiOrdinabili.sublist(0, numberOfVotes);
-      } else {
-        return votiOrdinabili;
-      }
+    if (tuttiIVoti == null || tuttiIVoti.isEmpty) {
+      return null;
     }
 
-    Future<StudentCard?> getCard() async {
-      final response = await http.get(
-        Uri.parse(card),
-        headers: otherHeaders,
-      );
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-        return StudentCard.fromJson(json['card']);
-      }
-      else {
-        return null;
-      }
+    List<Voto> votiOrdinabili = List<Voto>.from(tuttiIVoti);
+
+    votiOrdinabili.sort((a, b) {
+      bool aIsValid = a.dataVoto.length == 10; // Adattato per "AAAA-MM-GG"
+      bool bIsValid = b.dataVoto.length == 10; // Adattato per "AAAA-MM-GG"
+      if (aIsValid && !bIsValid)
+        return -1; // 'a' valida, 'b' no -> 'a' (più recente) viene prima
+      if (!aIsValid && bIsValid)
+        return 1; // 'b' valida, 'a' no -> 'b' (più recente) viene prima
+      if (!aIsValid && !bIsValid)
+        return 0; // Entrambe non valide per lunghezza, ordine invariato
+      return b.dataVoto.compareTo(a.dataVoto);
+    });
+
+    if (votiOrdinabili.length > numberOfVotes) {
+      return votiOrdinabili.sublist(0, numberOfVotes);
+    } else {
+      return votiOrdinabili;
     }
+  }
 
-    Future<List<List<Info>>> getInfo() async {
-      DateTime now = DateTime.now();
-      // Formatta le date come YYYYMMDD ${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}
-      String fromDate = "20250510";
-      String toDate = "${now.year}1231"; // Fine dell'anno corrente
+  Future<StudentCard?> getCard() async {
+    final response = await http.get(
+      Uri.parse(card),
+      headers: otherHeaders,
+    );
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      return StudentCard.fromJson(json['card']);
+    }
+    else {
+      return null;
+    }
+  }
 
-      final url = getAgendaUrl(fromDate, toDate);
-      final response = await http.get(
-        Uri.parse(url),
-        headers: otherHeaders,
-      );
+  Future<List<List<Info>>> getInfo() async {
+    DateTime now = DateTime.now();
+    // Formatta le date come YYYYMMDD TODO ${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}
+    String fromDate = "20250510";
+    String toDate = "${now.year}1231"; // Fine dell'anno corrente
 
-      if (response.statusCode == 200) {
-        final dynamic decodedJson = jsonDecode(response.body);
+    final url = getAgendaUrl(fromDate, toDate);
+    final response = await http.get(
+      Uri.parse(url),
+      headers: otherHeaders,
+    );
 
-        // Controlla se il JSON decodificato è una Mappa e contiene la chiave "agenda"
-        if (decodedJson is Map<String, dynamic> &&
-            decodedJson.containsKey('agenda')) {
-          final dynamic agendaData = decodedJson['agenda']; // Estrai la parte "agenda"
+    if (response.statusCode == 200) {
+      final dynamic decodedJson = jsonDecode(response.body);
 
-          if (agendaData is List) { // Ora controlla se "agendaData" è una lista
-            if (decodedJson.containsKey('agenda')) {
-              final dynamic agendaData = decodedJson['agenda']; // Estrai la parte "agenda"
+      // Controlla se il JSON decodificato è una Mappa e contiene la chiave "agenda"
+      if (decodedJson is Map<String, dynamic> &&
+          decodedJson.containsKey('agenda')) {
+        final dynamic agendaData = decodedJson['agenda']; // Estrai la parte "agenda"
 
-              if (agendaData is List) {
-                final List<Map<String, dynamic>> jsonMapList = List<
-                    Map<String, dynamic>>.from(
-                    agendaData.map((item) { // Itera su agendaData
-                      if (item is Map<String, dynamic>) {
-                        return item;
-                      }
-                      return <String, dynamic>{};
-                    })
-                ).where((map) => map.isNotEmpty).toList();
+        if (agendaData is List) { // Ora controlla se "agendaData" è una lista
+          if (decodedJson.containsKey('agenda')) {
+            final dynamic agendaData = decodedJson['agenda']; // Estrai la parte "agenda"
 
-                var compitiFiltrati = Info.fromJsonListCompiti(jsonMapList);
-                var notizieFiltrate = Info.fromJsonListAgenda(jsonMapList);
-                var verificheFiltrate = Info.fromJsonListVerifiche(jsonMapList);
+            if (agendaData is List) {
+              final List<Map<String, dynamic>> jsonMapList = List<
+                  Map<String, dynamic>>.from(
+                  agendaData.map((item) { // Itera su agendaData
+                    if (item is Map<String, dynamic>) {
+                      return item;
+                    }
+                    return <String, dynamic>{};
+                  })
+              ).where((map) => map.isNotEmpty).toList();
+
+              var compitiFiltrati = Info.fromJsonListCompiti(jsonMapList);
+              var notizieFiltrate = Info.fromJsonListAgenda(jsonMapList);
+              var verificheFiltrate = Info.fromJsonListVerifiche(jsonMapList);
 
 
-                return [
-                  compitiFiltrati,
-                  notizieFiltrate,
-                  verificheFiltrate
-                ];
-              } else {
-                print("Errore: Il campo 'agenda' nel JSON non è una lista.");
-                return [];
-              }
+              return [
+                compitiFiltrati,
+                notizieFiltrate,
+                verificheFiltrate
+              ];
             } else {
-              print(
-                  "Errore: il JSON decodificato per i compiti non è una mappa o non contiene la chiave 'agenda'.");
-              print("JSON ricevuto: $decodedJson"); // Stampa il JSON per debug
+              print("Errore: Il campo 'agenda' nel JSON non è una lista.");
               return [];
             }
           } else {
-            print("Errore: Il campo 'agenda' nel JSON non è una lista.");
+            print(
+                "Errore: il JSON decodificato per i compiti non è una mappa o non contiene la chiave 'agenda'.");
+            print("JSON ricevuto: $decodedJson"); // Stampa il JSON per debug
             return [];
           }
         } else {
-          print(
-              "Errore: il JSON decodificato per i compiti non è una mappa o non contiene la chiave 'agenda'.");
-          print("JSON ricevuto: $decodedJson"); // Stampa il JSON per debug
+          print("Errore: Il campo 'agenda' nel JSON non è una lista.");
           return [];
         }
       } else {
-        print("Errore HTTP durante il recupero dei compiti: ${response
-            .statusCode}");
-        print("Corpo della risposta (errore): ${response.body}");
+        print(
+            "Errore: il JSON decodificato per i compiti non è una mappa o non contiene la chiave 'agenda'.");
+        print("JSON ricevuto: $decodedJson"); // Stampa il JSON per debug
         return [];
       }
+    } else {
+      print("Errore HTTP durante il recupero dei compiti: ${response
+          .statusCode}");
+      print("Corpo della risposta (errore): ${response.body}");
+      return [];
     }
+  }
 
-    List<Materia> getMaterieFromVoti(List<Voto> voti) {
-      List<Materia> materie = [];
+  List<Materia> getMaterieFromVoti(List<Voto> voti) {
+    List<Materia> materie = [];
 
-      String codeMateria = "";
-      String nomeProf = "";
-      String nomeMateria = "";
-      Materia materiaAttuale;
-      List<Voto> votiMateriaAttuale = [];
-      for (Voto v in voti) {
-        if(v.codiceMateria == codeMateria){
-          votiMateriaAttuale.add(v);
-        }
-        else {
-            materiaAttuale = Materia(
-                codiceMateria: codeMateria,
-                nomeInteroMateria: nomeMateria,
-                nomeProf: nomeProf,
-                voti: votiMateriaAttuale
-            );
-            codeMateria = v.codiceMateria;
-            nomeMateria = v.nomeInteroMateria;
-            nomeProf = v.nomeProf;
-            materie.add(materiaAttuale);
-            votiMateriaAttuale = [];
-            votiMateriaAttuale.add(v);
-        }
-
+    String codeMateria = "";
+    String nomeProf = "";
+    String nomeMateria = "";
+    Materia materiaAttuale;
+    List<Voto> votiMateriaAttuale = [];
+    for (Voto v in voti) {
+      if(v.codiceMateria == codeMateria){
+        votiMateriaAttuale.add(v);
       }
-      materie.remove(materie[0]);
-      return materie;
-
-    }
-
-    Future<List<List<Notizia>?>> getNotizie() async {
-      final response = await http.get(
-        Uri.parse(noticeboard),
-        headers: otherHeaders,
-      );
-      if(response.statusCode == 200){
-        final json = jsonDecode(response.body);
-        final List<Notizia> result1 = Notizia.fromJsonList(json, 1);
-        final List<Notizia> result2 = Notizia.fromJsonList(json, 2);
-        final List<Notizia> result3 = Notizia.fromJsonList(json, 3);
-        final List<Notizia> result4 = Notizia.fromJsonList(json, 4);
-        print(result1.length);
-        print(result2.length);
-        print(result3.length);
-        print(result4.length);
-        final List<List<Notizia>> result = [result1, result2, result3, result4];
-        return result;
-      }else {
-        return [];
+      else {
+        materiaAttuale = Materia(
+            codiceMateria: codeMateria,
+            nomeInteroMateria: nomeMateria,
+            nomeProf: nomeProf,
+            voti: votiMateriaAttuale
+        );
+        codeMateria = v.codiceMateria;
+        nomeMateria = v.nomeInteroMateria;
+        nomeProf = v.nomeProf;
+        materie.add(materiaAttuale);
+        votiMateriaAttuale = [];
+        votiMateriaAttuale.add(v);
       }
+
     }
+    materie.remove(materie[0]);
+    return materie;
+
+  }
+
+  Future<List<List<Notizia>?>> getNotizie() async {
+    final response = await http.get(
+      Uri.parse(noticeboard),
+      headers: otherHeaders,
+    );
+    if(response.statusCode == 200){
+      final json = jsonDecode(response.body);
+      final List<Notizia> result1 = Notizia.fromJsonList(json, 1);
+      final List<Notizia> result2 = Notizia.fromJsonList(json, 2);
+      final List<Notizia> result3 = Notizia.fromJsonList(json, 3);
+      final List<Notizia> result4 = Notizia.fromJsonList(json, 4);
+      final List<List<Notizia>> result = [result1, result2, result3, result4];
+      return result;
+    }else {
+      return [];
+    }
+  }
 
   Future<void> downloadAndOpenAttachment(int pubId, int attachNum) async {
     final url =
@@ -482,6 +495,65 @@ class Apiservice {
     }
 
   }
+
+  Future<List<Pagella>> getPagelle() async {
+    final response = await http.post(
+      Uri.parse(documents),
+      headers: otherHeaders,
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      // Assicurati che "schoolReports" sia una lista nel JSON
+      final pagJsonList = json["schoolReports"] as List<dynamic>?;
+
+      if (pagJsonList != null) {
+        // Utilizza il tuo metodo statico fromJsonList per convertire la lista
+        return await Pagella.fromJsonList(pagJsonList);
+      } else {
+        // Se "schoolReports" è null o non è una lista, restituisci una lista vuota
+        return [];
+      }
+    } else {
+      // In caso di errore, restituisci una lista vuota
+      return [];
+    }
+  }
+
+  Future<List<List<Assenza>>> getAssenze() async{
+    final response = await http.get(
+      Uri.parse(absences),
+      headers: otherHeaders,
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final List<Assenza> assenze = Assenza.fromJsonList(json, "ABA0");
+      final List<Assenza> uscite = Assenza.fromJsonList(json, "ABU0");
+      final List<Assenza> ritardi = Assenza.fromJsonList(json, "ABR0");
+
+      final List<List<Assenza>> ass = [assenze, uscite, ritardi];
+      return ass;
+    } else {
+      return [];
+    }
+  }
+
+  Future<List<Lezione>> getLezioni() async{
+    final response = await http.get(
+      Uri.parse(lessonsToday),
+      headers: otherHeaders,
+    );
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      return Lezione.fromJsonList(json);
+    } else {
+      return [];
+    }
+  }
+
+
+
 
 
     /*
