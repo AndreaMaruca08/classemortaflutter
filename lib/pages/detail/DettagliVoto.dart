@@ -4,7 +4,8 @@ import '../../models/Voto.dart';
 
 class Dettaglivoto extends StatelessWidget {
   final Voto voto;
-  const  Dettaglivoto({super.key, required this.voto});
+  final Voto? prec;
+  const  Dettaglivoto({super.key, required this.voto, this.prec});
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +93,46 @@ class Dettaglivoto extends StatelessWidget {
               ),
             ],
           ),
-
+            if(prec != null)
+              Row(
+                children: [
+                  const Text(
+                    "Progresso: ",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                      prec?.voto.toStringAsFixed(2) ?? "0",
+                      style: const TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold
+                      ),
+                  ),
+                  const SizedBox(width: 10,),
+                  Icon(
+                    voto.voto > (prec?.voto ?? 0) ?
+                      Icons.trending_up : voto.voto == (prec?.voto ?? 0) ?
+                      Icons.trending_neutral_rounded : Icons.trending_down,
+                    size: 40,
+                    color: voto.voto > (prec?.voto ?? 0) ?
+                      Colors.green : voto.voto == (prec?.voto ?? 0) ?
+                      Colors.white : Colors.red,
+                  ),
+                  const SizedBox(width: 10,),
+                  Expanded(
+                    child: Text(
+                      voto.voto.toStringAsFixed(2),
+                      // Removed the length check and substring logic
+                      style: const TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                  ),
+                ],
+              ),
 
         ],
       ),

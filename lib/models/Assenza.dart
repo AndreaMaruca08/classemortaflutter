@@ -47,11 +47,7 @@ class Assenza{
 
     List<Assenza> ass = [];
     for(Assenza a in assenze){
-      print(a.type);
-      print(type);
-      print("_----");
       if(a.type == type ){
-
         ass.add(a);
       }
     }

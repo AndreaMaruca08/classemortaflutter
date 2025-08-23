@@ -28,7 +28,7 @@ class Streak{
     }
   }
 
-  bool isGoat(List<Voto> votiIniziali){
+  bool isGoated(List<Voto> votiIniziali){
     return votiIniziali.length == votiBuoni;
   }
 

@@ -1,19 +1,19 @@
-import 'package:ClasseMorta/widgets/Cerchio.dart';
 import 'package:flutter/material.dart';
 import '../models/Voto.dart';
 import 'SingoloVotoWid.dart';
 
 class Votodisplay extends StatelessWidget {
   final Voto voto;
+  final Voto? precedente;
   final double grandezza;
-  const  Votodisplay({super.key, required this.voto, required this.grandezza});
+  const  Votodisplay({super.key, required this.voto,  this.precedente,  required this.grandezza});
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Row(
         children: [
-          VotoSingolo(voto: voto, grandezza: grandezza),
+          VotoSingolo(voto: voto, prec: precedente, grandezza: grandezza),
           const SizedBox(width: 10),
           Icon(
             Icons.calendar_month,

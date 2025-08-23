@@ -351,16 +351,16 @@ class _MainPageState extends State<MainPage> {
                             const SizedBox(width: 60),
                             const Text("Streak: ", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                             Icon(
-                              streak.isGoat(loadedVoti) ? Icons.star: streak.votiBuoni >= 10 ? Icons.local_fire_department: Icons.local_fire_department_outlined,
-                              color: streak.isGoat(loadedVoti)? Colors.yellow : streak.getStreakColor(),
+                              streak.isGoated(loadedVoti) ? Icons.star: streak.votiBuoni >= 10 ? Icons.local_fire_department: Icons.local_fire_department_outlined,
+                              color: streak.isGoated(loadedVoti)? Colors.yellow : streak.getStreakColor(),
                               size: 40,
                             ),
                             Text(
-                              " ${streak.isGoat(loadedVoti) ? "GOAT" : streak.votiBuoni}",
+                              " ${streak.isGoated(loadedVoti) ? "GOAT" : streak.votiBuoni}",
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 25,
-                                  color: streak.isGoat(loadedVoti)? Colors.yellow : streak.getStreakColor(),
+                                  color: streak.isGoated(loadedVoti)? Colors.yellow : streak.getStreakColor(),
 
                               ),
                             )
@@ -387,7 +387,22 @@ class _MainPageState extends State<MainPage> {
                               physics: const AlwaysScrollableScrollPhysics(),
                               itemCount: loadedVoti.length,
                               itemBuilder: (context, index) {
-                                return Votodisplay(voto: loadedVoti[index], grandezza: 88);
+                                Voto votoCorrente = loadedVoti[index]; // Es. MAT 7.5 all'indice 0
+                                Voto? precedenteCronologico;
+
+                                // Cerca negli elementi SUCCESSIVI della lista (che sono cronologicamente PRECEDENTI)
+                                for (int j = index + 1; j < loadedVoti.length; j++) {
+                                  if (loadedVoti[j].codiceMateria == votoCorrente.codiceMateria) {
+                                    precedenteCronologico = loadedVoti[j]; // Trovato il primo voto cronologicamente precedente della stessa materia
+                                    break;
+                                  }
+                                }
+
+                                return Votodisplay(
+                                  voto: votoCorrente, // Il voto più recente (es. MAT 7.5)
+                                  precedente: precedenteCronologico, // Il voto di MAT che è venuto prima del 7.5
+                                  grandezza: 88,
+                                );
                               }
                           ),
                         )

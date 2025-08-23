@@ -230,16 +230,16 @@ class Dettaglimateria extends StatelessWidget {
                 const SizedBox(width: 30,),
                 const Text("Streak :", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),),
                 Icon(
-                  streak.isGoat(voti) ? Icons.star: streak.votiBuoni >= 10 ? Icons.local_fire_department: Icons.local_fire_department_outlined,
-                  color: streak.isGoat(voti)? Colors.yellow : streak.getStreakColor(),
+                  streak.isGoated(voti) ? Icons.star: streak.votiBuoni >= 10 ? Icons.local_fire_department: Icons.local_fire_department_outlined,
+                  color: streak.isGoated(voti)? Colors.yellow : streak.getStreakColor(),
                   size: 30,
                 ),
                 Text(
-                  " ${streak.isGoat(voti) ? "GOAT" : streak.votiBuoni}",
+                  " ${streak.isGoated(voti) ? "GOAT" : streak.votiBuoni}",
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 22,
-                      color: streak.isGoat(voti)? Colors.yellow : streak.getStreakColor()
+                      color: streak.isGoated(voti)? Colors.yellow : streak.getStreakColor()
                   ),
                 ),
                 const SizedBox(width: 5,),

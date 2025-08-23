@@ -81,6 +81,7 @@ class Apiservice {
   };
 
   Apiservice(String codiceStudente, bool precedente) {
+     precedente = false;
     if(precedente){
       base = "https://web$year.spaggiari.eu/rest/v1/";
     }
@@ -93,7 +94,7 @@ class Apiservice {
     grades = "${base}students/$code/grades";
     notes = "${base}students/$code/notes/all";
     absences = "${base}students/$code/absences/details";
-    lessonsToday = "${base}students/$code/lessons/20250530"; //TODO cambiare
+    lessonsToday = "${base}students/$code/lessons/today";
     calendarAll = "${base}students/$code/calendar/all";
     didactics = "${base}students/$code/didactics";
     books = "${base}students/$code/books";
@@ -331,8 +332,8 @@ class Apiservice {
 
   Future<List<List<Info>>> getInfo() async {
     DateTime now = DateTime.now();
-    // Formatta le date come YYYYMMDD TODO ${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}
-    String fromDate = "20250510";
+
+    String fromDate = "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}";
     String toDate = "${now.year}1231"; // Fine dell'anno corrente
 
     final url = getAgendaUrl(fromDate, toDate);

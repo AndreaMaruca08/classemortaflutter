@@ -5,10 +5,12 @@ import '../models/Voto.dart';
 
 class VotoSingolo extends StatelessWidget {
   final Voto voto;
+  final Voto? prec;
   final double grandezza;
   const VotoSingolo({
     super.key,
     required this.voto,
+    this.prec,
     required this.grandezza,
   });
 
@@ -20,7 +22,7 @@ class VotoSingolo extends StatelessWidget {
         onTap: (){
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => Dettaglivoto(voto: voto)), // Sostituisci con la tua pagina
+            MaterialPageRoute(builder: (context) => Dettaglivoto(voto: voto, prec: prec,)), // Sostituisci con la tua pagina
           );
         }, // Assegna la callback onTap
         splashColor: voto.voto >= 6 ? Colors.green : voto.voto >= 5 ? Colors.yellow : Colors.red, // Cambia il colore del ripple in base al voto,
@@ -30,22 +32,45 @@ class VotoSingolo extends StatelessWidget {
           currentValue: voto.voto,
           maxValue: 10,
           size: grandezza,
-          child: Text(
-            // Considera di rendere il testo più leggibile se la grandezza è piccola
-            // Potresti voler usare FittedBox o TextOverflow.ellipsis
-            "${voto.codiceMateria} - ${voto.displayValue}",
-            textAlign: TextAlign.center, // Utile se il testo va a capo
-            style: TextStyle(fontSize: grandezza * 0.15,
-                shadows: <Shadow>[
-                  Shadow(
-                    offset: Offset(1.0, 2.0), // Spostamento orizzontale e verticale dell'ombra
-                    blurRadius: 3.0,         // Quanto deve essere sfocata l'ombra
-                    color: Colors.black, // Colore dell'ombra con opacità
-                  ),
-                ]), // Esempio di dimensione testo scalabile
-          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "${voto.codiceMateria} - ${voto.displayValue}",
+                textAlign: TextAlign.center, // Utile se il testo va a capo
+                style: TextStyle(fontSize: grandezza * 0.15,
+                    shadows: <Shadow>[
+                      Shadow(
+                        offset: Offset(1.0, 2.0), // Spostamento orizzontale e verticale dell'ombra
+                        blurRadius: 3.0,         // Quanto deve essere sfocata l'ombra
+                        color: Colors.black, // Colore dell'ombra con opacità
+                      ),
+                    ]), // Esempio di dimensione testo scalabile
+              ),
+              if(prec != null)
+                Icon(
+                  voto.voto > (prec?.voto ?? 0) ?
+                  Icons.trending_up : voto.voto == (prec?.voto ?? 0) ?
+                  Icons.trending_neutral_rounded : Icons.trending_down,
+                  size: 20,
+                  color: voto.voto > (prec?.voto ?? 0) ?
+                  Colors.green : voto.voto == (prec?.voto ?? 0) ?
+                  Colors.white : Colors.red,
+                ),
+            ],
+          )
         ),
       ),
     );
   }
+  String getStock(Voto? prec){
+    if(prec == null){
+      return "";
+    }
+    print(prec.voto);
+    return voto.voto > prec.voto ? "📈" : voto.voto == prec.voto ?  "🟰" : "📉";
+  }
 }
+/*
+
+ */
