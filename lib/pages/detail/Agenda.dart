@@ -42,13 +42,12 @@ class _AgendaState extends State<Agenda> {
         onRefresh: _handleRefresh,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          child: FutureBuilder<List<List<Info>?>>( // Outer FutureBuilder for the main list of lists
+          child: FutureBuilder<List<List<Info>?>>(
             future: _info,
             builder: (context, snapshotOuter) {
               if (snapshotOuter.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               } else if (snapshotOuter.hasError) {
-                print(snapshotOuter.error);
                 return Center(child: Text("Errore nel caricare i dati principali: ${snapshotOuter.error}"));
               } else if (snapshotOuter.hasData && snapshotOuter.data != null) {
                 List<List<Info>?> listOfLists = snapshotOuter.data!;

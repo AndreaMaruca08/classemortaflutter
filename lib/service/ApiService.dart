@@ -3,10 +3,12 @@ import 'dart:io';
 import 'package:ClasseMorta/models/Assenza.dart';
 import 'package:ClasseMorta/models/Info.dart';
 import 'package:ClasseMorta/models/Pagella.dart';
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
-import 'package:open_filex/open_filex.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../models/FileDidattica.dart';
 import '../models/Lezione.dart';
 import '../models/Login.dart';
 import '../models/Materia.dart';
@@ -70,6 +72,7 @@ class Apiservice {
   late String noticeboard;
   late String documents;
   late String fullCode;
+  late String apriFile;
 
   late String token;
 
@@ -81,7 +84,7 @@ class Apiservice {
   };
 
   Apiservice(String codiceStudente, bool precedente) {
-     precedente = false;
+    precedente = false;
     if(precedente){
       base = "https://web$year.spaggiari.eu/rest/v1/";
     }
@@ -102,6 +105,7 @@ class Apiservice {
     periods = "${base}students/$code/periods";
     noticeboard = "${base}students/$code/noticeboard";
     documents = "${base}students/$code/documents";
+    apriFile = "${base}students/$code/didactics/item/";
   }
 
   String getAgendaUrl(String fromDate, String toDate) {
@@ -475,9 +479,6 @@ class Apiservice {
 
       final file = File(filePath);
       await file.writeAsBytes(response.bodyBytes);
-
-      // Apri popup "Apri con..."
-      await OpenFilex.open(filePath);
     } else {
       throw Exception("Errore durante il download: ${response.statusCode}");
     }
@@ -553,11 +554,83 @@ class Apiservice {
     }
   }
 
+  Future<List<Didattica>> fetchDidattica() async {
+    final response = await http.get(
+      Uri.parse(didactics),
+      headers: otherHeaders, // headers già definiti
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final List<Didattica> files = [];
+
+      for (var teacher in data['didacticts']) {
+        final teacherName = teacher['teacherName'] ?? '';
+
+        for (var folder in teacher['folders']) {
+          files.add(Didattica.fromJson(folder, teacherName));
+        }
+      }
+
+      // Ordino per data (più recente prima)
+      files.sort((a, b) => b.data.compareTo(a.data));
+
+      return files;
+    } else {
+      throw Exception(
+        "Errore nel recupero dei file didattici: ${response.statusCode}",
+      );
+    }
+  }
+
+  Future<void> downloadAndOpenPdfById(
+      String docId,
+      String filename,
+      ) async {
+    final dio = Dio();
+
+    // Imposta gli header extra
+    dio.options.headers = otherHeaders;
+
+    // Costruisci l'URL a partire dall'id
+    final url = 'https://web24.spaggiari.eu/rest/v1/students/10435383/didactics/item/$docId';
+
+    // Ottieni cartella temporanea
+    final dir = await getTemporaryDirectory();
+    final filePath = '${dir.path}/$filename';
+    final file = File(filePath);
+
+    try {
+      // Scarica il PDF
+      await dio.download(url, filePath);
+
+      if (await file.exists()) {
+        print('Download completato: $filePath');
+        // Apri il PDF con app esterna
+        final result = await OpenFile.open(filePath);
+        print(result.message);
+      } else {
+        print('ERRORE: il file non esiste dopo il download');
+      }
+    } on DioException catch (e) {
+      print('ERRORE Dio: ${e.toString()}');
+      if (e.response != null) {
+        print('Status code: ${e.response?.statusCode}');
+        print('Response headers: ${e.response?.headers}');
+        print('Response data: ${e.response?.data}');
+      } else {
+        print('Nessuna risposta dal server');
+      }
+    }
+  }
+
+  Future<void> openPdf(File file) async {
+    final result = await OpenFile.open(file.path);
+    print(result.message); // per debug
+  }
 
 
-
-
-    /*
+  /*
     esempio risposta:
       {
       "ident": "S10435383U",

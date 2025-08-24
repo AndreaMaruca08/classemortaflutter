@@ -98,22 +98,24 @@ class InfoSingola extends StatelessWidget {
   // ... il tuo metodo getColor ...
   Color? getColor(String dataString) {
     try {
-      // DateTime now = DateTime.now(); // Non usato se today è hardcoded
-      DateTime today = DateTime(2025, 05, 13); // Considera di usare DateTime.now() per la data corrente reale
+      DateTime today = DateTime.now(); // Considera di usare DateTime.now() per la data corrente reale
       DateTime scadenza = DateTime.parse(dataString.substring(0,10));
       DateTime scadenzaDateOnly = DateTime(scadenza.year, scadenza.month, scadenza.day);
 
       if (scadenzaDateOnly.isBefore(today)) {
-        return Colors.red[200];
+        return Colors.grey[600];
       }
       Duration differenza = scadenzaDateOnly.difference(today);
+      if(differenza.inDays <= 1){
+        return Colors.red[500];
+      }
       if (differenza.inDays <= 2) {
-        return Colors.yellow[300];
+        return Colors.red[300];
       }
       if (differenza.inDays <= 7) {
-        return Colors.green[200];
+        return Colors.green[300];
       }
-      return Colors.green[400];
+      return Colors.green[600];
     } catch (e) {
       return Colors.grey[300];
     }
@@ -123,7 +125,7 @@ class InfoSingola extends StatelessWidget {
   String getDistanza(String dataString) {
     try {
       // DateTime now = DateTime.now(); // Non usato se today è hardcoded
-      DateTime today = DateTime(2025, 05, 13); // Considera di usare DateTime.now() per la data corrente reale
+      DateTime today = DateTime.now(); // Considera di usare DateTime.now() per la data corrente reale
       DateTime scadenza = DateTime.parse(dataString.substring(0,10));
       DateTime scadenzaDateOnly = DateTime(scadenza.year, scadenza.month, scadenza.day);
 

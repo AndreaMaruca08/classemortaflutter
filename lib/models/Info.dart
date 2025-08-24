@@ -25,9 +25,8 @@ class Info {
   static List<Info> fromJsonListCompiti(List<Map<String, dynamic>> jsonInput) {
     var filteredIterable = jsonInput.where((item) {
       var notesValue = item['notes'];
-      if (notesValue == null) {
-        return false;
-      }
+      if (notesValue == null) return false;
+
       String descrizione = notesValue.toString().toLowerCase();
       bool con1 = descrizione.contains("es");
       bool con2 = descrizione.contains("compit");
@@ -35,46 +34,63 @@ class Info {
       return con1 || con2 || con3;
     });
 
-    List<Info> compitiFiltrati = filteredIterable
-        .map<Info>((jsonMap) => Info.fromJson(jsonMap))
-        .toList();
-    return compitiFiltrati.toList();
+    List<Info> compitiFiltrati =
+    filteredIterable.map<Info>((jsonMap) => Info.fromJson(jsonMap)).toList();
+
+    compitiFiltrati.sort((a, b) {
+      DateTime da = DateTime.tryParse(a.data) ?? DateTime(2100);
+      DateTime db = DateTime.tryParse(b.data) ?? DateTime(2100);
+      return da.compareTo(db);
+    });
+
+    return compitiFiltrati;
   }
 
   static List<Info> fromJsonListAgenda(List<Map<String, dynamic>> jsonInput) {
     var filteredIterable = jsonInput.where((item) {
       var notesValue = item['notes'];
-      if (notesValue == null) {
-        return false;
-      }
+      if (notesValue == null) return false;
+
       String descrizione = notesValue.toString().toLowerCase();
       bool con1 = descrizione.contains("port");
       bool con2 = descrizione.contains("entrambi");
       return con1 || con2;
     });
 
-    List<Info> compitiFiltrati = filteredIterable
-        .map<Info>((jsonMap) => Info.fromJson(jsonMap))
-        .toList();
-    return compitiFiltrati.toList();
+    List<Info> compitiFiltrati =
+    filteredIterable.map<Info>((jsonMap) => Info.fromJson(jsonMap)).toList();
+
+    compitiFiltrati.sort((a, b) {
+      DateTime da = DateTime.tryParse(a.data) ?? DateTime(2100);
+      DateTime db = DateTime.tryParse(b.data) ?? DateTime(2100);
+      return da.compareTo(db);
+    });
+
+    return compitiFiltrati;
   }
 
   static List<Info> fromJsonListVerifiche(List<Map<String, dynamic>> jsonInput) {
     var filteredIterable = jsonInput.where((item) {
       var notesValue = item['notes'];
-      if (notesValue == null) {
-        return false;
-      }
+      if (notesValue == null) return false;
+
       String descrizione = notesValue.toString().toLowerCase();
       bool con1 = descrizione.contains("verific");
       bool con2 = descrizione.contains("compito in classe");
       return con1 || con2;
     });
 
-    List<Info> compitiFiltrati = filteredIterable
-        .map<Info>((jsonMap) => Info.fromJson(jsonMap))
-        .toList();
-    return compitiFiltrati.toList();
+    List<Info> compitiFiltrati =
+    filteredIterable.map<Info>((jsonMap) => Info.fromJson(jsonMap)).toList();
+
+    compitiFiltrati.sort((a, b) {
+      DateTime da = DateTime.tryParse(a.data) ?? DateTime(2100);
+      DateTime db = DateTime.tryParse(b.data) ?? DateTime(2100);
+      return da.compareTo(db);
+    });
+
+    return compitiFiltrati;
   }
+
 }
 

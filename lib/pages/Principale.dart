@@ -13,6 +13,7 @@ import 'package:ClasseMorta/widgets/VotoDisplay.dart';
 import 'package:flutter/material.dart';
 
 import '../models/Assenza.dart';
+import '../models/FileDidattica.dart';
 import '../models/Lezione.dart';
 import '../models/Nota.dart';
 import '../models/Notizia.dart';
@@ -21,6 +22,7 @@ import '../models/Streak.dart';
 import '../models/StudentCard.dart';
 import '../service/ApiService.dart';
 import '../widgets/Lezionewidget.dart';
+import 'DidatticaPagina.dart';
 import 'detail/DettagliPersona.dart';
 
 class MainPage extends StatefulWidget {
@@ -41,6 +43,7 @@ class _MainPageState extends State<MainPage> {
   late Future<List<Pagella>?> _pagelle;
   late Future<List<List<Assenza>>> _assenze;
   late Future<List<Lezione>> _lessonsToday;
+  late Future<List<Didattica>> _didattica;
 
   @override
 
@@ -56,6 +59,7 @@ class _MainPageState extends State<MainPage> {
     _assenze = _service.getAssenze();
     _note = _service.getNote();
     _lessonsToday = _service.getLezioni();
+    _didattica = _service.fetchDidattica();
 
   }
 
@@ -70,6 +74,7 @@ class _MainPageState extends State<MainPage> {
       _assenze = _service.getAssenze();
       _lessonsToday = _service.getLezioni();
       _pagelle = _service.getPagelle() as Future<List<Pagella>?>;
+      _didattica = _service.fetchDidattica();
     });
     await _medieGeneraliFuture;
     await _lastVotiFutureMedie;
@@ -80,6 +85,7 @@ class _MainPageState extends State<MainPage> {
     await _pagelle;
     await _lessonsToday;
     await _assenze;
+    await _didattica;
   }
 
   @override
@@ -157,7 +163,7 @@ class _MainPageState extends State<MainPage> {
                       return const Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
                       return Center(
-                        child: Text('Errore nel caricamento: ${snapshot.error}'),
+                        child: Text('Anno non iniziato'),
                       );
                     } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                       final List<Voto> loadedMedie = snapshot.data!;
@@ -337,7 +343,7 @@ class _MainPageState extends State<MainPage> {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
                     return Center(
-                      child: Text('Errore nel caricamento: ${snapshot.error}'),
+                      child: Text('Anno non iniziato'),
                     );
                   } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                     final List<Voto> loadedVoti = snapshot.data!;
@@ -424,7 +430,7 @@ class _MainPageState extends State<MainPage> {
                           return const Center(child: CircularProgressIndicator());
                           } else if (snapshot.hasError) {
                           return Center(
-                            child: Text('Errore nel caricamento: ${snapshot.error}'),
+                            child: Text('Anno non iniziato'),
                           );
                         } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                           final List<Voto> loadedVoti = snapshot.data!;
@@ -448,7 +454,7 @@ class _MainPageState extends State<MainPage> {
                         return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasError) {
                         return Center(
-                          child: Text('Errore nel caricamento: ${snapshot.error}'),
+                          child: Text('Anno non iniziato'),
                         );
                       } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                         final List<List<Notizia>?> loadedNotizie = snapshot.data!;
@@ -476,7 +482,7 @@ class _MainPageState extends State<MainPage> {
                         return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasError) {
                         return Center(
-                          child: Text('Errore nel caricamento: ${snapshot.error}'),
+                          child: Text('Anno non iniziato'),
                         );
                       } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                         final List<List<Nota>> loadedNote = snapshot.data!;
@@ -506,7 +512,7 @@ class _MainPageState extends State<MainPage> {
                         return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasError) {
                         return Center(
-                          child: Text('Errore nel caricamento: ${snapshot.error}'),
+                          child: Text('Anno non iniziato'),
                         );
                       } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                         final List<Pagella> pag = snapshot.data!;
@@ -519,10 +525,33 @@ class _MainPageState extends State<MainPage> {
                         );
 
                       }else{
-                        return const Center(child: Text("Nessuna materia con voto"));
+                        return const Center(child: Text("Nessuna pagella"));
                       }
                     }),
                     SizedBox(width: 10,),
+                    FutureBuilder(future: _didattica, builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(
+                          child: Text('Anno non iniziato'),
+                        );
+                        } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                        final List<Didattica> didattica = snapshot.data!;
+                        return passaggio(
+                            context,
+                            "  Didattica          ",
+                            "Didattica",
+                            Didatticapagina(didattica: didattica, service: _service),
+                            Icon(Icons.edit_note_outlined)
+                        );
+
+                      }else{
+                        return const Center(child: Text("Nessun materiale"));
+                      }
+
+                    }
+                    )
 
                   ],
                 ),
@@ -559,7 +588,7 @@ class _MainPageState extends State<MainPage> {
                               return const Center(child: CircularProgressIndicator());
                             } else if (snapshot.hasError) {
                               return Center(
-                                child: Text('Errore nel caricamento: ${snapshot.error}'),
+                                child: Text('Anno non iniziato'),
                               );
                             } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                               final List<Lezione> lezioni = snapshot.data!;
@@ -592,7 +621,7 @@ class _MainPageState extends State<MainPage> {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
                     return Center(
-                      child: Text('Errore nel caricamento: ${snapshot.error}'),
+                      child: Text('Anno non iniziato'),
                     );
                   } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                     final List<List<Assenza>> ass = snapshot.data!;
