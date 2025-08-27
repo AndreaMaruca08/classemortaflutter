@@ -13,16 +13,22 @@ class Votodisplay extends StatelessWidget {
     return Center(
       child: Row(
         children: [
-          VotoSingolo(voto: voto, prec: precedente, grandezza: grandezza),
+          VotoSingolo(voto: voto, prec: precedente, grandezza: grandezza, fontSize: 21),
           const SizedBox(width: 10),
-          Icon(
-            Icons.calendar_month,
-            size: 20,
-          ),
-          Text(
-            "${voto.dataVoto} | ${voto.nomeInteroMateria.length > 20 ? "${voto.nomeInteroMateria.substring(0, 20)}..." : voto.nomeInteroMateria}",
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-          ),
+
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                voto.codiceMateria,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                "${voto.dataVoto} | ${voto.nomeInteroMateria.length > 20 ? "${voto.nomeInteroMateria.substring(0, 12)}..." : voto.nomeInteroMateria}"
+              )
+            ],
+          )
+
         ],
       )
     );

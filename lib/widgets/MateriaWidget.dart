@@ -126,17 +126,17 @@ class Materiawidget extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.start, // O come preferisci allineare
               children: [
-                VotoSingolo(voto: voti[0], grandezza: 100),
+                VotoSingolo(voto: voti[0], grandezza: 100, fontSize: 15),
 
                 if (voti.length > 1)
                   SizedBox(width: 12),
                 if (voti.length > 1)
-                  VotoSingolo(voto: voti[1], grandezza: 90),
+                  VotoSingolo(voto: voti[1], grandezza: 90, fontSize: 16),
 
                 if (voti.length > 2)
                   SizedBox(width: 10),
                 if (voti.length > 2)
-                  VotoSingolo(voto: voti[2], grandezza: 90),
+                  VotoSingolo(voto: voti[2], grandezza: 90, fontSize: 16),
               ],
             )
           else

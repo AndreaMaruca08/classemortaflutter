@@ -47,6 +47,15 @@ class _MainPageState extends State<StudentDetail> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  const SizedBox(height: 5),
+                  const Text(
+                      " Versione 1.2 - files docenti, cambio grafico",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8.0),
                     child: Text("  Informazioni studente ", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),),

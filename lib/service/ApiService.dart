@@ -568,7 +568,12 @@ class Apiservice {
         final teacherName = teacher['teacherName'] ?? '';
 
         for (var folder in teacher['folders']) {
-          files.add(Didattica.fromJson(folder, teacherName));
+          final folderId = folder['folderId'];
+          final title = folder['folderName'];
+
+          for (var content in folder['contents']) {
+            files.add(Didattica.fromJson(content, title,  teacherName, folderId));
+          }
         }
       }
 

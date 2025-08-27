@@ -6,10 +6,12 @@ import '../models/Voto.dart';
 class VotoSingolo extends StatelessWidget {
   final Voto voto;
   final Voto? prec;
+  final double fontSize;
   final double grandezza;
   const VotoSingolo({
     super.key,
     required this.voto,
+    required this.fontSize,
     this.prec,
     required this.grandezza,
   });
@@ -36,17 +38,19 @@ class VotoSingolo extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "${voto.codiceMateria} - ${voto.displayValue}",
+                "${!voto.tipo.contains("Scritto") && !voto.tipo.contains("Orale") && !voto.tipo.contains("Pratico") ? "${voto.codiceMateria} " : ""} ${voto.displayValue}",
                 textAlign: TextAlign.center, // Utile se il testo va a capo
-                style: TextStyle(fontSize: grandezza * 0.15,
+                style: TextStyle(fontSize: fontSize,
                     shadows: <Shadow>[
                       Shadow(
                         offset: Offset(1.0, 2.0), // Spostamento orizzontale e verticale dell'ombra
                         blurRadius: 3.0,         // Quanto deve essere sfocata l'ombra
                         color: Colors.black, // Colore dell'ombra con opacità
                       ),
-                    ]), // Esempio di dimensione testo scalabile
+                    ]
+                ), 
               ),
+              const SizedBox(width: 5,),
               if(prec != null)
                 Icon(
                   voto.voto > (prec?.voto ?? 0) ?
@@ -62,13 +66,6 @@ class VotoSingolo extends StatelessWidget {
         ),
       ),
     );
-  }
-  String getStock(Voto? prec){
-    if(prec == null){
-      return "";
-    }
-    print(prec.voto);
-    return voto.voto > prec.voto ? "📈" : voto.voto == prec.voto ?  "🟰" : "📉";
   }
 }
 /*

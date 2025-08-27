@@ -201,7 +201,7 @@ class Dettaglimateria extends StatelessWidget {
                   return Row(
                     children: [
                       const SizedBox(width: 10),
-                      VotoSingolo(voto: voto, grandezza: 85)
+                      VotoSingolo(voto: voto, grandezza: 85, fontSize: 25)
                     ],
                   );
                 },

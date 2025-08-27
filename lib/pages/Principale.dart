@@ -33,10 +33,10 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  late Apiservice _service; // Rinominato per convenzione (_ per privato)
-  late Future<List<Voto>?> _medieGeneraliFuture; // Stato per il Future
-  late Future<List<Voto>?> _lastVotiFutureMedie; // Stato per il Future
-  late Future<List<Voto>?> _lastVotiFuture; // Stato per il Future
+  late Apiservice _service;
+  late Future<List<Voto>?> _medieGeneraliFuture;
+  late Future<List<Voto>?> _lastVotiFutureMedie;
+  late Future<List<Voto>?> _lastVotiFuture;
   late Future<List<Voto>?> _voti;
   late Future<List<List<Notizia>?>> _notizie;
   late Future<List<List<Nota>>> _note;
@@ -106,6 +106,7 @@ class _MainPageState extends State<MainPage> {
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(), // Per consentire sempre il pull-to-refresh
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 //CARTA STUDENTE
                 FutureBuilder(future: _service.getCard(), builder: (context, snapshot) {
@@ -153,8 +154,14 @@ class _MainPageState extends State<MainPage> {
                     return const Center(child: Text("Nessun risultato"));
                   }
                 }),
-                const SizedBox(height: 20),
-
+                const SizedBox(height: 10),
+                const Text("Media totale",
+                  style: TextStyle(
+                    fontSize: 27,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 10),
                 //MEDIE
                 FutureBuilder<List<Voto>?>( // Specificato il tipo del FutureBuilder
                   future: _medieGeneraliFuture, // Usa lo stato del Future
@@ -169,11 +176,11 @@ class _MainPageState extends State<MainPage> {
                       final List<Voto> loadedMedie = snapshot.data!;
                       return Container(
                         decoration: BoxDecoration(
-                          color: Colors.grey[800],
+                          color: Colors.grey[900],
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                           boxShadow: [
                             BoxShadow(
-                              color: Color.fromRGBO(240, 240, 240, 0.4),
+                              color: Color.fromRGBO(250, 250, 250, 0.2),
                               spreadRadius: 1,
                               blurRadius: 1,
                               offset: Offset(2, 2),
@@ -182,65 +189,15 @@ class _MainPageState extends State<MainPage> {
                         ),
                         child: Column(
                           children: [
-                             Row(
-                              children: [
-                                SizedBox(width: 1),
-                                Text(
-                                    "Media Totale",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                        shadows: <Shadow>[
-                                          Shadow(
-                                            offset: Offset(2.0, 2.0), // Spostamento orizzontale e verticale dell'ombra
-                                            blurRadius: 3.0,         // Quanto deve essere sfocata l'ombra
-                                            color: Colors.black, // Colore dell'ombra con opacità
-                                          ),
-                                        ]
-                                    )
-                                ),
-                                SizedBox(width: 33),
-                                Text(
-                                    "Primo",
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        shadows: <Shadow>[
-                                          Shadow(
-                                            offset: Offset(2.0, 2.0), // Spostamento orizzontale e verticale dell'ombra
-                                            blurRadius: 3.0,         // Quanto deve essere sfocata l'ombra
-                                            color: Colors.black, // Colore dell'ombra con opacità
-                                          ),
-                                        ]
-                                    )
-                                ),
-                                SizedBox(width: 35),
-                                Text(
-                                    "Secondo",
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        shadows: <Shadow>[
-                                          Shadow(
-                                            offset: Offset(2.0, 2.0), // Spostamento orizzontale e verticale dell'ombra
-                                            blurRadius: 3.0,         // Quanto deve essere sfocata l'ombra
-                                            color: Colors.black, // Colore dell'ombra con opacità
-                                          ),
-                                        ]
-                                    )
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 5),
                             Row(
                               children: [
                                 // Assicurati che loadedMedie abbia abbastanza elementi
-                                if (loadedMedie.isNotEmpty) VotoSingolo(voto: loadedMedie[0], grandezza: 115),
-                                const SizedBox(width: 20),
-                                if (loadedMedie.length > 1) VotoSingolo(voto: loadedMedie[1], grandezza: 90),
-                                const SizedBox(width: 15),
-                                if (loadedMedie.length > 2) VotoSingolo(voto: loadedMedie[2], grandezza: 90),
+                                if (loadedMedie.isNotEmpty) VotoSingolo(voto: loadedMedie[0], grandezza: 115, fontSize: 17,),
+                                const SizedBox(width: 16),
+                                if (loadedMedie.length > 1) VotoSingolo(voto: loadedMedie[1], grandezza: 100, fontSize: 17),
+                                const SizedBox(width: 10),
+                                if (loadedMedie.length > 2) VotoSingolo(voto: loadedMedie[2], grandezza: 100, fontSize: 17),
                               ],
                             ),
                             const SizedBox(height: 10),
@@ -353,9 +310,9 @@ class _MainPageState extends State<MainPage> {
                          Row(
                           children: [
                             const SizedBox(width: 1),
-                            const Text("Tutti i voti", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                            const SizedBox(width: 60),
-                            const Text("Streak: ", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                            const Text("Tutti i voti", style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold)),
+                            const SizedBox(width: 15),
+                            const Text("-   Streak: ", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                             Icon(
                               streak.isGoated(loadedVoti) ? Icons.star: streak.votiBuoni >= 10 ? Icons.local_fire_department: Icons.local_fire_department_outlined,
                               color: streak.isGoated(loadedVoti)? Colors.yellow : streak.getStreakColor(),
@@ -377,11 +334,11 @@ class _MainPageState extends State<MainPage> {
                         height: 176,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.grey[800],
+                            color: Colors.grey[900],
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                             boxShadow: [
                               BoxShadow(
-                                color: Color.fromRGBO(240, 240, 240, 0.4),
+                                color: Color.fromRGBO(240, 240, 240, 0.2),
                                 spreadRadius: 1,
                                 blurRadius: 1,
                                 offset: Offset(2, 2),
@@ -528,7 +485,7 @@ class _MainPageState extends State<MainPage> {
                         return const Center(child: Text("Nessuna pagella"));
                       }
                     }),
-                    SizedBox(width: 10,),
+                    SizedBox(width: 13,),
                     FutureBuilder(future: _didattica, builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -540,7 +497,7 @@ class _MainPageState extends State<MainPage> {
                         final List<Didattica> didattica = snapshot.data!;
                         return passaggio(
                             context,
-                            "  Didattica          ",
+                            "  Didattica        ",
                             "Didattica",
                             Didatticapagina(didattica: didattica, service: _service),
                             Icon(Icons.edit_note_outlined)
@@ -613,7 +570,6 @@ class _MainPageState extends State<MainPage> {
                     ),
                   ],
                 ),
-// ...
 
                 const Divider(thickness: 1, color: Colors.white,),
                 FutureBuilder(future: _assenze, builder: (context, snapshot) {
@@ -647,7 +603,7 @@ class _MainPageState extends State<MainPage> {
                               Container(
                                 padding: EdgeInsets.all(10),
                                 height: 70,
-                                width: 160,
+                                width: 150,
                                 decoration: BoxDecoration(
                                   color: Color.fromRGBO(255, 0, 0, 0.6),
                                   borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -678,7 +634,7 @@ class _MainPageState extends State<MainPage> {
                               ),
                               SizedBox(width: 10,),
                               Container(
-                                width: 155,
+                                width: 150,
                                 padding: EdgeInsets.all(10),
                                 height: 70,
                                 decoration: BoxDecoration(
@@ -723,7 +679,7 @@ class _MainPageState extends State<MainPage> {
                               Container(
                                 padding: EdgeInsets.all(10),
                                 height: 75,
-                                width: 160,
+                                width: 150,
                                 decoration: BoxDecoration(
                                   color: Color.fromRGBO(0, 0, 255, 0.6),
                                   borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -756,7 +712,7 @@ class _MainPageState extends State<MainPage> {
                               Container(
                                 padding: EdgeInsets.all(10),
                                 height: 75,
-                                width: 155,
+                                width: 150,
                                 decoration: BoxDecoration(
                                   color: Color.fromRGBO(0, 0, 0, 0.6),
                                   borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -825,11 +781,11 @@ class _MainPageState extends State<MainPage> {
   Widget passaggio(BuildContext context, String mess, String tooltip, Widget pagina,  Icon icon){
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[800],
+        color: Colors.grey[900],
         borderRadius: BorderRadius.all(Radius.circular(10)),
         boxShadow: [
           BoxShadow(
-            color: Color.fromRGBO(240, 240, 240, 0.4),
+            color: Color.fromRGBO(240, 240, 240, 0.2),
             spreadRadius: 1,
             blurRadius: 1,
             offset: Offset(2, 2),

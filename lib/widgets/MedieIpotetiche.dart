@@ -95,7 +95,7 @@ class Ipotetiche extends StatelessWidget {
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      VotoSingolo(voto: votoPerDisplayMedia, grandezza: 70) // Riduci un po' la grandezza se serve
+                      VotoSingolo(voto: votoPerDisplayMedia, grandezza: 70, fontSize: 17) // Riduci un po' la grandezza se serve
                     ],
                   ),
                 );
