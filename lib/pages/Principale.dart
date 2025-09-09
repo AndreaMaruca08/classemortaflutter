@@ -8,6 +8,7 @@ import 'package:ClasseMorta/pages/Materie.dart';
 import 'package:ClasseMorta/pages/NotePagina.dart';
 import 'package:ClasseMorta/pages/Notizie.dart';
 import 'package:ClasseMorta/pages/PagellePagina.dart';
+import 'package:ClasseMorta/widgets/GestioneAccesso.dart';
 import 'package:ClasseMorta/widgets/SingoloVotoWid.dart';
 import 'package:ClasseMorta/widgets/VotoDisplay.dart';
 import 'package:flutter/material.dart';
@@ -767,7 +768,12 @@ class _MainPageState extends State<MainPage> {
                     return const Center(child: Text("Nessuna assenza/ritardo/usccita"));
                   }
                 }),
-                SizedBox(height: 200,)
+                SizedBox(height: 30,),
+                anno(true),
+                SizedBox(height: 10,),
+                anno(false),
+                SizedBox(height: 200,),
+
 
               ],
             ),
@@ -776,6 +782,54 @@ class _MainPageState extends State<MainPage> {
       ),
     );
 
+  }
+
+  Widget anno(bool precedente){
+    return Container(
+        padding: EdgeInsets.all(10),
+        height: 60,
+        width: 200,
+        decoration: BoxDecoration(
+          color: Colors.grey[900],
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          boxShadow: [
+            BoxShadow(
+              color: Color.fromRGBO(10, 10, 10, 0.4),
+              spreadRadius: 1,
+              blurRadius: 1,
+              offset: Offset(2, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            IconButton(
+              onPressed: (){
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => AuthWrapper(precedente: precedente)), // Sostituisci con la tua pagina
+                );
+              },
+              icon: Icon(precedente? Icons.arrow_back_ios: Icons.arrow_forward_ios, color: Colors.white),
+            ),
+            Text(
+              precedente? "Anno precedente": "Anno attuale",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                shadows: [
+                  BoxShadow(
+                    color: Color.fromRGBO(10, 10, 10, 0.4),
+                    spreadRadius: 1,
+                    blurRadius: 1,
+                    offset: Offset(2, 2),
+                  ),
+                ],
+              ),
+            )
+          ],
+        )
+    );
   }
 
   Widget passaggio(BuildContext context, String mess, String tooltip, Widget pagina,  Icon icon){

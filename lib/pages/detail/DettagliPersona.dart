@@ -49,7 +49,7 @@ class _MainPageState extends State<StudentDetail> {
                 children: [
                   const SizedBox(height: 5),
                   const Text(
-                      " Versione 1.2.1 - miglioramento filtro agenda (99% di precisione)",
+                      " Versione 1.3.0 - anno precedente",
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,

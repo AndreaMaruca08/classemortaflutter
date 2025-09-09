@@ -16,7 +16,7 @@ class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'ClasseMorta',
       // Forza l'uso del tema scuro
       themeMode: ThemeMode.dark,
       darkTheme: ThemeData(
@@ -105,7 +105,7 @@ class Login extends StatelessWidget {
           onSecondary: Colors.white,      // Testo/icone su secondario
         ),
       ),
-      home: const AuthWrapper(),
+      home: const AuthWrapper(precedente: false,),
     );
   }
 }
@@ -187,7 +187,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   if(!areInputsValid(codice, password)){return;}
 
-                  Apiservice apiService = Apiservice(codice, true);
+                  Apiservice apiService = Apiservice(codice, false);
 
                   //login
                   LoginResponse? loginResponse = await apiService.doLogin(password);

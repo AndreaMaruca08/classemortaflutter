@@ -84,7 +84,6 @@ class Apiservice {
   };
 
   Apiservice(String codiceStudente, bool precedente) {
-    // precedente = false;
     if(precedente){
       base = "https://web$year.spaggiari.eu/rest/v1/";
     }
@@ -346,9 +345,9 @@ class Apiservice {
 
   Future<List<List<Info>>> getInfo() async {
     DateTime now = DateTime.now();
-    //${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}
-    String fromDate = "20240403";
-    String toDate = "20241231"; // Fine dell'anno corrente
+
+    String fromDate = "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}";
+    String toDate = "${now.year}1231";
 
     final url = getAgendaUrl(fromDate, toDate);
     final response = await http.get(
@@ -506,7 +505,30 @@ class Apiservice {
     );
     if(response.statusCode == 200){
       final json = jsonDecode(response.body);
-      return Nota.getNote(json);
+      var note = Nota.getNote(json);
+
+      List<String> tips = ["NTCL", "NTTE", "NTST", "NTWN"];
+
+      int i = 0;
+      for(List<Nota> lista in note){
+        for(Nota nota in lista){
+          if(nota.messaggio != "..."){
+            continue;
+          }
+          final url = "${base}students/$code/notes/${tips[i]}/read/${nota.id}";
+          final response = await http.post(
+            Uri.parse(url),
+            headers: otherHeaders,
+          );
+          final json = jsonDecode(response.body);
+          print(json.toString());
+          nota.messaggio = json['event']['evtText'];
+        }
+        i++;
+      }
+
+
+      return note;
     }else{
       return [];
     }

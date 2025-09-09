@@ -8,12 +8,14 @@
         },
  */
 class Nota{
+  int id;
   String messaggio;
   String data;
   String nomeProf;
   bool letto;
 
   Nota({
+    required this.id,
     required this.messaggio,
     required this.data,
     required this.nomeProf,
@@ -22,6 +24,7 @@ class Nota{
 
   factory Nota.fromJson(Map<String, dynamic> json) {
     return Nota(
+      id: json['evtId'],
       messaggio: json['evtText'],
       data: json['evtDate'],
       nomeProf: json['authorName'],

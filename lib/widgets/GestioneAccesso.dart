@@ -7,7 +7,8 @@ import 'package:ClasseMorta/pages/Principale.dart';    // Assicurati che il perc
 import 'package:ClasseMorta/main.dart';     // Assicurati che il percorso sia corretto per LoginPage
 
 class AuthWrapper extends StatefulWidget {
-  const AuthWrapper({super.key});
+  final bool precedente;
+  const AuthWrapper({super.key, required this.precedente});
 
   @override
   State<AuthWrapper> createState() => _AuthWrapperState();
@@ -32,7 +33,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
     if (!mounted) return;
 
     if (cred != null && cred.code.isNotEmpty && cred.pass.isNotEmpty) {
-      Apiservice apiService = Apiservice(cred.code, true);
+      Apiservice apiService = Apiservice(cred.code, widget.precedente);
       LoginResponse? loginSuccess = await apiService.doLogin(cred.pass); // Supponiamo che doLogin restituisca bool
       if (!mounted) return;
 
