@@ -73,6 +73,13 @@ class _AgendaState extends State<Agenda> {
                   verificheFuture = Future.value(null); // Or an empty list: Future.value([]);
                 }
 
+                Future<List<Info>?> altroFuture;
+                if (listOfLists.isNotEmpty && listOfLists[3] != null) {
+                  altroFuture = Future.value(listOfLists[3]);
+                } else {
+                  altroFuture = Future.value(null); // Or an empty list: Future.value([]);
+                }
+
                 return Column(
                   children: [
                     SizedBox(
@@ -139,7 +146,7 @@ class _AgendaState extends State<Agenda> {
                         } else if (snapshotCompiti.hasData && snapshotCompiti.data!.isNotEmpty) {
                           List<Info> loadedCompiti = snapshotCompiti.data!;
                           return SizedBox(
-                            height: 175,
+                            height: 185,
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
                               itemCount: loadedCompiti.length,
@@ -206,6 +213,52 @@ class _AgendaState extends State<Agenda> {
                         }
                       },
                     ),
+                    SizedBox(
+                      height: 40,
+                      width: 165,
+                      child: const Text(
+                        "Altro (non filtrati)",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    FutureBuilder<List<Info>?>( // Inner FutureBuilder for the "Compiti" list
+                      future: altroFuture, // Use the extracted list (wrapped in a Future)
+                      builder: (context, snapshotCompiti) {
+                        if (snapshotCompiti.connectionState == ConnectionState.waiting && listOfLists.isEmpty) {
+                          // Show loading only if the outer future hasn't resolved yet with data
+                          return const Center(child: CircularProgressIndicator());
+                        } else if (snapshotCompiti.hasError) {
+                          print(snapshotCompiti.error);
+                          return Center(child: Text("Errore caricamento verifiche: ${snapshotCompiti.error}"));
+                        } else if (snapshotCompiti.hasData && snapshotCompiti.data!.isNotEmpty) {
+                          List<Info> loadedCompiti = snapshotCompiti.data!;
+                          return SizedBox(
+                            height: 200,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: loadedCompiti.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                Info compito = loadedCompiti[index];
+                                return Row(
+                                  children: [
+                                    const SizedBox(width: 10),
+                                    InfoSingola(info: compito)
+                                  ],
+                                );
+                              },
+                            ),
+                          );
+                        } else {
+                          return SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            child: const Center(child: Text("Non avanza niente")),
+                          );
+                        }
+                      },
+                    ),
+                    SizedBox(
+                      height: 50,
+                    )
 
                   ],
                 );

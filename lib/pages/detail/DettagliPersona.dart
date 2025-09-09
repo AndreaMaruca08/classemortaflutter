@@ -31,14 +31,14 @@ class _MainPageState extends State<StudentDetail> {
         padding:const EdgeInsets.all(20.0),
         child: Container(
             decoration: BoxDecoration(
-              color: Colors.grey[800],
+              color: Colors.grey[900],
               borderRadius: BorderRadius.all(Radius.circular(10)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withValues(), // Usato withOpacity
-                  spreadRadius: 2,
-                  blurRadius: 2,
-                  offset: Offset(3, 2),
+                  color: Color.fromRGBO(240, 240, 240, 0.2),
+                  spreadRadius: 1,
+                  blurRadius: 1,
+                  offset: Offset(2, 2),
                 ),
               ],
             ),
@@ -49,9 +49,9 @@ class _MainPageState extends State<StudentDetail> {
                 children: [
                   const SizedBox(height: 5),
                   const Text(
-                      " Versione 1.2 - files docenti, cambio grafico",
+                      " Versione 1.2.1 - miglioramento filtro agenda (99% di precisione)",
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

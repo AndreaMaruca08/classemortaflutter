@@ -22,14 +22,14 @@ class Materiawidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12.0), // Aggiungi padding interno per non far toccare il testo ai bordi
       decoration: BoxDecoration(
-        color: Colors.grey[800],
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        color: Colors.grey[900],
+        borderRadius: BorderRadius.all(Radius.circular(10)),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
+            color: Color.fromRGBO(240, 240, 240, 0.2),
             spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(2, 2),
+            blurRadius: 1,
+            offset: Offset(2, 2),
           ),
         ],
       ),

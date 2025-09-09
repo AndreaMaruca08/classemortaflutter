@@ -53,7 +53,7 @@ import '../models/Voto.dart';
 /// *Note: `{date}`, `{from}`, `{to}` must be in `YYYYMMDD` format.*
 
 class Apiservice {
-  final String year = (DateTime.now().year - 2001).toString();
+  final String year = (DateTime.now().year - 2002).toString();
   late String base = "https://web.spaggiari.eu/rest/v1/";
 
   late String login;
@@ -84,7 +84,7 @@ class Apiservice {
   };
 
   Apiservice(String codiceStudente, bool precedente) {
-    precedente = false;
+    // precedente = false;
     if(precedente){
       base = "https://web$year.spaggiari.eu/rest/v1/";
     }
@@ -126,7 +126,14 @@ class Apiservice {
     );
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
-      return Voto.fromJsonList(json);
+      var voti = Voto.fromJsonList(json);
+      List<Voto> finalVoti = [];
+      for (Voto voto in voti) {
+        if(voto.voto != 0.0){
+          finalVoti.add(voto);
+        }
+      }
+      return finalVoti;
     } else {
       throw Exception('Failed to load grades');
     }
@@ -150,7 +157,7 @@ class Apiservice {
     double media2 = 0.0;
     for (Voto voto in voti) {
       //si toglie religione nel conto della media
-      if (voto.cancellato ||
+      if (voto.cancellato || voto.voto == 0.0 ||
           voto.codiceMateria.toUpperCase() == "REL" ||
           voto.nomeInteroMateria.toUpperCase() == "RELIGIONE") {
         continue;
@@ -232,6 +239,9 @@ class Apiservice {
       double media1 = 0.0;
       double media2 = 0.0;
       for (Voto voto in voti) {
+        if(voto.cancellato || voto.voto == 0){
+          continue;
+        }
         somma += voto.voto;
         voto.periodo == 1 ? somma1 += voto.voto : somma2 += voto.voto;
         voto.periodo == 1 ? count1++ : count2++;
@@ -268,7 +278,7 @@ class Apiservice {
               .year}",
           voto: media1,
           displayValue: media1.toStringAsFixed(2),
-          descrizione: "Media primo quadrimestre, contando tutti i voti, di tutto il primo quadrimestre senza contare quelli cancellati e religione",
+          descrizione: "Media primo quadrimestre, contando tutti i voti, di tutto il primo quadrimestre senza contare quelli cancellati",
           periodo: 1,
           cancellato: false,
           nomeProf: "Media 1° periodo",
@@ -336,9 +346,9 @@ class Apiservice {
 
   Future<List<List<Info>>> getInfo() async {
     DateTime now = DateTime.now();
-
-    String fromDate = "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}";
-    String toDate = "${now.year}1231"; // Fine dell'anno corrente
+    //${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}
+    String fromDate = "20240403";
+    String toDate = "20241231"; // Fine dell'anno corrente
 
     final url = getAgendaUrl(fromDate, toDate);
     final response = await http.get(
@@ -372,12 +382,14 @@ class Apiservice {
               var compitiFiltrati = Info.fromJsonListCompiti(jsonMapList);
               var notizieFiltrate = Info.fromJsonListAgenda(jsonMapList);
               var verificheFiltrate = Info.fromJsonListVerifiche(jsonMapList);
+              var resto = Info.fromJsonAltro(jsonMapList);
 
 
               return [
                 compitiFiltrati,
                 notizieFiltrate,
-                verificheFiltrate
+                verificheFiltrate,
+                resto
               ];
             } else {
               print("Errore: Il campo 'agenda' nel JSON non è una lista.");
@@ -416,7 +428,10 @@ class Apiservice {
     Materia materiaAttuale;
     List<Voto> votiMateriaAttuale = [];
     for (Voto v in voti) {
-      if(v.codiceMateria == codeMateria){
+      if(v.cancellato || v.voto == 0){
+        continue;
+      }
+      else if(v.codiceMateria == codeMateria ){
         votiMateriaAttuale.add(v);
       }
       else {
@@ -598,8 +613,7 @@ class Apiservice {
     dio.options.headers = otherHeaders;
 
     // Costruisci l'URL a partire dall'id
-    final url = 'https://web24.spaggiari.eu/rest/v1/students/10435383/didactics/item/$docId';
-
+    final url = '${base}students/$code/didactics/item/$docId';
     // Ottieni cartella temporanea
     final dir = await getTemporaryDirectory();
     final filePath = '${dir.path}/$filename';
@@ -630,8 +644,7 @@ class Apiservice {
   }
 
   Future<void> openPdf(File file) async {
-    final result = await OpenFile.open(file.path);
-    print(result.message); // per debug
+    await OpenFile.open(file.path);
   }
 
 

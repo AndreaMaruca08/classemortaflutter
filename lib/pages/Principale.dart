@@ -139,7 +139,7 @@ class _MainPageState extends State<MainPage> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => StudentDetail(card: card)), // Sostituisci con la tua pagina
+                              MaterialPageRoute(builder: (context) => StudentDetail(card: card)),
                             );
                           },
                           icon: Icon(Icons.info_outline),
@@ -163,8 +163,8 @@ class _MainPageState extends State<MainPage> {
                 ),
                 const SizedBox(height: 10),
                 //MEDIE
-                FutureBuilder<List<Voto>?>( // Specificato il tipo del FutureBuilder
-                  future: _medieGeneraliFuture, // Usa lo stato del Future
+                FutureBuilder<List<Voto>?>(
+                  future: _medieGeneraliFuture,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
@@ -194,9 +194,9 @@ class _MainPageState extends State<MainPage> {
                               children: [
                                 // Assicurati che loadedMedie abbia abbastanza elementi
                                 if (loadedMedie.isNotEmpty) VotoSingolo(voto: loadedMedie[0], grandezza: 115, fontSize: 17,),
-                                const SizedBox(width: 16),
+                                const SizedBox(width: 7),
                                 if (loadedMedie.length > 1) VotoSingolo(voto: loadedMedie[1], grandezza: 100, fontSize: 17),
-                                const SizedBox(width: 10),
+                                const SizedBox(width: 7),
                                 if (loadedMedie.length > 2) VotoSingolo(voto: loadedMedie[2], grandezza: 100, fontSize: 17),
                               ],
                             ),
@@ -214,7 +214,7 @@ class _MainPageState extends State<MainPage> {
                                   List<Voto> voti = snapshot.data!;
                                   return Row(
                                     children: [
-                                      SizedBox(width: 27,),
+                                      SizedBox(width: 36,),
                                       IconButton(
                                           onPressed: () {
                                             Navigator.push(
@@ -234,7 +234,7 @@ class _MainPageState extends State<MainPage> {
                                           },
                                           icon: Icon(Icons.auto_graph_sharp,
                                             color: Colors.white,)),
-                                      SizedBox(width: 82,),
+                                      SizedBox(width: 67,),
                                       IconButton(
                                           onPressed: () {
                                             Navigator.push(
@@ -398,7 +398,7 @@ class _MainPageState extends State<MainPage> {
                         }
                       }),
                     SizedBox(width: 10),
-                    passaggio(context, "  Compiti           ", "Agenda", Agenda(apiService: _service), Icon(Icons.calendar_month)),
+                    passaggio(context, "  Compiti           ", "Agenda", Agenda(apiService: _service), Icon(Icons.edit_calendar_outlined)),
                   ],
                 ),
                 SizedBox(
@@ -478,7 +478,7 @@ class _MainPageState extends State<MainPage> {
                             "  Pagelle            ",
                             "Pagelle",
                             Pagellepagina(pagelle: pag),
-                            Icon(Icons.edit_note_outlined)
+                            Icon(Icons.mark_email_read)
                         );
 
                       }else{
@@ -500,7 +500,7 @@ class _MainPageState extends State<MainPage> {
                             "  Didattica        ",
                             "Didattica",
                             Didatticapagina(didattica: didattica, service: _service),
-                            Icon(Icons.edit_note_outlined)
+                            Icon(Icons.sticky_note_2_outlined)
                         );
 
                       }else{
@@ -521,7 +521,7 @@ class _MainPageState extends State<MainPage> {
                   height: 10,
                 ),
                 Text(
-                  "Lezioni   ${DateTime.now().year}/${DateTime.now().month}/${DateTime.now().day}",
+                  "Lezioni  Oggi | ${DateTime.now().year}/${DateTime.now().month}/${DateTime.now().day}",
                   style: const TextStyle(
                     fontSize: 25,
                     fontWeight: FontWeight.bold,
