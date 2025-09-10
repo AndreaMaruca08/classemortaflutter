@@ -17,7 +17,7 @@ class Notepagina extends StatelessWidget {
     List<Nota> avvisi = note[3];
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Materie'),
+          title: const Text('Note'),
         ),
         body: SingleChildScrollView(
           physics: const ClampingScrollPhysics(), // o rimuovila per il default

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:ClasseMorta/models/Assenza.dart';
+import 'package:ClasseMorta/models/Giorno.dart';
 import 'package:ClasseMorta/models/Info.dart';
 import 'package:ClasseMorta/models/Pagella.dart';
 import 'package:dio/dio.dart';
@@ -585,6 +586,7 @@ class Apiservice {
     );
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
+
       return Lezione.fromJsonList(json);
     } else {
       return [];
@@ -625,10 +627,7 @@ class Apiservice {
     }
   }
 
-  Future<void> downloadAndOpenPdfById(
-      String docId,
-      String filename,
-      ) async {
+  Future<void> downloadAndOpenPdfById(String docId, String filename,) async {
     final dio = Dio();
 
     // Imposta gli header extra
@@ -668,6 +667,34 @@ class Apiservice {
   Future<void> openPdf(File file) async {
     await OpenFile.open(file.path);
   }
+
+  Future<List<Giorno>> getOrari() async {
+
+    DateTime oggi = DateTime.now();
+    int giornoSettimana = oggi.weekday;
+    DateTime lunediQuesto = oggi.subtract(Duration(days: giornoSettimana - 1));
+    DateTime lunediScorso = lunediQuesto.subtract(Duration(days: 7));
+
+    String fromDate = "${lunediScorso.year}${lunediScorso.month.toString().padLeft(2, '0')}${lunediScorso.day.toString().padLeft(2, '0')}";
+
+    List<Giorno> giorni = [];
+    for(int i = 1; i < 6; i++){
+      final response = await http.get(
+        Uri.parse(getLessonsForDateUrl(fromDate)),
+        headers: otherHeaders,
+      );
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final Giorno giorno = Giorno.fromJson(json);
+        giorni.add(giorno);
+      } else {
+        return [];
+      }
+
+    }
+    return giorni;
+  }
+
 
 
   /*

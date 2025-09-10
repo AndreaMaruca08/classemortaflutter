@@ -1,5 +1,7 @@
 /*
 {
+  "lessons":  [
+    {
             "evtId": 23604280,
             "evtDate": "2025-05-30",
             "evtCode": "LSF0",
@@ -12,7 +14,9 @@
             "subjectDesc": "MATEMATICA E COMPLEMENTI",
             "lessonType": "Lezione",
             "lessonArg": "Consegna verifica sui logaritmi. Interrogazione Pellecchia."
-        },
+  },
+ ]
+}
  */
 class Lezione{
   String prof;
@@ -53,8 +57,6 @@ class Lezione{
 
     List<Lezione> lezioneFiltrate = [];
 
-    //Si filtra per evitare i messaggi di lezioni
-    // ripetute della prof di sostegno
     for(Lezione l in lezioni){
       if(l.materia != "SOSTEGNO"){
         lezioneFiltrate.add(l);

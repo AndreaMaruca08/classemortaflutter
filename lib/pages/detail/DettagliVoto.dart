@@ -15,7 +15,7 @@ class Dettaglivoto extends StatelessWidget {
       ),
       body: Column(
         children: [
-          VotoSingolo(voto: voto, grandezza: 120, fontSize: 17),
+          VotoSingolo(voto: voto, grandezza: 120, fontSize: 20),
           Divider(thickness: 2, color: getcoloreVoto(voto.voto)),
           Row(
             children: [

@@ -1,6 +1,7 @@
 import 'dart:async'; // Aggiunto per Future
 import 'package:ClasseMorta/models/Materia.dart';
 import 'package:ClasseMorta/models/Voto.dart';
+import 'package:ClasseMorta/pages/GiorniPagina.dart';
 import 'package:ClasseMorta/pages/detail/Agenda.dart';
 import 'package:ClasseMorta/pages/AssenzePage.dart';
 import 'package:ClasseMorta/pages/detail/DettagliMateria.dart';
@@ -15,6 +16,7 @@ import 'package:flutter/material.dart';
 
 import '../models/Assenza.dart';
 import '../models/FileDidattica.dart';
+import '../models/Giorno.dart';
 import '../models/Lezione.dart';
 import '../models/Nota.dart';
 import '../models/Notizia.dart';
@@ -45,6 +47,7 @@ class _MainPageState extends State<MainPage> {
   late Future<List<List<Assenza>>> _assenze;
   late Future<List<Lezione>> _lessonsToday;
   late Future<List<Didattica>> _didattica;
+  late Future<List<Giorno>> _giorni;
 
   @override
 
@@ -61,6 +64,7 @@ class _MainPageState extends State<MainPage> {
     _note = _service.getNote();
     _lessonsToday = _service.getLezioni();
     _didattica = _service.fetchDidattica();
+    _giorni = _service.getOrari();
 
   }
 
@@ -76,6 +80,7 @@ class _MainPageState extends State<MainPage> {
       _lessonsToday = _service.getLezioni();
       _pagelle = _service.getPagelle() as Future<List<Pagella>?>;
       _didattica = _service.fetchDidattica();
+      _giorni = _service.getOrari();
     });
     await _medieGeneraliFuture;
     await _lastVotiFutureMedie;
@@ -87,6 +92,7 @@ class _MainPageState extends State<MainPage> {
     await _lessonsToday;
     await _assenze;
     await _didattica;
+    await _giorni;
   }
 
   @override
@@ -397,7 +403,7 @@ class _MainPageState extends State<MainPage> {
                         }else{
                           return const Center(child: Text("Nessuna materia con voto"));
                         }
-                      }),
+                    }),
                     SizedBox(width: 10),
                     passaggio(context, "  Compiti           ", "Agenda", Agenda(apiService: _service), Icon(Icons.edit_calendar_outlined)),
                   ],
@@ -483,7 +489,7 @@ class _MainPageState extends State<MainPage> {
                         );
 
                       }else{
-                        return const Center(child: Text("Nessuna pagella"));
+                        return const Center(child: Text("      Nessuna pagella            "));
                       }
                     }),
                     SizedBox(width: 13,),
@@ -509,8 +515,37 @@ class _MainPageState extends State<MainPage> {
                       }
 
                     }
-                    )
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  children: [
+                    FutureBuilder(future: _giorni, builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(
+                          child: Text('Orari non inizializzati'),
+                        );
+                      } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                        final List<Giorno> loadedGiorni = snapshot.data!;
+                        return passaggio(
+                            context,
+                            "  Orari                 ",
+                            "orari settimanali",
+                            Giornipagina(
+                              giorni: loadedGiorni,
+                            ),
+                            Icon(Icons.watch_later)
+                        );
 
+                      }else{
+                        return const Center(child: Text("      Nessun orario"));
+                      }
+                    }),
                   ],
                 ),
                 SizedBox(

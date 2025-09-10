@@ -3,14 +3,13 @@ import 'package:flutter/material.dart';
 
 class InfoSingola extends StatelessWidget {
   final Info info;
-  const InfoSingola({
-    super.key,
-    required this.info,
-  });
+  const InfoSingola({super.key, required this.info});
 
   @override
   Widget build(BuildContext context) {
-    Color textColor = Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87;
+    Color textColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white70
+        : Colors.black87;
 
     return Container(
       height: 450,
@@ -31,22 +30,34 @@ class InfoSingola extends StatelessWidget {
         width: 300,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min, // La Column cerca di essere il più piccola possibile, ma l'Expanded la forzerà a riempirsi
+          mainAxisSize: MainAxisSize
+              .min, // La Column cerca di essere il più piccola possibile, ma l'Expanded la forzerà a riempirsi
           children: [
             Text(
               info.materia.length > 35
                   ? "${info.materia.substring(0, 35)}..."
                   : info.materia,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: textColor),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 17,
+                color: textColor,
+              ),
             ),
             SizedBox(height: 6),
             Row(
               children: [
-                Icon(Icons.calendar_month, size: 16, color: textColor.withOpacity(0.8)),
+                Icon(
+                  Icons.calendar_month_outlined,
+                  size: 16,
+                  color: textColor.withOpacity(0.8),
+                ),
                 SizedBox(width: 6),
                 Text(
-                  "${info.data.length > 10 ? info.data.substring(0, 10) : info.data} - ${getDistanza(info.data)}",
-                  style: TextStyle(fontSize: 14, color: textColor.withOpacity(0.9)),
+                  "${getData(info.data)} - ${getDistanza(info.data)}",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: textColor.withOpacity(0.9),
+                  ),
                 ),
               ],
             ),
@@ -58,7 +69,10 @@ class InfoSingola extends StatelessWidget {
                 Expanded(
                   child: Text(
                     info.nomeInsegnante,
-                    style: TextStyle(fontSize: 14, color: textColor.withOpacity(0.9)),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: textColor.withOpacity(0.9),
+                    ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                   ),
@@ -75,14 +89,21 @@ class InfoSingola extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 1.0),
-                    child: Icon(Icons.description, size: 16, color: textColor.withOpacity(0.8)),
+                    child: Icon(
+                      Icons.description,
+                      size: 16,
+                      color: textColor.withOpacity(0.8),
+                    ),
                   ),
                   SizedBox(width: 6),
                   Expanded(
                     child: SingleChildScrollView(
                       child: Text(
                         info.descrizione,
-                        style: TextStyle(fontSize: 14, color: textColor.withOpacity(0.9)),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: textColor.withOpacity(0.9),
+                        ),
                       ),
                     ),
                   ),
@@ -95,24 +116,29 @@ class InfoSingola extends StatelessWidget {
     );
   }
 
-  // ... il tuo metodo getColor ...
+
   Color? getColor(String dataString) {
     try {
-      DateTime today = DateTime.now(); // Considera di usare DateTime.now() per la data corrente reale
-      DateTime scadenza = DateTime.parse(dataString.substring(0,10));
-      DateTime scadenzaDateOnly = DateTime(scadenza.year, scadenza.month, scadenza.day);
+      DateTime today =
+          DateTime.now(); // Considera di usare DateTime.now() per la data corrente reale
+      DateTime scadenza = DateTime.parse(dataString.substring(0, 10));
+      DateTime scadenzaDateOnly = DateTime(
+        scadenza.year,
+        scadenza.month,
+        scadenza.day,
+      );
 
       if (scadenzaDateOnly.isBefore(today)) {
         return Colors.grey[600];
       }
       Duration differenza = scadenzaDateOnly.difference(today);
-      if(differenza.inDays <= 1){
+      if (differenza.inDays <= 0) {
         return Colors.red[500];
       }
-      if (differenza.inDays <= 2) {
+      if (differenza.inDays <= 1) {
         return Colors.red[300];
       }
-      if (differenza.inDays <= 7) {
+      if (differenza.inDays <= 6) {
         return Colors.green[300];
       }
       return Colors.green[600];
@@ -121,25 +147,72 @@ class InfoSingola extends StatelessWidget {
     }
   }
 
-  // ... il tuo metodo getDistanza ...
+  String getData(String dataString){
+    List<String> nomiGiorni = [
+      'Lunedì',
+      'Martedì',
+      'Mercoledì',
+      'Giovedì',
+      'Venerdì',
+      'Sabato',
+      'Domenica',
+    ];
+    List<String> nomiMesi = [
+      'Gennaio',
+      'Febbraio',
+      'Marzo',
+      'Aprile',
+      'Maggio',
+      'Giugno',
+      'Luglio',
+      'Agosto',
+      'Settembre',
+      'Ottobre',
+      'Novembre',
+      'Dicembre',
+    ];
+    DateTime scadenza = DateTime.parse(dataString.substring(0, 10));
+    DateTime scadenzaDateOnly = DateTime(
+      scadenza.year,
+      scadenza.month,
+      scadenza.day,
+    );
+
+    String data = "${nomiGiorni[scadenzaDateOnly.weekday - 1].substring(0, 3)} "
+                  "${scadenzaDateOnly.day} ${nomiMesi[scadenzaDateOnly.month - 1].substring(0, 3)} "
+                  "${scadenzaDateOnly.year}";
+
+
+    return data;
+  }
+
   String getDistanza(String dataString) {
+
     try {
       // DateTime now = DateTime.now(); // Non usato se today è hardcoded
-      DateTime today = DateTime.now(); // Considera di usare DateTime.now() per la data corrente reale
-      DateTime scadenza = DateTime.parse(dataString.substring(0,10));
-      DateTime scadenzaDateOnly = DateTime(scadenza.year, scadenza.month, scadenza.day);
+      DateTime today =
+          DateTime.now(); // Considera di usare DateTime.now() per la data corrente reale
+      DateTime scadenza = DateTime.parse(dataString.substring(0, 10));
+      DateTime scadenzaDateOnly = DateTime(
+        scadenza.year,
+        scadenza.month,
+        scadenza.day,
+      );
 
       if (scadenzaDateOnly.isBefore(today)) {
         return "Già passata";
       }
-      if(scadenzaDateOnly.isAtSameMomentAs(today)){
-        return "PER OGGI !!!";
+      if (scadenzaDateOnly.isAtSameMomentAs(today)) {
+        return "PER OGGI !!";
       }
       Duration differenza = scadenzaDateOnly.difference(today);
-      if(differenza.inDays == 1){
+      if (differenza.inDays == 0) {
         return "DOMANI !!!";
       }
-      return "${differenza.inDays.toString()} giorni";
+      if (differenza.inDays == 1) {
+        return "Dopo domani";
+      }
+      return "${(differenza.inDays + 1).toString()} giorni";
 
     } catch (e) {
       return "Errore";
