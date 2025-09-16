@@ -38,6 +38,8 @@ class Info {
       bool con9 = descrizione.contains("scheda");
       bool con10 = descrizione.contains("finire");
 
+
+
       return (con1 || con2 || con3 || con6 || con7 || con8 || con9 || con10) && con4 && con5;
     });
 

@@ -55,7 +55,7 @@ class Giornipagina extends StatelessWidget {
     ];
     return Container(
       height: 500,
-      width: 75,
+      width: 63,
       decoration: BoxDecoration(
         color: Colors.grey[900],
         borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -71,7 +71,7 @@ class Giornipagina extends StatelessWidget {
       // Dentro il metodo displayGiorno
       child: Column(
         children: [
-          Text(nomiGiorni[giornod]),
+          Text(nomiGiorni[giornod], style: TextStyle(fontSize: 13)),
           Expanded(
             child: ListView.builder(
                 itemCount: giorno.orari.length,
@@ -85,8 +85,8 @@ class Giornipagina extends StatelessWidget {
                         color: Colors.white,
                       ),
                       SizedBox(height: 5,),
-                      Text(ora.materia.substring(0, 4) , style: TextStyle(
-                          fontSize: 13,
+                      Text("${ora.materia.substring(0, 4)} | ${ora.ora}" , style: TextStyle(
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
                           shadows: <Shadow>[
                             Shadow(
@@ -97,7 +97,7 @@ class Giornipagina extends StatelessWidget {
                           ]
                       ),),
                       Text(ora.prof[0], textAlign: TextAlign.center ,style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 9,
                           shadows: <Shadow>[
                             Shadow(
                               offset: Offset(2.0, 2.0), // Spostamento orizzontale e verticale dell'ombra

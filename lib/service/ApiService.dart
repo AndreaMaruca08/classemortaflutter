@@ -4,6 +4,7 @@ import 'package:ClasseMorta/models/Assenza.dart';
 import 'package:ClasseMorta/models/Giorno.dart';
 import 'package:ClasseMorta/models/Info.dart';
 import 'package:ClasseMorta/models/Pagella.dart';
+import 'package:ClasseMorta/models/ProvaCurriculum.dart';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_file/open_file.dart';
@@ -58,8 +59,11 @@ class Apiservice {
   late String base = "https://web.spaggiari.eu/rest/v1/";
 
   late String login;
+  late String phpSessId;
+  late String pass;
 
   late String code;
+  late String codiceStudent;
   late String card;
   late String grades;
   late String notes;
@@ -84,10 +88,12 @@ class Apiservice {
     'User-Agent': 'CVVS/std/4.1.3 Android/14',
   };
 
-  Apiservice(String codiceStudente, bool precedente) {
+  Apiservice(String codiceStudente, String password, bool precedente) {
     if(precedente){
       base = "https://web$year.spaggiari.eu/rest/v1/";
     }
+    pass = password;
+    codiceStudent = codiceStudente;
     login = "${base}auth/login";
     fullCode = codiceStudente;
     code = codiceStudente.replaceAll(RegExp(r'[a-zA-Z]'), "");
@@ -106,6 +112,8 @@ class Apiservice {
     noticeboard = "${base}students/$code/noticeboard";
     documents = "${base}students/$code/documents";
     apriFile = "${base}students/$code/didactics/item/";
+
+
   }
 
   String getAgendaUrl(String fromDate, String toDate) {
@@ -675,10 +683,12 @@ class Apiservice {
     DateTime lunediQuesto = oggi.subtract(Duration(days: giornoSettimana - 1));
     DateTime lunediScorso = lunediQuesto.subtract(Duration(days: 7));
 
-    String fromDate = "${lunediScorso.year}${lunediScorso.month.toString().padLeft(2, '0')}${lunediScorso.day.toString().padLeft(2, '0')}";
 
     List<Giorno> giorni = [];
-    for(int i = 1; i < 6; i++){
+    for(int i = 0; i < 5; i++){
+      DateTime data = lunediScorso.add(Duration(days: i));
+      String fromDate = "${data.year}${data.month.toString().padLeft(2, '0')}${data.day.toString().padLeft(2, '0')}";
+
       final response = await http.get(
         Uri.parse(getLessonsForDateUrl(fromDate)),
         headers: otherHeaders,
@@ -695,7 +705,55 @@ class Apiservice {
     return giorni;
   }
 
+  Future<String> ottieniPhpsessid() async {
+    final uri = Uri.parse(
+      'https://web.spaggiari.eu/auth-p7/app/default/AuthApi4.php?a=aLoginPwd',
+    );
 
+    final headers = <String, String>{
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      'Origin': 'https://web.spaggiari.eu',
+      'User-Agent': 'Mozilla/5.0',
+    };
+
+    final body = 'cid=&uid=$codiceStudent&pwd=Polveredistelle1.&pin=&target=';
+
+    final resp = await http.post(uri, headers: headers, body: body);
+
+    print('[DEBUG] Headers risposta: ${resp.headers}');
+
+    final setCookie = resp.headers['set-cookie'];
+    if (setCookie == null || setCookie.isEmpty) {
+      throw Exception('Nessun header Set-Cookie presente nella risposta');
+    }
+
+    // Estrae PHPSESSID dal/i Set-Cookie
+    final match = RegExp(r'PHPSESSID=([^;]+)').firstMatch(setCookie);
+    if (match == null) {
+      print('[ERRORE] Cookie PHPSESSID non trovato.');
+      throw Exception('PHPSESSID non trovato');
+    }
+
+    final phpsessid = match.group(1)!;
+    print('[DEBUG] PHPSESSID trovato: $phpsessid');
+    return phpsessid;
+  }
+
+  Future<PctoData> getCurriculum() async {
+    phpSessId =  await ottieniPhpsessid();
+
+    final response = await http.get(
+      Uri.parse("https://web.spaggiari.eu/set/app/default/curriculum.php?"),
+      headers: {'UserAgent' : 'Mozilla/5.0', 'Cookie': 'PHPSESSID=$phpSessId; webrole=gen; webidentity=$codiceStudent'},
+    );
+    if (response.statusCode == 200) {
+      final htmlContent = response.body;
+      final pctoData = parsePctoHtml(htmlContent);
+      return pctoData!;
+    } else {
+      throw Exception('Errore durante il recupero del curriculum: ${response.statusCode}');
+    }
+  }
 
   /*
     esempio risposta:
@@ -710,11 +768,11 @@ class Apiservice {
       "expire": "2025-08-12T17:24:53+02:00"
       }
    */
-    Future<LoginResponse?> doLogin(String password) async {
+    Future<LoginResponse?> doLogin() async {
       final response = await http.post(
           Uri.parse(login),
           headers: loginHeaders,
-          body: '{ "uid": "$fullCode", "pass": "$password", "ident": null}'
+          body: '{ "uid": "$fullCode", "pass": "$pass", "ident": null}'
       );
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);

@@ -187,10 +187,10 @@ class _LoginPageState extends State<LoginPage> {
 
                   if(!areInputsValid(codice, password)){return;}
 
-                  Apiservice apiService = Apiservice(codice, false);
+                  Apiservice apiService = Apiservice(codice, password, false);
 
                   //login
-                  LoginResponse? loginResponse = await apiService.doLogin(password);
+                  LoginResponse? loginResponse = await apiService.doLogin();
 
                   if(loginResponse == null) {
                     _mostraAlert(context, "Errore", "credenziali errate");

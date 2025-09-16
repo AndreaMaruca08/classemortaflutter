@@ -1,7 +1,9 @@
 import 'dart:async'; // Aggiunto per Future
 import 'package:ClasseMorta/models/Materia.dart';
+import 'package:ClasseMorta/models/ProvaCurriculum.dart';
 import 'package:ClasseMorta/models/Voto.dart';
 import 'package:ClasseMorta/pages/GiorniPagina.dart';
+import 'package:ClasseMorta/pages/PctoPage.dart';
 import 'package:ClasseMorta/pages/detail/Agenda.dart';
 import 'package:ClasseMorta/pages/AssenzePage.dart';
 import 'package:ClasseMorta/pages/detail/DettagliMateria.dart';
@@ -48,6 +50,7 @@ class _MainPageState extends State<MainPage> {
   late Future<List<Lezione>> _lessonsToday;
   late Future<List<Didattica>> _didattica;
   late Future<List<Giorno>> _giorni;
+  late Future<PctoData> _datiCurriculum;
 
   @override
 
@@ -65,7 +68,7 @@ class _MainPageState extends State<MainPage> {
     _lessonsToday = _service.getLezioni();
     _didattica = _service.fetchDidattica();
     _giorni = _service.getOrari();
-
+    _datiCurriculum = _service.getCurriculum();
   }
 
   Future<void> _handleRefresh() async {
@@ -81,6 +84,7 @@ class _MainPageState extends State<MainPage> {
       _pagelle = _service.getPagelle() as Future<List<Pagella>?>;
       _didattica = _service.fetchDidattica();
       _giorni = _service.getOrari();
+      _datiCurriculum = _service.getCurriculum();
     });
     await _medieGeneraliFuture;
     await _lastVotiFutureMedie;
@@ -93,6 +97,7 @@ class _MainPageState extends State<MainPage> {
     await _assenze;
     await _didattica;
     await _giorni;
+    await _datiCurriculum;
   }
 
   @override
@@ -200,11 +205,11 @@ class _MainPageState extends State<MainPage> {
                             Row(
                               children: [
                                 // Assicurati che loadedMedie abbia abbastanza elementi
-                                if (loadedMedie.isNotEmpty) VotoSingolo(voto: loadedMedie[0], grandezza: 115, fontSize: 17,),
+                                if (!loadedMedie[0].voto.isNaN) VotoSingolo(voto: loadedMedie[0], grandezza: 115, fontSize: 17,),
                                 const SizedBox(width: 7),
-                                if (loadedMedie.length > 1) VotoSingolo(voto: loadedMedie[1], grandezza: 100, fontSize: 17),
+                                if (!loadedMedie[1].voto.isNaN) VotoSingolo(voto: loadedMedie[1], grandezza: 100, fontSize: 17),
                                 const SizedBox(width: 7),
-                                if (loadedMedie.length > 2) VotoSingolo(voto: loadedMedie[2], grandezza: 100, fontSize: 17),
+                                if (!loadedMedie[2].voto.isNaN) VotoSingolo(voto: loadedMedie[2], grandezza: 100, fontSize: 17),
                               ],
                             ),
                             const SizedBox(height: 10),
@@ -284,7 +289,7 @@ class _MainPageState extends State<MainPage> {
                                     ],
                                   );
                                 }else{
-                                  return const Center(child: Text("Nessun risultato"));
+                                  return const Center(child: Text("Nessun voto"));
                                 }
                               },
                             ),
@@ -293,7 +298,7 @@ class _MainPageState extends State<MainPage> {
                         ),
                       );
                     } else {
-                      return const Center(child: Text("Nessun risultato"));
+                      return const Center(child: Text("Nessun risultato, controlla la connessione"));
                     }
                   },
 
@@ -380,7 +385,7 @@ class _MainPageState extends State<MainPage> {
                       ],
                     );
                   }else{
-                    return const Center(child: Text("Nessun risultato"));
+                    return const Center(child: Text("Nessun voto"));
                   }
                 }),
                 SizedBox(height: 10),
@@ -401,7 +406,7 @@ class _MainPageState extends State<MainPage> {
                           return passaggio(context, "  Materie            ", "Materie", MateriePag(service: _service, voti: loadedVoti,), Icon(Icons.medical_information_rounded));
 
                         }else{
-                          return const Center(child: Text("Nessuna materia con voto"));
+                          return const Center(child: Text("          Nessun voto           "));
                         }
                     }),
                     SizedBox(width: 10),
@@ -437,7 +442,7 @@ class _MainPageState extends State<MainPage> {
                         );
 
                       }else{
-                        return const Center(child: Text("Nessuna materia con voto"));
+                        return const Center(child: Text("Nessuna notizia"));
                       }
                     }),
                     SizedBox(width: 12),
@@ -461,7 +466,7 @@ class _MainPageState extends State<MainPage> {
                         );
 
                       }else{
-                        return const Center(child: Text("Nessuna materia con voto"));
+                        return const Center(child: Text("nessuna nota"));
                       }
                     }),
                   ],
@@ -489,7 +494,7 @@ class _MainPageState extends State<MainPage> {
                         );
 
                       }else{
-                        return const Center(child: Text("      Nessuna pagella            "));
+                        return const Center(child: Text("      Nessuna pagella       "));
                       }
                     }),
                     SizedBox(width: 13,),
@@ -528,7 +533,7 @@ class _MainPageState extends State<MainPage> {
                         return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasError) {
                         return Center(
-                          child: Text('Orari non inizializzati'),
+                          child: Text('Orari mancanti'),
                         );
                       } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                         final List<Giorno> loadedGiorni = snapshot.data!;
@@ -540,6 +545,30 @@ class _MainPageState extends State<MainPage> {
                               giorni: loadedGiorni,
                             ),
                             Icon(Icons.watch_later)
+                        );
+
+                      }else{
+                        return const Center(child: Text("      Nessun orario"));
+                      }
+                    }),
+                    SizedBox(width: 12),
+                    FutureBuilder(future: _datiCurriculum, builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(
+                          child: Text(''),
+                        );
+                      } else if (snapshot.hasData) {
+                        final PctoData pcto = snapshot.data!;
+                        return passaggio(
+                            context,
+                            "Curriculum      ",
+                            "orari settimanali",
+                            Pctopage(
+                              pctoDataa: pcto,
+                            ),
+                            Icon(Icons.book)
                         );
 
                       }else{
@@ -589,7 +618,17 @@ class _MainPageState extends State<MainPage> {
                                 itemCount: lezioni.length,
                                 itemBuilder: (BuildContext context, int index) {
                                   Lezione lezione = lezioni[index];
-                                  return Lezionewidget(lezione: lezione);
+                                  return Column(
+                                    children: [
+                                      SizedBox(
+                                        width: 330,
+                                        child: Lezionewidget(lezione: lezione),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                    ],
+                                  );
                                 },
                               );
                             } else if (snapshot.hasData && snapshot.data!.isEmpty) {
@@ -689,7 +728,7 @@ class _MainPageState extends State<MainPage> {
                                   width: 150,
                                   height: 10,
                                   child: Text(
-                                    "    Uscite ${ass[1].length}   ",
+                                    "     Uscite ${ass[1].length}   ",
                                     style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
@@ -729,7 +768,7 @@ class _MainPageState extends State<MainPage> {
                                   ],
                                 ),
                                 child: Text(
-                                  "      Ritardi ${ass[2].length}   ",
+                                  "     Ritardi ${ass[2].length}   ",
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,

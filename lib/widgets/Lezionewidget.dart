@@ -8,11 +8,22 @@ class Lezionewidget extends StatelessWidget {
     required this.lezione,
   });
 
+  double getHeight(String arg){
+    switch(arg.length){
+      case > 100:
+        return 250;
+      case > 50:
+        return 180;
+      default:
+        return 130;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 150,
-      height: 200,
+      height: getHeight(lezione.argomento),
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.grey[800],
@@ -46,7 +57,7 @@ class Lezionewidget extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                    "${lezione.prof} - Durata: ${lezione.durataOre}",
+                    "${lezione.prof}",
                   style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold

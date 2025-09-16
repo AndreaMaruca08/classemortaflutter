@@ -29,10 +29,21 @@ class Giorno{
   factory Giorno.fromJson(Map<String, dynamic> json) {
     List<Ora> l = Ora.fromJsonList(json);
     List<Ora> giorno = [];
+    int ora = 1;
+
     for (Ora o in l) {
-      if (o.materia.toUpperCase() != "SOSTEGNO") {
-        giorno.add(o);
+      //non si conta sostegno siccome servono gli orari
+      if (o.materia.toUpperCase() == "SOSTEGNO") {
+        continue;
       }
+      //si controlla per possibili firme dei prof di laboratorio che creerebbero
+      //doppioni
+      if(ora > o.ora){
+        continue;
+      }
+
+      giorno.add(o);
+      ora++;
     }
     return Giorno(
       orari: giorno,

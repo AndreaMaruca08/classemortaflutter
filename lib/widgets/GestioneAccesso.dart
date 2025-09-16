@@ -33,8 +33,8 @@ class _AuthWrapperState extends State<AuthWrapper> {
     if (!mounted) return;
 
     if (cred != null && cred.code.isNotEmpty && cred.pass.isNotEmpty) {
-      Apiservice apiService = Apiservice(cred.code, widget.precedente);
-      LoginResponse? loginSuccess = await apiService.doLogin(cred.pass); // Supponiamo che doLogin restituisca bool
+      Apiservice apiService = Apiservice(cred.code, cred.pass, widget.precedente);
+      LoginResponse? loginSuccess = await apiService.doLogin(); // Supponiamo che doLogin restituisca bool
       if (!mounted) return;
 
       if (loginSuccess?.token != "") {

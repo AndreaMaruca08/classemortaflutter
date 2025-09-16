@@ -119,21 +119,16 @@ class InfoSingola extends StatelessWidget {
 
   Color? getColor(String dataString) {
     try {
-      DateTime today =
-          DateTime.now(); // Considera di usare DateTime.now() per la data corrente reale
+      DateTime today = DateTime.now(); // Considera di usare DateTime.now() per la data corrente reale
       DateTime scadenza = DateTime.parse(dataString.substring(0, 10));
       DateTime scadenzaDateOnly = DateTime(
         scadenza.year,
         scadenza.month,
         scadenza.day,
       );
-
-      if (scadenzaDateOnly.isBefore(today)) {
-        return Colors.grey[600];
-      }
       Duration differenza = scadenzaDateOnly.difference(today);
-      if (differenza.inDays <= 0) {
-        return Colors.red[500];
+      if (scadenzaDateOnly.isBefore(today) ) {
+        return today.hour < 14 ? Colors.red[500] : Colors.grey;
       }
       if (differenza.inDays <= 1) {
         return Colors.red[300];
@@ -189,23 +184,21 @@ class InfoSingola extends StatelessWidget {
   String getDistanza(String dataString) {
 
     try {
-      // DateTime now = DateTime.now(); // Non usato se today è hardcoded
-      DateTime today =
-          DateTime.now(); // Considera di usare DateTime.now() per la data corrente reale
+      DateTime today = DateTime.now(); // Considera di usare DateTime.now() per la data corrente reale
       DateTime scadenza = DateTime.parse(dataString.substring(0, 10));
       DateTime scadenzaDateOnly = DateTime(
         scadenza.year,
         scadenza.month,
         scadenza.day,
       );
-
-      if (scadenzaDateOnly.isBefore(today)) {
-        return "Già passata";
-      }
-      if (scadenzaDateOnly.isAtSameMomentAs(today)) {
-        return "PER OGGI !!";
-      }
       Duration differenza = scadenzaDateOnly.difference(today);
+      print(differenza.inHours);
+      if(differenza.inHours < -14){
+        return "Oggi";
+      }
+      if (scadenzaDateOnly.isBefore(today)) {
+        return "PER OGGI !!!";
+      }
       if (differenza.inDays == 0) {
         return "DOMANI !!!";
       }
