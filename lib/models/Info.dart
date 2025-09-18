@@ -27,7 +27,8 @@ class Info {
       if (notesValue == null) return false;
 
       String descrizione = notesValue.toString().toLowerCase();
-      bool con1 = descrizione.contains("es");
+      bool con1 = descrizione.contains("es.");
+      bool con11 = descrizione.contains("eserc");
       bool con2 = descrizione.contains("compit");
       bool con3 = descrizione.contains("consegna");
       bool con7 = descrizione.contains("invalsi");
@@ -40,7 +41,7 @@ class Info {
 
 
 
-      return (con1 || con2 || con3 || con6 || con7 || con8 || con9 || con10) && con4 && con5;
+      return (con1 || con11 || con2 || con3 || con6 || con7 || con8 || con9 || con10) && con4 && con5;
     });
 
     List<Info> compitiFiltrati =

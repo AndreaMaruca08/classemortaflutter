@@ -8,6 +8,7 @@ class VisualizzaHtmlSemplice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(htmlData);
     return Scaffold(
       appBar: AppBar(title: Text("Contenuto HTML")),
       body: SingleChildScrollView( // Buono per contenuti lunghi
@@ -15,12 +16,11 @@ class VisualizzaHtmlSemplice extends StatelessWidget {
         child: Html(
           data: htmlData,
           // Puoi personalizzare stili, gestori di tap, ecc.
-          // style: {
-          //   "body": Style(
-          //     fontSize: FontSize.large,
-          //   ),
-          //   "p": Style(color: Colors.red),
-          // },
+           style: {
+             "body": Style(
+               fontSize: FontSize.large,   ),
+             "p": Style(color: Colors.red),
+           },
         ),
       ),
     );

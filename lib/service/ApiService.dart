@@ -47,7 +47,7 @@ import '../models/Voto.dart';
 /// | `/students/{id}/documents`              | Get available documents (report cards, certificates, etc.). |
 ///
 ///
-/// ATTENTION!!!!!!!!!!!
+/// PAY ATTENTION!!!!!!!!!!!
 /// to use the functions you have to first create an instance of ApiService and
 /// then use the login function to validate this instance because you need the
 /// session token.
@@ -716,7 +716,7 @@ class Apiservice {
       'User-Agent': 'Mozilla/5.0',
     };
 
-    final body = 'cid=&uid=$codiceStudent&pwd=Polveredistelle1.&pin=&target=';
+    final body = 'cid=&uid=$codiceStudent&pwd=$pass&pin=&target=';
 
     final resp = await http.post(uri, headers: headers, body: body);
 
@@ -748,7 +748,7 @@ class Apiservice {
     );
     if (response.statusCode == 200) {
       final htmlContent = response.body;
-      final pctoData = parsePctoHtml(htmlContent);
+      final pctoData = parsePctoHtmlIndependent(htmlContent);
       return pctoData!;
     } else {
       throw Exception('Errore durante il recupero del curriculum: ${response.statusCode}');

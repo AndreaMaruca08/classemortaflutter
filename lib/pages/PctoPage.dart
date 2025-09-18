@@ -25,14 +25,14 @@ class Pctopage extends StatelessWidget {
                   children: [
                     const SizedBox(width: 10,),
                     const Text('Ore Previste: ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
-                    Text(pctoData.orePreviste ?? 'N/A', style: const TextStyle(fontSize: 20)),
+                    Text(pctoData.orePrevisteRaw ?? 'N/A', style: const TextStyle(fontSize: 20)),
                   ],
                 ),
                 Row(
                   children: [
                     const SizedBox(width: 10,),
                     const Text('Ore Presenze Totali: ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
-                    Text(pctoData.orePresenzeTotali, style: TextStyle(fontSize: 20, color: double.parse((pctoData.orePresenzeTotali).substring(0, 3)) < double.parse((pctoData.orePreviste).substring(0, 3)) ? Colors.red : Colors.green)),
+                    Text(pctoData.orePresenzeTotaliRaw, style: TextStyle(fontSize: 20, color: double.parse((pctoData.orePresenzeTotali).toString().substring(0, 3)) < double.parse((pctoData.orePreviste).toString().substring(0, 3)) ? Colors.red : Colors.green)),
                   ],
                 ),
                 const SizedBox(height: 20),

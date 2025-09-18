@@ -13,9 +13,11 @@ class Lezionewidget extends StatelessWidget {
       case > 100:
         return 250;
       case > 50:
-        return 180;
+        return 230;
+      case > 20:
+        return 215;
       default:
-        return 130;
+        return 170;
     }
   }
 

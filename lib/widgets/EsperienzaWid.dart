@@ -30,8 +30,8 @@ class Esperienzawid extends StatelessWidget {
         children: [
           Text(esp.nomePosto, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           Text('Ore Esperienza: ${esp.oreEsperienza}',  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          if(esp.orePresenzaEsperienza != '')
-          Text('Ore Presenza: ${esp.orePresenzaEsperienza}',  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          if(esp.orePresenzaEsperienza != 0)
+          Text('Ore Presenza: ${esp.orePresenzaEsperienza.toString().substring(0, 3)}',  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         ],
         )
         )

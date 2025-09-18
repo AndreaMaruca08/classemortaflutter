@@ -58,9 +58,9 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     _service = widget.apiService;
     _medieGeneraliFuture = _service.getMedieGenerali() ; // Caricamento iniziale
-    _lastVotiFutureMedie = _service.getLastVoti(100);
+    _lastVotiFutureMedie = _service.getLastVoti(200);
     _voti = _service.getAllVoti();
-    _lastVotiFuture = _service.getLastVoti(100);
+    _lastVotiFuture = _service.getLastVoti(200);
     _notizie = _service.getNotizie();
     _pagelle = _service.getPagelle() as Future<List<Pagella>?>;
     _assenze = _service.getAssenze();
