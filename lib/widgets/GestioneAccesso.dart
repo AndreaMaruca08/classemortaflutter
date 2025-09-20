@@ -39,7 +39,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
       if (loginSuccess?.token != "") {
         setState(() {
-          _destinationPage = MainPage(apiService: apiService);
+          _destinationPage = MainPage(apiService: apiService, code: cred.code);
           _isLoading = false;
         });
       } else {

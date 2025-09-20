@@ -49,7 +49,7 @@ class _MainPageState extends State<StudentDetail> {
                 children: [
                   const SizedBox(height: 5),
                   const Text(
-                      " Versione 1.5.0 - orari + bugfix + curriculum",
+                      " Versione 1.6.0 bugfix + giustificazioni se genitore",
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,

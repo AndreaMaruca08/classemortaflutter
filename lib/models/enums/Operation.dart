@@ -1,0 +1,4 @@
+enum Ope{
+  NUOVO,
+  ELIMINA
+}

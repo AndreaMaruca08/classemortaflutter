@@ -4,20 +4,24 @@ class Info {
   String nomeInsegnante;
   String descrizione;
   String data;
+  String orario;
 
   Info({
     required this.materia,
     required this.nomeInsegnante,
     required this.descrizione,
     required this.data,
+    required this.orario,
   });
 
   factory Info.fromJson(Map<String, dynamic> json) {
+    String ora = "${json['evtDatetimeBegin'].toString().substring(11,  16)} - ${json['evtDatetimeEnd'].toString().substring(11,  16)}";
     return Info(
-      materia: json['subjectDesc'] as String? ?? "Materia non specificata",
+      materia: json['subjectDesc'] as String? ?? "null",
       nomeInsegnante: json['authorName'] as String? ?? "Insegnante sconosciuto",
       descrizione: json['notes'] as String? ?? "Nessuna descrizione",
       data: json['evtDatetimeBegin'] as String? ?? "Data non disponibile",
+      orario: ora,
     );
   }
 

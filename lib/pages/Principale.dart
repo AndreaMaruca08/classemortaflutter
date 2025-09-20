@@ -3,6 +3,7 @@ import 'package:ClasseMorta/models/Materia.dart';
 import 'package:ClasseMorta/models/ProvaCurriculum.dart';
 import 'package:ClasseMorta/models/Voto.dart';
 import 'package:ClasseMorta/pages/GiorniPagina.dart';
+import 'package:ClasseMorta/pages/GiustifichePagina.dart';
 import 'package:ClasseMorta/pages/PctoPage.dart';
 import 'package:ClasseMorta/pages/detail/Agenda.dart';
 import 'package:ClasseMorta/pages/AssenzePage.dart';
@@ -23,6 +24,7 @@ import '../models/Lezione.dart';
 import '../models/Nota.dart';
 import '../models/Notizia.dart';
 import '../models/Pagella.dart';
+import '../models/SchoolEvent.dart';
 import '../models/Streak.dart';
 import '../models/StudentCard.dart';
 import '../service/ApiService.dart';
@@ -32,7 +34,8 @@ import 'detail/DettagliPersona.dart';
 
 class MainPage extends StatefulWidget {
   final Apiservice apiService;
-  const MainPage({super.key, required this.apiService});
+  final String? code;
+  const MainPage({super.key, required this.apiService, this.code});
   @override
   State<MainPage> createState() => _MainPageState();
 }
@@ -51,6 +54,7 @@ class _MainPageState extends State<MainPage> {
   late Future<List<Didattica>> _didattica;
   late Future<List<Giorno>> _giorni;
   late Future<PctoData> _datiCurriculum;
+  late Future<List<SchoolEvent>> _events;
 
   @override
 
@@ -69,6 +73,7 @@ class _MainPageState extends State<MainPage> {
     _didattica = _service.fetchDidattica();
     _giorni = _service.getOrari();
     _datiCurriculum = _service.getCurriculum();
+    _events = _service.getEvents();
   }
 
   Future<void> _handleRefresh() async {
@@ -85,6 +90,7 @@ class _MainPageState extends State<MainPage> {
       _didattica = _service.fetchDidattica();
       _giorni = _service.getOrari();
       _datiCurriculum = _service.getCurriculum();
+      _events = _service.getEvents();
     });
     await _medieGeneraliFuture;
     await _lastVotiFutureMedie;
@@ -98,6 +104,7 @@ class _MainPageState extends State<MainPage> {
     await _didattica;
     await _giorni;
     await _datiCurriculum;
+    await _events;
   }
 
   @override
@@ -135,7 +142,7 @@ class _MainPageState extends State<MainPage> {
                         Text(
                           "Buongiorno ${card.usrType == "S" ? "Studente" : card.usrType == "P" ? "Professore" : "Genitore di"} ${card.nome} ${card.cognome}",
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                               shadows: <Shadow>[
                                 Shadow(
@@ -410,7 +417,7 @@ class _MainPageState extends State<MainPage> {
                         }
                     }),
                     SizedBox(width: 10),
-                    passaggio(context, "  Compiti           ", "Agenda", Agenda(apiService: _service), Icon(Icons.edit_calendar_outlined)),
+                    passaggio(context, "  Compiti          ", "Agenda", Agenda(apiService: _service), Icon(Icons.edit_calendar_outlined)),
                   ],
                 ),
                 SizedBox(
@@ -557,14 +564,14 @@ class _MainPageState extends State<MainPage> {
                         return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasError) {
                         return Center(
-                          child: Text(''),
+                          child: Text('         Errore'),
                         );
                       } else if (snapshot.hasData) {
                         final PctoData pcto = snapshot.data!;
                         return passaggio(
                             context,
                             "Curriculum      ",
-                            "orari settimanali",
+                            "Curriculum / ore PCTO",
                             Pctopage(
                               pctoDataa: pcto,
                             ),
@@ -572,7 +579,37 @@ class _MainPageState extends State<MainPage> {
                         );
 
                       }else{
-                        return const Center(child: Text("      Nessun orario"));
+                        return const Center(child: Text("      Nessun dato"));
+                      }
+                    }),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+
+                if(widget.code?[0] == 'G')
+                Row(
+                  children: [
+                    FutureBuilder(future: _events, builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(
+                          child: Text('         Errore'),
+                        );
+                      } else if (snapshot.hasData) {
+                        final List<SchoolEvent> events = snapshot.data!;
+                        return passaggio(
+                            context,
+                            "Giustifiche         ",
+                            "Giustifica un evento",
+                            Giustifichepagina(events: events, service: _service,),
+                            Icon(Icons.add)
+                        );
+
+                      }else{
+                        return const Center(child: Text("      Vuoto"));
                       }
                     }),
                   ],
@@ -847,7 +884,6 @@ class _MainPageState extends State<MainPage> {
                 SizedBox(height: 10,),
                 anno(false),
                 SizedBox(height: 200,),
-
 
               ],
             ),

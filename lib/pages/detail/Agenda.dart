@@ -102,7 +102,7 @@ class _AgendaState extends State<Agenda> {
                         } else if (snapshotCompiti.hasData && snapshotCompiti.data!.isNotEmpty) {
                           List<Info> loadedCompiti = snapshotCompiti.data!;
                           return SizedBox(
-                            height: 230,
+                            height: 240,
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
                               itemCount: loadedCompiti.length,
@@ -190,7 +190,7 @@ class _AgendaState extends State<Agenda> {
                         } else if (snapshotCompiti.hasData && snapshotCompiti.data!.isNotEmpty) {
                           List<Info> loadedCompiti = snapshotCompiti.data!;
                           return SizedBox(
-                            height: 200,
+                            height: 210,
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
                               itemCount: loadedCompiti.length,
@@ -233,7 +233,7 @@ class _AgendaState extends State<Agenda> {
                         } else if (snapshotCompiti.hasData && snapshotCompiti.data!.isNotEmpty) {
                           List<Info> loadedCompiti = snapshotCompiti.data!;
                           return SizedBox(
-                            height: 200,
+                            height: 230,
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
                               itemCount: loadedCompiti.length,

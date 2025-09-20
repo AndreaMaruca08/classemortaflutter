@@ -5,6 +5,9 @@ class InfoSingola extends StatelessWidget {
   final Info info;
   const InfoSingola({super.key, required this.info});
 
+  bool materiaIsNull(){
+    return info.materia == "null";
+  }
   @override
   Widget build(BuildContext context) {
     Color textColor = Theme.of(context).brightness == Brightness.dark
@@ -34,6 +37,7 @@ class InfoSingola extends StatelessWidget {
               .min, // La Column cerca di essere il più piccola possibile, ma l'Expanded la forzerà a riempirsi
           children: [
             Text(
+              materiaIsNull() ? info.nomeInsegnante :
               info.materia.length > 35
                   ? "${info.materia.substring(0, 35)}..."
                   : info.materia,
@@ -61,7 +65,26 @@ class InfoSingola extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(
+                  Icons.watch_later_outlined,
+                  size: 16,
+                  color: textColor.withOpacity(0.8),
+                ),
+                SizedBox(width: 6),
+                Text(
+                  info.orario,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: textColor.withOpacity(0.9),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            if(!materiaIsNull())
             Row(
               children: [
                 Icon(Icons.person, size: 16, color: textColor.withOpacity(0.8)),

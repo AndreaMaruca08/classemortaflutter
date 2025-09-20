@@ -5,6 +5,8 @@ import 'package:ClasseMorta/models/Giorno.dart';
 import 'package:ClasseMorta/models/Info.dart';
 import 'package:ClasseMorta/models/Pagella.dart';
 import 'package:ClasseMorta/models/ProvaCurriculum.dart';
+import 'package:ClasseMorta/models/RichiestaGiustifica.dart';
+import 'package:ClasseMorta/models/SchoolEvent.dart';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_file/open_file.dart';
@@ -18,6 +20,8 @@ import '../models/Nota.dart';
 import '../models/Notizia.dart';
 import '../models/StudentCard.dart';
 import '../models/Voto.dart';
+import '../models/enums/Operation.dart';
+import 'HtmlParserService.dart';
 
 /// A service class for interacting with the Spaggiari API.
 ///
@@ -112,6 +116,7 @@ class Apiservice {
     noticeboard = "${base}students/$code/noticeboard";
     documents = "${base}students/$code/documents";
     apriFile = "${base}students/$code/didactics/item/";
+
 
 
   }
@@ -720,7 +725,6 @@ class Apiservice {
 
     final resp = await http.post(uri, headers: headers, body: body);
 
-    print('[DEBUG] Headers risposta: ${resp.headers}');
 
     final setCookie = resp.headers['set-cookie'];
     if (setCookie == null || setCookie.isEmpty) {
@@ -730,12 +734,10 @@ class Apiservice {
     // Estrae PHPSESSID dal/i Set-Cookie
     final match = RegExp(r'PHPSESSID=([^;]+)').firstMatch(setCookie);
     if (match == null) {
-      print('[ERRORE] Cookie PHPSESSID non trovato.');
       throw Exception('PHPSESSID non trovato');
     }
 
     final phpsessid = match.group(1)!;
-    print('[DEBUG] PHPSESSID trovato: $phpsessid');
     return phpsessid;
   }
 
@@ -754,6 +756,124 @@ class Apiservice {
       throw Exception('Errore durante il recupero del curriculum: ${response.statusCode}');
     }
   }
+
+  Future<List<SchoolEvent>> getEvents() async {
+    phpSessId =  await ottieniPhpsessid();
+
+    final response = await http.get(
+      Uri.parse("https://web.spaggiari.eu/fml/app/default/librettoweb.php"),
+      headers: {'UserAgent' : 'Mozilla/5.0', 'Cookie': 'PHPSESSID=$phpSessId; webrole=gen; webidentity=$codiceStudent'},
+    );
+    if (response.statusCode == 200) {
+      final htmlContent = response.body;
+      final events = HtmlParserService().parseEvents(htmlContent);
+      return events;
+    }else{
+      return [];
+    }
+  }
+  String getOpeTipo(Ope tipo){
+    return switch(tipo){
+      Ope.NUOVO => "NUOVO",
+      Ope.ELIMINA => "ELIMINA"
+    };
+  }
+  Future<void> sendRequest(RichiestaGiustifica richiesta) async {
+
+    final uri = Uri.parse(
+      'https://web.spaggiari.eu/fml/app/default/librettoweb_io.php',
+    );
+
+    final Map<String, String> body = {
+      'ope': getOpeTipo(richiesta.ope),
+      'tipo_giustifica': richiesta.tipo_giustifica.toString(),
+      'inizio_assenza': richiesta.inizio_assenza,
+      'fine_assenza': richiesta.fine_assenza,
+      'motivazione_assenza': richiesta.motivazione_assenza,
+      'giorno_entrata_uscita': richiesta.giorno_entrata_uscita,
+      'ora_entrata_uscita': richiesta.ora_entrata_uscita,
+      'motivazione_entrata_uscita': richiesta.motivazione_entrata_uscita,
+      'accompagnatore': richiesta.accompagnatore,
+    };
+    final resp = await http.post(
+      uri,
+      headers: {'UserAgent' : 'Mozilla/5.0', 'Cookie': 'PHPSESSID=$phpSessId; webrole=gen; webidentity=$codiceStudent', 'Content-Type': 'application/x-www-form-urlencoded'},
+      body: body,
+    );
+
+    print('Status code: ${resp.statusCode}');
+    print('Response data: ${resp.body.toString()}');
+  }
+
+  /*
+  METHOD: POST
+
+  URL
+  https://web.spaggiari.eu/fml/app/default/librettoweb_io.php
+
+HEADERS
+Accept:
+  Accept-Encoding: gzip, deflate, br, zstd
+  Accept-Language:
+  it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7
+  Connection:
+  keep-alive
+  Content-Length:
+  187
+  Content-Type:
+  application/x-www-form-urlencoded; charset=UTF-8
+  Cookie:
+  PHPSESSID=74gedcm5rjlpt36elcu039eu59e3rftk; webrole=gen; webidentity=G10435383U
+  Host:
+  web.spaggiari.eu
+  Origin:
+  https://web.spaggiari.eu
+  Referer:
+  https://web.spaggiari.eu/fml/app/default/librettoweb.php
+  sec-ch-ua:
+  "Chromium";v="140", "Not=A?Brand";v="24", "Google Chrome";v="140"
+  sec-ch-ua-mobile:
+  ?0
+  sec-ch-ua-platform:
+  "macOS"
+  Sec-Fetch-Dest:
+  emptyw
+  Sec-Fetch-Mode:
+  cors
+  Sec-Fetch-Site:
+  same-origin
+  User-Agent:
+  Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36
+  X-Requested-With:
+  XMLHttpRequest
+
+
+
+
+  RICHIESTA:
+  ope              NUOVO
+  tipo_giustifica  2
+
+  inizio _assenza
+
+  fine_assenza
+
+  motivazione_assenza
+
+  giorno_entrata_uscita  22/09/2025
+
+  ora_entrata_uscita     12:50
+
+  motivazione_entrata_uscita  testo di prova
+
+  accompagnatore  testo di prova
+
+
+
+
+  */
+
+
 
   /*
     esempio risposta:

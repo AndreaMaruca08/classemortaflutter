@@ -202,7 +202,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => MainPage(apiService: apiService)),
+                    MaterialPageRoute(builder: (context) => MainPage(apiService: apiService, code: codice,)),
                   );
                 },
                 child: const Text('Accedi'),
