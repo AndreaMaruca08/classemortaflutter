@@ -86,7 +86,7 @@ class _AgendaState extends State<Agenda> {
                       height: 40,
                       width: 100,
                       child: const Text(
-                        "Compiti",
+                        " Compiti",
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -125,6 +125,7 @@ class _AgendaState extends State<Agenda> {
                         }
                       },
                     ),
+                    SizedBox(height: 15,),
                     //LIBRI DA PORTARE
                     SizedBox(
                       height: 40,
@@ -170,6 +171,7 @@ class _AgendaState extends State<Agenda> {
                         }
                       },
                     ),
+                    SizedBox(height: 15,),
                     SizedBox(
                       height: 40,
                       width: 100,
@@ -213,6 +215,7 @@ class _AgendaState extends State<Agenda> {
                         }
                       },
                     ),
+                    SizedBox(height: 15,),
                     SizedBox(
                       height: 40,
                       width: 165,

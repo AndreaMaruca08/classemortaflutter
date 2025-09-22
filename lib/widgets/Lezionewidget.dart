@@ -11,13 +11,13 @@ class Lezionewidget extends StatelessWidget {
   double getHeight(String arg){
     switch(arg.length){
       case > 100:
-        return 250;
+        return 300;
       case > 50:
-        return 230;
+        return 250;
       case > 20:
-        return 215;
+        return 230;
       default:
-        return 170;
+        return 212;
     }
   }
 

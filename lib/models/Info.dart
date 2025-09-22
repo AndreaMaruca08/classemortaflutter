@@ -42,10 +42,11 @@ class Info {
       bool con8 = descrizione.contains("n.");
       bool con9 = descrizione.contains("scheda");
       bool con10 = descrizione.contains("finire");
+      bool con12 = descrizione.contains("leggere");
 
 
 
-      return (con1 || con11 || con2 || con3 || con6 || con7 || con8 || con9 || con10) && con4 && con5;
+      return (con1 || con11 || con2 || con3 || con6 || con7 || con8 || con9 || con10 || con12) && con4 && con5;
     });
 
     List<Info> compitiFiltrati =
@@ -149,11 +150,12 @@ class Info {
       bool con16 = !descrizione.contains("scheda");
       bool con17 = !descrizione.contains("finire");
       bool con18 = !descrizione.contains("presentazion");
+      bool con19 = !descrizione.contains("leggere");
 
       return con1 && con2 && con3 && con4 && con5 && con6
              && con7 && con8 && con9 && con10 && con11
              && con12 && con13 && con14 && con15 && con16
-             && con17 && con18;
+             && con17 && con18 && con19;
     });
 
     List<Info> compitiFiltrati =

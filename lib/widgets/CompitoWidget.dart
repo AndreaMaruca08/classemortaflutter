@@ -151,10 +151,16 @@ class InfoSingola extends StatelessWidget {
       );
       Duration differenza = scadenzaDateOnly.difference(today);
       if (scadenzaDateOnly.isBefore(today) ) {
-        return today.hour < 14 ? Colors.red[500] : Colors.grey;
+        return today.hour < 14 ? Colors.red[600] : Colors.grey;
       }
-      if (differenza.inDays <= 1) {
-        return Colors.red[300];
+      if (differenza.inDays == 0) {
+        return Colors.red[400];
+      }
+      if (differenza.inDays == 1) {
+        return Colors.orange[500];
+      }
+      if (differenza.inDays == 2) {
+        return Colors.orange[200];
       }
       if (differenza.inDays <= 6) {
         return Colors.green[300];
