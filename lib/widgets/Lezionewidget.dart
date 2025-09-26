@@ -28,11 +28,11 @@ class Lezionewidget extends StatelessWidget {
       height: getHeight(lezione.argomento),
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.grey[800],
+        color: Colors.grey[900],
         borderRadius: BorderRadius.all(Radius.circular(10)),
         boxShadow: [
           BoxShadow(
-            color: Color.fromRGBO(240, 240, 240, 0.4),
+            color: Color.fromRGBO(240, 240, 240, 0.2),
             spreadRadius: 1,
             blurRadius: 1,
             offset: Offset(2, 2),

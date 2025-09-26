@@ -4,6 +4,7 @@ class Info {
   String nomeInsegnante;
   String descrizione;
   String data;
+  String dataFine;
   String orario;
 
   Info({
@@ -12,6 +13,7 @@ class Info {
     required this.descrizione,
     required this.data,
     required this.orario,
+    required this.dataFine,
   });
 
   factory Info.fromJson(Map<String, dynamic> json) {
@@ -21,6 +23,7 @@ class Info {
       nomeInsegnante: json['authorName'] as String? ?? "Insegnante sconosciuto",
       descrizione: json['notes'] as String? ?? "Nessuna descrizione",
       data: json['evtDatetimeBegin'] as String? ?? "Data non disponibile",
+      dataFine: json['evtDatetimeEnd'] as String? ?? "Data non disponibile",
       orario: ora,
     );
   }

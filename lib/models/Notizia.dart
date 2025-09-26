@@ -32,15 +32,19 @@ import 'package:ClasseMorta/models/Attach.dart';
 class Notizia{
   int codiceDocumento;
   bool hasFile;
+  String evtCode;
   String title;
-  bool letta = false;
+  bool letta;
+  String dataDiInserimento;
   List<Attach> files;
 
   Notizia({
     required this.codiceDocumento,
     required this.hasFile,
+    required this.evtCode,
     required this.title,
     required this.letta,
+    required this.dataDiInserimento,
     required this.files,
   });
 
@@ -48,8 +52,10 @@ class Notizia{
     return Notizia(
       codiceDocumento: json['pubId'],
       hasFile: json['cntHasAttach'],
+      evtCode: json['evtCode'],
       title: json['cntTitle'],
       letta: json['readStatus'],
+      dataDiInserimento: json['dinsert_allegato'],
       files: Attach.fromJsonList(json),
     );
 

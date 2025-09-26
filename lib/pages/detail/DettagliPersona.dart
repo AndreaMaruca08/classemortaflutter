@@ -43,13 +43,12 @@ class _MainPageState extends State<StudentDetail> {
               ],
             ),
             child: Column(
-
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   const SizedBox(height: 5),
                   const Text(
-                      " Versione 1.6.0 bugfix + giustificazioni se genitore",
+                      " Versione 1.7.1 bugfix + vacanze + bacheca con file funzionanti + piccoli cambiamenti grafici",
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,

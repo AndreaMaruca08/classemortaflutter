@@ -24,7 +24,7 @@ class Votodisplay extends StatelessWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               Text(
-                "${voto.dataVoto} | ${voto.nomeInteroMateria.length > 20 ? "${voto.nomeInteroMateria.substring(0, 12)}..." : voto.nomeInteroMateria}"
+                "${getData(voto.dataVoto)} | ${voto.nomeInteroMateria.length > 12 ? "${voto.nomeInteroMateria.substring(0, 12)}..." : voto.nomeInteroMateria}"
               )
             ],
           )
@@ -32,6 +32,44 @@ class Votodisplay extends StatelessWidget {
         ],
       )
     );
+  }
+  String getData(String dataString){
+    List<String> nomiGiorni = [
+      'Lunedì',
+      'Martedì',
+      'Mercoledì',
+      'Giovedì',
+      'Venerdì',
+      'Sabato',
+      'Domenica',
+    ];
+    List<String> nomiMesi = [
+      'Gennaio',
+      'Febbraio',
+      'Marzo',
+      'Aprile',
+      'Maggio',
+      'Giugno',
+      'Luglio',
+      'Agosto',
+      'Settembre',
+      'Ottobre',
+      'Novembre',
+      'Dicembre',
+    ];
+    DateTime scadenza = DateTime.parse(dataString.substring(0, 10));
+    DateTime scadenzaDateOnly = DateTime(
+      scadenza.year,
+      scadenza.month,
+      scadenza.day,
+    );
+
+    String data = "${nomiGiorni[scadenzaDateOnly.weekday - 1].substring(0, 3)} "
+        "${scadenzaDateOnly.day} ${nomiMesi[scadenzaDateOnly.month - 1].substring(0, 3)} "
+        "${scadenzaDateOnly.year}";
+
+
+    return data;
   }
 }
 

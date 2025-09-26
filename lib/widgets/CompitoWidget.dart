@@ -18,7 +18,7 @@ class InfoSingola extends StatelessWidget {
       height: 450,
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
-        color: getColor(info.data)?.withOpacity(0.3),
+        color: getColor(info.dataFine)?.withOpacity(0.3),
         borderRadius: BorderRadius.all(Radius.circular(10)),
         boxShadow: [
           BoxShadow(
@@ -140,18 +140,13 @@ class InfoSingola extends StatelessWidget {
   }
 
 
-  Color? getColor(String dataString) {
+  Color? getColor(String dataFine) {
     try {
       DateTime today = DateTime.now(); // Considera di usare DateTime.now() per la data corrente reale
-      DateTime scadenza = DateTime.parse(dataString.substring(0, 10));
-      DateTime scadenzaDateOnly = DateTime(
-        scadenza.year,
-        scadenza.month,
-        scadenza.day,
-      );
-      Duration differenza = scadenzaDateOnly.difference(today);
-      if (scadenzaDateOnly.isBefore(today) ) {
-        return today.hour < 14 ? Colors.red[600] : Colors.grey;
+      DateTime scadenzaFine = DateTime.parse(dataFine.substring(0, 19));
+      Duration differenza = scadenzaFine.difference(today);
+      if (scadenzaFine.isBefore(today) ) {
+        return today.hour < scadenzaFine.hour ? Colors.red : Colors.grey;
       }
       if (differenza.inDays == 0) {
         return Colors.red[400];

@@ -33,7 +33,7 @@ class Dettaglivoto extends StatelessWidget {
               const Icon(Icons.date_range_outlined, size: 30),
               Expanded(
                 child: Text(
-                  voto.dataVoto,
+                  getData(voto.dataVoto),
                   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -148,6 +148,51 @@ class Dettaglivoto extends StatelessWidget {
       return Colors.red;
     }
 
+  }
+  String getData(String dataString){
+    if(dataString.isEmpty ){
+      return "";
+    }
+    else if(dataString.length == 4){
+      return dataString;
+    }
+
+    List<String> nomiGiorni = [
+      'Lunedì',
+      'Martedì',
+      'Mercoledì',
+      'Giovedì',
+      'Venerdì',
+      'Sabato',
+      'Domenica',
+    ];
+    List<String> nomiMesi = [
+      'Gennaio',
+      'Febbraio',
+      'Marzo',
+      'Aprile',
+      'Maggio',
+      'Giugno',
+      'Luglio',
+      'Agosto',
+      'Settembre',
+      'Ottobre',
+      'Novembre',
+      'Dicembre',
+    ];
+    DateTime scadenza = DateTime.parse(dataString.substring(0, 10));
+    DateTime scadenzaDateOnly = DateTime(
+      scadenza.year,
+      scadenza.month,
+      scadenza.day,
+    );
+
+    String data = "${nomiGiorni[scadenzaDateOnly.weekday - 1].substring(0, 3)} "
+        "${scadenzaDateOnly.day} ${nomiMesi[scadenzaDateOnly.month - 1].substring(0, 3)} "
+        "${scadenzaDateOnly.year}";
+
+
+    return data;
   }
 }
 

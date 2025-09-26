@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:mime/mime.dart';
 import 'package:ClasseMorta/models/Assenza.dart';
 import 'package:ClasseMorta/models/Giorno.dart';
 import 'package:ClasseMorta/models/Info.dart';
 import 'package:ClasseMorta/models/Pagella.dart';
+import 'package:ClasseMorta/models/PeriodoFestivo.dart';
 import 'package:ClasseMorta/models/ProvaCurriculum.dart';
 import 'package:ClasseMorta/models/RichiestaGiustifica.dart';
 import 'package:ClasseMorta/models/SchoolEvent.dart';
@@ -29,27 +31,65 @@ import 'HtmlParserService.dart';
 /// such as grades, absences, notes, and more.
 ///
 ///
-/// ## API Endpoints
-/// The following table lists the API endpoints used by this service:
-///
-/// | **Endpoint Path**                       | **Description**                                             |
-/// | --------------------------------------- | ----------------------------------------------------------- |
-/// | `/auth/login`                           | Authenticate the user and return the session token.         |
-/// | `/students/{id}/grades`                 | Get the student’s grades.                                   |
-/// | `/students/{id}/notes`                  | Get disciplinary notes or annotations.                      |
-/// | `/students/{id}/absences`               | Get the list of recorded absences.                          |
-/// | `/students/{id}/agenda/all/{from}/{to}` | Get agenda items (homework, events) between two dates.      |
-/// | `/students/{id}/lessons/today`          | Get today’s lessons.                                        |
-/// | `/students/{id}/lessons/{date}`         | Get lessons for a specific date.                            |
-/// | `/students/{id}/calendar/all`           | Get the school calendar (holidays, events, etc.).           |
-/// | `/students/{id}/didactics`              | Get didactic materials and programs.                        |
-/// | `/students/{id}/books`                  | Get the list of school books.                               |
-/// | `/students/{id}/card`                   | Get the student’s profile card info.                        |
-/// | `/students/{id}/subjects`               | Get the list of subjects.                                   |
-/// | `/students/{id}/periods`                | Get the list of school periods.                             |
-/// | `/students/{id}/noticeboard`            | Get the noticeboard (general communications).               |
-/// | `/students/{id}/documents`              | Get available documents (report cards, certificates, etc.). |
-///
+///Authentication
+//
+// POST v1/auth/login
+// GET v1/auth/avatar
+// GET v1/auth/status
+// GET v1/auth/ticket
+// User
+//
+// Absence
+//
+// GET v1/students/{studentId}/absences/details
+// GET v1/students/{studentId}/absences/details/{begin}
+// GET v1/students/{studentId}/absences/details/{begin}/{end}
+// Agenda
+//
+// GET v1/students/{studentId}/agenda/all/{begin}/{end}
+// GET v1/students/{studentId}/agenda/{eventCode}/{begin}/{end}
+// Didactics
+//
+// GET v1/students/{studentId}/didactics
+// GET v1/students/{studentId}/didactics/item/{contentId}
+// Notice Board
+//
+// GET v1/students/{studentId}/noticeboard
+// POST v1/students/{studentId}/noticeboard/read/{eventCode}/{pubId}/101
+// GET v1/students/{studentId}/noticeboard/attach/{eventCode}/{pubId}/101
+// Schoolbooks
+//
+// GET v1/students/{studentId}/schoolbooks
+// Calendar
+//
+// GET v1/students/{studentId}/calendar/all 🤔🤔🤔
+// Card
+//
+// GET v1/students/{studentId}/card
+// GET v1/students/{studentId}/cards
+// Grades
+//
+// GET v1/students/{studentId}/grades
+// Lessons
+//
+// GET v1/students/{studentId}/lessons/today
+// GET v1/students/{studentId}/lessons/{day}
+// GET v1/students/{studentId}/lessons/{start}/{end}
+// Notes
+//
+// GET v1/students/{studentId}/notes/all
+// POST v1/students/{studentId}/notes/{type}/read/{note}
+// Periods
+//
+// GET v1/students/{studentId}/periods
+// Subjects
+//
+// GET v1/students/{studentId}/subjects
+// Documents
+//
+// POST v1/students/{studentId}/documents
+// POST v1/students/{studentId}/documents/check/{hash}
+// POST v1/students/{studentId}/documents/read/{hash}
 ///
 /// PAY ATTENTION!!!!!!!!!!!
 /// to use the functions you have to first create an instance of ApiService and
@@ -61,6 +101,8 @@ import 'HtmlParserService.dart';
 class Apiservice {
   final String year = (DateTime.now().year - 2002).toString();
   late String base = "https://web.spaggiari.eu/rest/v1/";
+
+  late bool precedente;
 
   late String login;
   late String phpSessId;
@@ -82,6 +124,7 @@ class Apiservice {
   late String documents;
   late String fullCode;
   late String apriFile;
+  late String vacanze;
 
   late String token;
 
@@ -92,7 +135,7 @@ class Apiservice {
     'User-Agent': 'CVVS/std/4.1.3 Android/14',
   };
 
-  Apiservice(String codiceStudente, String password, bool precedente) {
+  Apiservice(String codiceStudente, String password, this.precedente) {
     if(precedente){
       base = "https://web$year.spaggiari.eu/rest/v1/";
     }
@@ -116,9 +159,12 @@ class Apiservice {
     noticeboard = "${base}students/$code/noticeboard";
     documents = "${base}students/$code/documents";
     apriFile = "${base}students/$code/didactics/item/";
+    vacanze = "${base}students/$code/calendar/all";
 
+  }
 
-
+  int getYear(){
+    return precedente? DateTime.now().year - 2 : DateTime.now().year;
   }
 
   String getAgendaUrl(String fromDate, String toDate) {
@@ -486,32 +532,6 @@ class Apiservice {
     }
   }
 
-  Future<void> downloadAndOpenAttachment(int pubId, int attachNum) async {
-    final url =
-        "$base$code/noticeboard/attach/$pubId/$attachNum";
-
-    final response = await http.get(
-      Uri.parse(url),
-      headers: {
-        "Z-Auth-Token": token,
-        'User-Agent': 'CVVS/std/4.1.3 Android/14',
-        "Z-Dev-Apikey": "Tg1NWEwNGIgIC0K",
-        'X-Requested-With': 'XMLHttpRequest'
-      },
-    );
-
-    if (response.statusCode == 200) {
-      // Salva in una cartella temporanea
-      final dir = await getTemporaryDirectory();
-      final filePath = "${dir.path}/allegato_$pubId.pdf";
-
-      final file = File(filePath);
-      await file.writeAsBytes(response.bodyBytes);
-    } else {
-      throw Exception("Errore durante il download: ${response.statusCode}");
-    }
-  }
-
   Future<List<List<Nota>>> getNote() async {
     final response = await http.get(
       Uri.parse(notes),
@@ -640,31 +660,89 @@ class Apiservice {
     }
   }
 
-  Future<void> downloadAndOpenPdfById(String docId, String filename,) async {
+  Future<String> readNoticeboardFile (String docId, String filename, String evtCode, int num, bool didattica, bool hasfile) async{
+     final response = await http.post(
+      Uri.parse("${base}students/$code/noticeboard/read/$evtCode/$docId/101"),
+      headers: otherHeaders,
+    );
+     if(response.statusCode == 200){
+       final data = jsonDecode(response.body);
+       if(!hasfile){
+         return data["item"]["text"];
+       }
+       await downloadAndOpenPdfById(docId, filename, evtCode, num, didattica);
+     }
+     return "";
+  }
+
+  Future<void> downloadAndOpenPdfById(String docId, String fileNameWithoutExtension, String evtCode, int num, bool didattica) async {
     final dio = Dio();
 
     // Imposta gli header extra
     dio.options.headers = otherHeaders;
 
-    // Costruisci l'URL a partire dall'id
-    final url = '${base}students/$code/didactics/item/$docId';
+    String url;
+    if (didattica) {
+      url = '${base}students/$code/didactics/item/$docId';
+    } else {
+      url = '${base}students/$code/noticeboard/attach/$evtCode/$docId/$num';
+    }
+
     // Ottieni cartella temporanea
     final dir = await getTemporaryDirectory();
-    final filePath = '${dir.path}/$filename';
-    final file = File(filePath);
+    String? filePath; // Inizializza come nullable
 
     try {
-      // Scarica il PDF
-      await dio.download(url, filePath);
+      // Esegui una richiesta HEAD per ottenere gli header prima di scaricare il corpo completo
+      // o scarica direttamente e controlla la risposta.
+      // Per semplicità, scaricheremo e poi controlleremo.
+      // Se i file sono molto grandi, una richiesta HEAD sarebbe più efficiente.
 
-      if (await file.exists()) {
-        print('Download completato: $filePath');
-        // Apri il PDF con app esterna
-        final result = await OpenFile.open(filePath);
-        print(result.message);
+      final response = await dio.get(
+        url,
+        options: Options(
+          responseType: ResponseType.bytes, // Scarica come stream di byte
+        ),
+      );
+
+      // ... (dentro la tua funzione downloadAndOpenPdfById)
+
+      if (response.statusCode == 200 && response.data != null) {
+        String fileExtension = '.pdf'; // Estensione predefinita come da tua indicazione
+        final contentTypeHeader = response.headers.value(Headers.contentTypeHeader);
+
+        if (contentTypeHeader != null) {
+          final mimeType = contentTypeHeader.split(';').first.trim(); // Estrai il tipo MIME principale
+
+          // Utilizza la funzione dal pacchetto mime e assegna a una variabile con nome diverso
+          final String determinedExtension = extensionFromMime(mimeType); // << CORREZIONE QUI
+
+          fileExtension = '.$determinedExtension';
+                  print('Content-Type: $mimeType, Estensione derivata: $fileExtension');
+        } else {
+          print('Content-Type header non trovato, usando estensione predefinita .pdf');
+        }
+
+        final completeFileName = '$fileNameWithoutExtension$fileExtension';
+        filePath = '${dir.path}/$completeFileName';
+        final file = File(filePath!);
+
+        await file.writeAsBytes(response.data);
+
+        if (await file.exists()) {
+          final result = await OpenFile.open(filePath);
+          print('OpenFile result: ${result.type}, Message: ${result.message}');
+          if (result.type != ResultType.done) {
+            print('Errore durante l''apertura del file: ${result.message}');
+          }
+        } else {
+          print('ERRORE: il file non esiste dopo il salvataggio');
+        }
       } else {
-        print('ERRORE: il file non esiste dopo il download');
+        print('ERRORE nel download del file: Status code: ${response.statusCode}');
       }
+      // ... (resto della funzione)
+
     } on DioException catch (e) {
       print('ERRORE Dio: ${e.toString()}');
       if (e.response != null) {
@@ -672,10 +750,15 @@ class Apiservice {
         print('Response headers: ${e.response?.headers}');
         print('Response data: ${e.response?.data}');
       } else {
-        print('Nessuna risposta dal server');
+        print('Nessuna risposta dal server o errore di connessione');
       }
+      // Potresti voler propagare l'errore o gestirlo mostrando un messaggio all'utente
+    } catch (e) {
+      print('Errore generico in downloadAndOpenPdfById: $e');
+      // Gestisci altri tipi di errori
     }
   }
+
 
   Future<void> openPdf(File file) async {
     await OpenFile.open(file.path);
@@ -772,12 +855,14 @@ class Apiservice {
       return [];
     }
   }
+
   String getOpeTipo(Ope tipo){
     return switch(tipo){
       Ope.NUOVO => "NUOVO",
       Ope.ELIMINA => "ELIMINA"
     };
   }
+
   Future<void> sendRequest(RichiestaGiustifica richiesta) async {
 
     final uri = Uri.parse(
@@ -805,73 +890,21 @@ class Apiservice {
     print('Response data: ${resp.body.toString()}');
   }
 
-  /*
-  METHOD: POST
-
-  URL
-  https://web.spaggiari.eu/fml/app/default/librettoweb_io.php
-
-HEADERS
-Accept:
-  Accept-Encoding: gzip, deflate, br, zstd
-  Accept-Language:
-  it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7
-  Connection:
-  keep-alive
-  Content-Length:
-  187
-  Content-Type:
-  application/x-www-form-urlencoded; charset=UTF-8
-  Cookie:
-  PHPSESSID=74gedcm5rjlpt36elcu039eu59e3rftk; webrole=gen; webidentity=G10435383U
-  Host:
-  web.spaggiari.eu
-  Origin:
-  https://web.spaggiari.eu
-  Referer:
-  https://web.spaggiari.eu/fml/app/default/librettoweb.php
-  sec-ch-ua:
-  "Chromium";v="140", "Not=A?Brand";v="24", "Google Chrome";v="140"
-  sec-ch-ua-mobile:
-  ?0
-  sec-ch-ua-platform:
-  "macOS"
-  Sec-Fetch-Dest:
-  emptyw
-  Sec-Fetch-Mode:
-  cors
-  Sec-Fetch-Site:
-  same-origin
-  User-Agent:
-  Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36
-  X-Requested-With:
-  XMLHttpRequest
-
-
-
-
-  RICHIESTA:
-  ope              NUOVO
-  tipo_giustifica  2
-
-  inizio _assenza
-
-  fine_assenza
-
-  motivazione_assenza
-
-  giorno_entrata_uscita  22/09/2025
-
-  ora_entrata_uscita     12:50
-
-  motivazione_entrata_uscita  testo di prova
-
-  accompagnatore  testo di prova
-
-
-
-
-  */
+  Future<List<PeriodoFestivo>> getPeriodiFestivi () async {
+    final response = await http.get(
+      Uri.parse(vacanze),
+      headers: otherHeaders,
+    );
+    if(response.statusCode == 200){
+      final json = jsonDecode(response.body);
+      return PeriodoFestivo.fromJson(json);
+    }
+    else{
+      print(response.body);
+      print(response.statusCode);
+    }
+    return [];
+  }
 
 
 

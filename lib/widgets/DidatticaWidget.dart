@@ -17,7 +17,7 @@ class Didatticawidget extends StatelessWidget {
       height: 190,
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
-        color: Colors.grey[800],
+        color: Colors.grey[900],
         borderRadius: BorderRadius.all(Radius.circular(10)),
         boxShadow: [
           BoxShadow(
@@ -99,7 +99,10 @@ class Didatticawidget extends StatelessWidget {
                   onPressed: () async {
                     await apiservice.downloadAndOpenPdfById(
                       '${fileSingolo.fileId}',
-                      '${fileSingolo.titolo}.pdf',
+                      '${fileSingolo.titolo}',
+                        "",
+                        0,
+                        true
                     );
                   },
                   icon: Icon(Icons.file_download),

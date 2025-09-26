@@ -84,9 +84,9 @@ class _AgendaState extends State<Agenda> {
                   children: [
                     SizedBox(
                       height: 40,
-                      width: 100,
+                      width: 200 ,
                       child: const Text(
-                        " Compiti",
+                        "          Compiti",
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -129,9 +129,9 @@ class _AgendaState extends State<Agenda> {
                     //LIBRI DA PORTARE
                     SizedBox(
                       height: 40,
-                      width: 200,
+                      width: 250,
                       child: const Text(
-                        "    Cose da portare",
+                        "        Cose da portare",
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -174,9 +174,9 @@ class _AgendaState extends State<Agenda> {
                     SizedBox(height: 15,),
                     SizedBox(
                       height: 40,
-                      width: 100,
+                      width: 200,
                       child: const Text(
-                        "Verifiche",
+                        "         Verifiche",
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -184,10 +184,8 @@ class _AgendaState extends State<Agenda> {
                       future: verificheFuture, // Use the extracted list (wrapped in a Future)
                       builder: (context, snapshotCompiti) {
                         if (snapshotCompiti.connectionState == ConnectionState.waiting && listOfLists.isEmpty) {
-                          // Show loading only if the outer future hasn't resolved yet with data
                           return const Center(child: CircularProgressIndicator());
                         } else if (snapshotCompiti.hasError) {
-                          print(snapshotCompiti.error);
                           return Center(child: Text("Errore caricamento verifiche: ${snapshotCompiti.error}"));
                         } else if (snapshotCompiti.hasData && snapshotCompiti.data!.isNotEmpty) {
                           List<Info> loadedCompiti = snapshotCompiti.data!;
@@ -218,7 +216,7 @@ class _AgendaState extends State<Agenda> {
                     SizedBox(height: 15,),
                     SizedBox(
                       height: 40,
-                      width: 165,
+                      width: 200,
                       child: const Text(
                         "Altro (non filtrati)",
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),

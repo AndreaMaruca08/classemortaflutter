@@ -46,7 +46,7 @@ class Notasingola extends StatelessWidget {
                 Icon(Icons.calendar_month, size: 16, color: textColor.withOpacity(0.8)),
                 SizedBox(width: 6),
                 Text(
-                  "${nota.data.length > 10 ? nota.data.substring(0, 10) : nota.data} }",
+                  nota.data.length > 10 ? nota.data.substring(0, 10) : nota.data,
                   style: TextStyle(fontSize: 14, color: textColor.withOpacity(0.9)),
                 ),
               ],

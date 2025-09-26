@@ -72,14 +72,14 @@ class Giornipagina extends StatelessWidget {
       // Dentro il metodo displayGiorno
       child: Column(
         children: [
-          Text(nomiGiorni[giornod], style: TextStyle(fontSize: 13)),
+          Text(nomiGiorni[giornod], style: TextStyle(fontSize: 11)),
           Expanded(
             child: ListView.builder(
                 itemCount: giorno.orari.length,
                 itemBuilder: (context, index) {
                   Ora ora = giorno.orari[index];
                   return SizedBox(
-                    height: 75,
+                    height: 85,
                     child: Column(
                       children: [
                         SizedBox(height: 5,),

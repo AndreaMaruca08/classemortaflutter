@@ -80,7 +80,7 @@ class NotiziePage extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: 300, // Altezza fissa per questo blocco
+            height: notizie.length == 1 ? 230 : 400, // Altezza fissa per questo blocco
             child: ListView.builder(
               itemCount: notizie.length,
               itemBuilder: (context, index) {
