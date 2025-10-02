@@ -1,5 +1,5 @@
-import 'package:ClasseMorta/models/ProvaCurriculum.dart';
-import 'package:ClasseMorta/widgets/EsperienzaWid.dart';
+import 'package:classemorta/models/ProvaCurriculum.dart';
+import 'package:classemorta/widgets/EsperienzaWid.dart';
 import 'package:flutter/material.dart';
 class Pctopage extends StatelessWidget {
   final PctoData? pctoDataa;

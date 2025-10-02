@@ -1,7 +1,7 @@
-import 'package:ClasseMorta/models/Voto.dart';
-import 'package:ClasseMorta/pages/detail/DettagliMateria.dart';
-import 'package:ClasseMorta/service/ApiService.dart';
-import 'package:ClasseMorta/widgets/SingoloVotoWid.dart';
+import 'package:classemorta/models/Voto.dart';
+import 'package:classemorta/pages/detail/DettagliMateria.dart';
+import 'package:classemorta/service/ApiService.dart';
+import 'package:classemorta/widgets/SingoloVotoWid.dart';
 import 'package:flutter/material.dart';
 import '../models/Materia.dart'; // Assicurati che il percorso sia corretto
 
@@ -133,9 +133,9 @@ class Materiawidget extends StatelessWidget {
                 if (voti.length > 1)
                   VotoSingolo(voto: voti[1], grandezza: 90, fontSize: 16),
 
-                if (voti.length > 2)
+                if (voti.length > 2 && !voti[2].voto.isNaN)
                   SizedBox(width: 10),
-                if (voti.length > 2)
+                if (voti.length > 2 && !voti[2].voto.isNaN)
                   VotoSingolo(voto: voti[2], grandezza: 90, fontSize: 16),
               ],
             )
@@ -168,6 +168,7 @@ class Materiawidget extends StatelessWidget {
                     },
                     icon: Icon(Icons.auto_graph_sharp, color: Colors.white,)),
                 SizedBox(width: 55,),
+                if (voti!.length > 2 && !voti[2].voto.isNaN)
                 IconButton(
                     onPressed: (){
                       Navigator.push(

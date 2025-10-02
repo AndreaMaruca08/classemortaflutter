@@ -1,4 +1,4 @@
-import 'package:ClasseMorta/models/Pagella.dart';
+import 'package:classemorta/models/Pagella.dart';
 import 'package:flutter/material.dart';
 import '../widgets/PagellaWid.dart';
 

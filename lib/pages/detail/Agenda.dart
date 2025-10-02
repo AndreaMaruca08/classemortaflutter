@@ -1,5 +1,5 @@
-import 'package:ClasseMorta/models/Info.dart';
-import 'package:ClasseMorta/widgets/CompitoWidget.dart';
+import 'package:classemorta/models/Info.dart';
+import 'package:classemorta/widgets/CompitoWidget.dart';
 import 'package:flutter/material.dart';
 import '../../service/ApiService.dart';
 

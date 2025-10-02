@@ -1,4 +1,4 @@
-import 'package:ClasseMorta/widgets/NotaSingola.dart';
+import 'package:classemorta/widgets/NotaSingola.dart';
 import 'package:flutter/material.dart';
 import '../models/Nota.dart';
 

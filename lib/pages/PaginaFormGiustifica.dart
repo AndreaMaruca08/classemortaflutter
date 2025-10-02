@@ -1,6 +1,6 @@
-import 'package:ClasseMorta/models/RichiestaGiustifica.dart';
-import 'package:ClasseMorta/models/enums/Operation.dart';
-import 'package:ClasseMorta/service/ApiService.dart';
+import 'package:classemorta/models/RichiestaGiustifica.dart';
+import 'package:classemorta/models/enums/Operation.dart';
+import 'package:classemorta/service/ApiService.dart';
 import 'package:flutter/material.dart';
 class NuovaGiustificazionePage extends StatefulWidget {
   final VoidCallback onConferma;

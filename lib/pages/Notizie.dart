@@ -1,5 +1,5 @@
-import 'package:ClasseMorta/service/ApiService.dart';
-import 'package:ClasseMorta/widgets/NotiziaWidget.dart';
+import 'package:classemorta/service/ApiService.dart';
+import 'package:classemorta/widgets/NotiziaWidget.dart';
 import 'package:flutter/material.dart';
 import '../models/Notizia.dart'; // Assicurati che il percorso del modello Notizia sia corretto
 

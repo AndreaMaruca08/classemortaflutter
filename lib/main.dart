@@ -1,7 +1,7 @@
 
-import 'package:ClasseMorta/pages/Principale.dart';
-import 'package:ClasseMorta/service/AccessService.dart';
-import 'package:ClasseMorta/widgets/GestioneAccesso.dart';
+import 'package:classemorta/pages/Principale.dart';
+import 'package:classemorta/service/AccessService.dart';
+import 'package:classemorta/widgets/GestioneAccesso.dart';
 import 'package:flutter/material.dart';
 import '../service/ApiService.dart';
 import 'models/Login.dart';

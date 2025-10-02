@@ -1,4 +1,4 @@
-import 'package:ClasseMorta/pages/html.dart';
+import 'package:classemorta/pages/html.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import '../models/Pagella.dart';

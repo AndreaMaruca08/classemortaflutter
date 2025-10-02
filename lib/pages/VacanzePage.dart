@@ -1,4 +1,4 @@
-import 'package:ClasseMorta/models/PeriodoFestivo.dart';
+import 'package:classemorta/models/PeriodoFestivo.dart';
 import 'package:flutter/material.dart';
 
 class Vacanzepage extends StatelessWidget {

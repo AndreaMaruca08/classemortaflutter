@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:mime/mime.dart';
-import 'package:ClasseMorta/models/Assenza.dart';
-import 'package:ClasseMorta/models/Giorno.dart';
-import 'package:ClasseMorta/models/Info.dart';
-import 'package:ClasseMorta/models/Pagella.dart';
-import 'package:ClasseMorta/models/PeriodoFestivo.dart';
-import 'package:ClasseMorta/models/ProvaCurriculum.dart';
-import 'package:ClasseMorta/models/RichiestaGiustifica.dart';
-import 'package:ClasseMorta/models/SchoolEvent.dart';
+import 'package:classemorta/models/Assenza.dart';
+import 'package:classemorta/models/Giorno.dart';
+import 'package:classemorta/models/Info.dart';
+import 'package:classemorta/models/Pagella.dart';
+import 'package:classemorta/models/PeriodoFestivo.dart';
+import 'package:classemorta/models/ProvaCurriculum.dart';
+import 'package:classemorta/models/RichiestaGiustifica.dart';
+import 'package:classemorta/models/SchoolEvent.dart';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_file/open_file.dart';
@@ -481,6 +481,8 @@ class Apiservice {
   List<Materia> getMaterieFromVoti(List<Voto> voti) {
     List<Materia> materie = [];
 
+
+
     String codeMateria = "";
     String nomeProf = "";
     String nomeMateria = "";
@@ -490,7 +492,7 @@ class Apiservice {
       if(v.cancellato || v.voto == 0){
         continue;
       }
-      else if(v.codiceMateria == codeMateria ){
+      else if(v.codiceMateria == codeMateria){
         votiMateriaAttuale.add(v);
       }
       else {
@@ -506,10 +508,21 @@ class Apiservice {
         materie.add(materiaAttuale);
         votiMateriaAttuale = [];
         votiMateriaAttuale.add(v);
+
+        if(voti.where((element) => element.codiceMateria == codeMateria).length == 1 && voti.last == v){
+          materiaAttuale = Materia(
+              codiceMateria: codeMateria,
+              nomeInteroMateria: nomeMateria,
+              nomeProf: nomeProf,
+              voti: votiMateriaAttuale
+          );
+          materie.add(materiaAttuale);
+        }
       }
 
     }
     materie.remove(materie[0]);
+
     return materie;
 
   }
@@ -725,7 +738,7 @@ class Apiservice {
 
         final completeFileName = '$fileNameWithoutExtension$fileExtension';
         filePath = '${dir.path}/$completeFileName';
-        final file = File(filePath!);
+        final file = File(filePath);
 
         await file.writeAsBytes(response.data);
 

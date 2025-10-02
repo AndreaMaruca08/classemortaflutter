@@ -1,5 +1,5 @@
-import 'package:ClasseMorta/service/ApiService.dart';
-import 'package:ClasseMorta/widgets/MateriaWidget.dart';
+import 'package:classemorta/service/ApiService.dart';
+import 'package:classemorta/widgets/MateriaWidget.dart';
 import 'package:flutter/material.dart';
 import '../models/Materia.dart';
 import '../models/Voto.dart';

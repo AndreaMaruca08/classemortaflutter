@@ -1,4 +1,4 @@
-import 'package:ClasseMorta/models/Attach.dart';
+import 'package:classemorta/models/Attach.dart';
 
 /*
 {

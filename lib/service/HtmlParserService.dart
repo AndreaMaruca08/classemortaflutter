@@ -1,4 +1,4 @@
-import 'package:ClasseMorta/models/Ritardo.dart';
+import 'package:classemorta/models/Ritardo.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as dom;
 

@@ -1,4 +1,4 @@
-import 'package:ClasseMorta/models/ProvaCurriculum.dart';
+import 'package:classemorta/models/ProvaCurriculum.dart';
 import 'package:flutter/material.dart';
 
 class Esperienzawid extends StatelessWidget {

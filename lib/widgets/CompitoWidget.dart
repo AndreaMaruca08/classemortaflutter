@@ -1,4 +1,4 @@
-import 'package:ClasseMorta/models/Info.dart';
+import 'package:classemorta/models/Info.dart';
 import 'package:flutter/material.dart';
 
 class InfoSingola extends StatelessWidget {
@@ -144,20 +144,22 @@ class InfoSingola extends StatelessWidget {
     try {
       DateTime today = DateTime.now(); // Considera di usare DateTime.now() per la data corrente reale
       DateTime scadenzaFine = DateTime.parse(dataFine.substring(0, 19));
+      DateTime scadenzaGen = DateTime.parse(dataFine.substring(0, 10));
       Duration differenza = scadenzaFine.difference(today);
+      Duration differenzaGen = scadenzaGen.difference(today);
       if (scadenzaFine.isBefore(today) ) {
         return today.hour < scadenzaFine.hour ? Colors.red : Colors.grey;
       }
-      if (differenza.inDays == 0) {
+      if (differenzaGen.inDays == 0) {
         return Colors.red[400];
       }
-      if (differenza.inDays == 1) {
-        return Colors.orange[500];
+      if (differenzaGen.inDays == 1) {
+        return Colors.orange[700];
       }
-      if (differenza.inDays == 2) {
-        return Colors.orange[200];
+      if (differenzaGen.inDays == 2) {
+        return Colors.orange[300];
       }
-      if (differenza.inDays <= 6) {
+      if (differenzaGen.inDays <= 6) {
         return Colors.green[300];
       }
       return Colors.green[600];

@@ -1,4 +1,4 @@
-import 'package:ClasseMorta/widgets/SingoloVotoWid.dart';
+import 'package:classemorta/widgets/SingoloVotoWid.dart';
 import 'package:flutter/material.dart';
 import '../models/Voto.dart';
 

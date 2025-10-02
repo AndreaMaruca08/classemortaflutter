@@ -1,22 +1,22 @@
 import 'dart:async'; // Aggiunto per Future
-import 'package:ClasseMorta/models/Materia.dart';
-import 'package:ClasseMorta/models/PeriodoFestivo.dart';
-import 'package:ClasseMorta/models/ProvaCurriculum.dart';
-import 'package:ClasseMorta/models/Voto.dart';
-import 'package:ClasseMorta/pages/GiorniPagina.dart';
-import 'package:ClasseMorta/pages/GiustifichePagina.dart';
-import 'package:ClasseMorta/pages/PctoPage.dart';
-import 'package:ClasseMorta/pages/VacanzePage.dart';
-import 'package:ClasseMorta/pages/detail/Agenda.dart';
-import 'package:ClasseMorta/pages/AssenzePage.dart';
-import 'package:ClasseMorta/pages/detail/DettagliMateria.dart';
-import 'package:ClasseMorta/pages/Materie.dart';
-import 'package:ClasseMorta/pages/NotePagina.dart';
-import 'package:ClasseMorta/pages/Notizie.dart';
-import 'package:ClasseMorta/pages/PagellePagina.dart';
-import 'package:ClasseMorta/widgets/GestioneAccesso.dart';
-import 'package:ClasseMorta/widgets/SingoloVotoWid.dart';
-import 'package:ClasseMorta/widgets/VotoDisplay.dart';
+import 'package:classemorta/models/Materia.dart';
+import 'package:classemorta/models/PeriodoFestivo.dart';
+import 'package:classemorta/models/ProvaCurriculum.dart';
+import 'package:classemorta/models/Voto.dart';
+import 'package:classemorta/pages/GiorniPagina.dart';
+import 'package:classemorta/pages/GiustifichePagina.dart';
+import 'package:classemorta/pages/PctoPage.dart';
+import 'package:classemorta/pages/VacanzePage.dart';
+import 'package:classemorta/pages/detail/Agenda.dart';
+import 'package:classemorta/pages/AssenzePage.dart';
+import 'package:classemorta/pages/detail/DettagliMateria.dart';
+import 'package:classemorta/pages/Materie.dart';
+import 'package:classemorta/pages/NotePagina.dart';
+import 'package:classemorta/pages/Notizie.dart';
+import 'package:classemorta/pages/PagellePagina.dart';
+import 'package:classemorta/widgets/GestioneAccesso.dart';
+import 'package:classemorta/widgets/SingoloVotoWid.dart';
+import 'package:classemorta/widgets/VotoDisplay.dart';
 import 'package:flutter/material.dart';
 
 import '../models/Assenza.dart';
@@ -284,6 +284,7 @@ class _MainPageState extends State<MainPage> {
                                             icon: Icon(Icons.auto_graph_sharp,
                                               color: Colors.white,)),
                                         SizedBox(width: 60,),
+                                        if (!loadedMedie[2].voto.isNaN)
                                         IconButton(
                                             onPressed: () {
                                               Navigator.push(
@@ -342,7 +343,7 @@ class _MainPageState extends State<MainPage> {
                             const SizedBox(width: 1),
                             const Text("Tutti i voti", style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold)),
                             const SizedBox(width: 15),
-                            const Text("-   Streak: ", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                            const Text("-   Streak: ", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                             Icon(
                               streak.isGoated(loadedVoti) ? Icons.star: streak.votiBuoni >= 10 ? Icons.local_fire_department: Icons.local_fire_department_outlined,
                               color: streak.isGoated(loadedVoti)? Colors.yellow : streak.getStreakColor(),
@@ -352,7 +353,7 @@ class _MainPageState extends State<MainPage> {
                               " ${streak.isGoated(loadedVoti) ? "GOAT" : streak.votiBuoni}",
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 25,
+                                  fontSize: 16,
                                   color: streak.isGoated(loadedVoti)? Colors.yellow : streak.getStreakColor(),
 
                               ),
@@ -380,7 +381,7 @@ class _MainPageState extends State<MainPage> {
                               physics: const AlwaysScrollableScrollPhysics(),
                               itemCount: loadedVoti.length,
                               itemBuilder: (context, index) {
-                                Voto votoCorrente = loadedVoti[index]; // Es. MAT 7.5 all'indice 0
+                                Voto votoCorrente = loadedVoti[index];
                                 Voto? precedenteCronologico;
 
                                 // Cerca negli elementi SUCCESSIVI della lista (che sono cronologicamente PRECEDENTI)

@@ -1,4 +1,4 @@
-import 'package:ClasseMorta/service/ApiService.dart';
+import 'package:classemorta/service/ApiService.dart';
 import 'package:flutter/material.dart';
 import '../models/Notizia.dart';
 

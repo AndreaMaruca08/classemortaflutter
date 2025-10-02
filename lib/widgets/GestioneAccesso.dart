@@ -1,10 +1,10 @@
-import 'package:ClasseMorta/models/Login.dart';
+import 'package:classemorta/models/Login.dart';
 import 'package:flutter/material.dart';
-import 'package:ClasseMorta/models/Credenziali.dart'; // Assicurati che il percorso sia corretto
-import 'package:ClasseMorta/service/AccessService.dart'; // Assicurati che il percorso sia corretto per Save
-import 'package:ClasseMorta/service/ApiService.dart';   // Assicurati che il percorso sia corretto
-import 'package:ClasseMorta/pages/Principale.dart';    // Assicurati che il percorso sia corretto per MainPage
-import 'package:ClasseMorta/main.dart';     // Assicurati che il percorso sia corretto per LoginPage
+import 'package:classemorta/models/Credenziali.dart'; // Assicurati che il percorso sia corretto
+import 'package:classemorta/service/AccessService.dart'; // Assicurati che il percorso sia corretto per Save
+import 'package:classemorta/service/ApiService.dart';   // Assicurati che il percorso sia corretto
+import 'package:classemorta/pages/Principale.dart';    // Assicurati che il percorso sia corretto per MainPage
+import 'package:classemorta/main.dart';     // Assicurati che il percorso sia corretto per LoginPage
 
 class AuthWrapper extends StatefulWidget {
   final bool precedente;

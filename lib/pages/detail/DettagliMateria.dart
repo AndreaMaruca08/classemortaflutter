@@ -1,7 +1,7 @@
-import 'package:ClasseMorta/models/Streak.dart';
-import 'package:ClasseMorta/models/Voto.dart';
-import 'package:ClasseMorta/widgets/SingoloVotoWid.dart';
-import 'package:ClasseMorta/widgets/torta.dart';
+import 'package:classemorta/models/Streak.dart';
+import 'package:classemorta/models/Voto.dart';
+import 'package:classemorta/widgets/SingoloVotoWid.dart';
+import 'package:classemorta/widgets/torta.dart';
 import 'package:flutter/material.dart';
 import '../../models/Materia.dart';
 import 'package:fl_chart/fl_chart.dart';

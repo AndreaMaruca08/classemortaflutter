@@ -1,6 +1,6 @@
-import 'package:ClasseMorta/models/SchoolEvent.dart';
-import 'package:ClasseMorta/models/enums/EventType.dart';
-import 'package:ClasseMorta/service/ApiService.dart';
+import 'package:classemorta/models/SchoolEvent.dart';
+import 'package:classemorta/models/enums/EventType.dart';
+import 'package:classemorta/service/ApiService.dart';
 import 'package:flutter/material.dart';
 
 import '../models/enums/JustificationStatus.dart';

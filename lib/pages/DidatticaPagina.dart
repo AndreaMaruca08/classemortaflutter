@@ -1,6 +1,6 @@
-import 'package:ClasseMorta/models/FileDidattica.dart';
-import 'package:ClasseMorta/service/ApiService.dart';
-import 'package:ClasseMorta/widgets/DidatticaWidget.dart';
+import 'package:classemorta/models/FileDidattica.dart';
+import 'package:classemorta/service/ApiService.dart';
+import 'package:classemorta/widgets/DidatticaWidget.dart';
 import 'package:flutter/material.dart';
 
 class Didatticapagina extends StatelessWidget {

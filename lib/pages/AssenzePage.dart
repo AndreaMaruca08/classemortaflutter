@@ -1,4 +1,4 @@
-import 'package:ClasseMorta/widgets/Assenzawidget.dart';
+import 'package:classemorta/widgets/Assenzawidget.dart';
 import 'package:flutter/material.dart';
 import '../models/Assenza.dart';
 
