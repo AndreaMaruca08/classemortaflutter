@@ -75,4 +75,8 @@ class Voto{
     final voti = json['grades'];
     return voti.map<Voto>((json) => Voto.fromJson(json)).toList();
   }
+
+  static List<Voto> perAchievmentVoto(List<dynamic> votiList) {
+    return votiList.map<Voto>((jsonMap) => Voto.fromJson(jsonMap)).toList();
+  }
 }

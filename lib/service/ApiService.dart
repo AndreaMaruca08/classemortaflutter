@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:classemorta/models/Achievment.dart';
 import 'package:mime/mime.dart';
 import 'package:classemorta/models/Assenza.dart';
 import 'package:classemorta/models/Giorno.dart';
@@ -125,6 +126,7 @@ class Apiservice {
   late String fullCode;
   late String apriFile;
   late String vacanze;
+  late String overview;
 
   late String token;
 
@@ -160,7 +162,7 @@ class Apiservice {
     documents = "${base}students/$code/documents";
     apriFile = "${base}students/$code/didactics/item/";
     vacanze = "${base}students/$code/calendar/all";
-
+    overview = "${base}students/$code/overview/all/";
   }
 
   int getYear(){
@@ -772,7 +774,6 @@ class Apiservice {
     }
   }
 
-
   Future<void> openPdf(File file) async {
     await OpenFile.open(file.path);
   }
@@ -917,6 +918,44 @@ class Apiservice {
       print(response.statusCode);
     }
     return [];
+  }
+
+  Future<List<Achievment>> processAchievments() async{
+
+    final response = await http.get(
+      Uri.parse("$overview${getDate()}"),
+      headers: otherHeaders,
+    );
+    if(response.statusCode == 200){
+      try {
+        final json = jsonDecode(response.body);
+        List<List<Nota>> note = Nota.getNote(json["notes"]);
+        List<Nota> annotazioni = note[1];
+        List<Nota> disciplinari = note[0];
+        List<Assenza> assenze = Assenza.perAchievment(json["events"], "ABA0");
+        List<Assenza> ritardi = Assenza.perAchievment(json["events"], "ABUO");
+        List<Assenza> uscite = Assenza.perAchievment(json["events"], "ABRO");
+        List<Voto> voti = Voto.perAchievmentVoto(json["grades"]);
+        return Achievment.getAchievments(
+            disciplinari, annotazioni, voti, assenze, ritardi, uscite);
+      }catch(e){
+        print(e);
+      }
+    }
+
+    return [];
+  }
+  String getDate(){
+    DateTime now = DateTime.now();
+    int year = now.year;
+    int month = now.month;
+    int day = now.day;
+    int yearStart = year;
+    if(month <= 6){
+      yearStart--;
+    }
+    year++;
+    return "${yearStart}0909/${year}0610";
   }
 
 

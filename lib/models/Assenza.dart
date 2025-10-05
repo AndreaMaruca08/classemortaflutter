@@ -44,14 +44,29 @@ class Assenza{
     final j = json["events"];
     List<Assenza> assenze = j.map<Assenza>((jsonMap) => Assenza.fromJson(jsonMap)).toList();
 
-
     List<Assenza> ass = [];
     for(Assenza a in assenze){
       if(a.type == type ){
         ass.add(a);
       }
     }
-
     return ass;
   }
+
+  static List<Assenza> perAchievment(List<dynamic> eventsList, String type) {
+    // 1. Mappa la lista di eventi in una lista di oggetti Assenza
+    List<Assenza> tutteLeAssenze = eventsList
+        .map<Assenza>((jsonMap) => Assenza.fromJson(jsonMap))
+        .toList();
+
+    // 2. Filtra la lista per ottenere solo il tipo desiderato
+    List<Assenza> assenzeFiltrate = [];
+    for (Assenza a in tutteLeAssenze) {
+      if (a.type == type) {
+        assenzeFiltrate.add(a);
+      }
+    }
+    return assenzeFiltrate;
+  }
+
 }

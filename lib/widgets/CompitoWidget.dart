@@ -57,9 +57,17 @@ class InfoSingola extends StatelessWidget {
                 ),
                 SizedBox(width: 6),
                 Text(
-                  "${getData(info.data)} - ${getDistanza(info.data)}",
+                  getData(info.data),
                   style: TextStyle(
                     fontSize: 16,
+                    color: textColor.withOpacity(0.9),
+                  ),
+                ),
+                Text(
+                  " - ${getDistanza(info.data)}",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                     color: textColor.withOpacity(0.9),
                   ),
                 ),

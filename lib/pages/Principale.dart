@@ -1,8 +1,10 @@
 import 'dart:async'; // Aggiunto per Future
+import 'package:classemorta/models/Achievment.dart';
 import 'package:classemorta/models/Materia.dart';
 import 'package:classemorta/models/PeriodoFestivo.dart';
 import 'package:classemorta/models/ProvaCurriculum.dart';
 import 'package:classemorta/models/Voto.dart';
+import 'package:classemorta/pages/AchievmentPage.dart';
 import 'package:classemorta/pages/GiorniPagina.dart';
 import 'package:classemorta/pages/GiustifichePagina.dart';
 import 'package:classemorta/pages/PctoPage.dart';
@@ -58,6 +60,8 @@ class _MainPageState extends State<MainPage> {
   late Future<PctoData> _datiCurriculum;
   late Future<List<SchoolEvent>> _events;
   late Future<List<PeriodoFestivo>> _vacanze;
+  late Future<List<Achievment>> _achievments;
+
 
   @override
   void initState() {
@@ -77,6 +81,7 @@ class _MainPageState extends State<MainPage> {
     _datiCurriculum = _service.getCurriculum();
     _events = _service.getEvents();
     _vacanze = _service.getPeriodiFestivi();
+    _achievments = _service.processAchievments();
   }
 
   Future<void> _handleRefresh() async {
@@ -95,6 +100,7 @@ class _MainPageState extends State<MainPage> {
       _datiCurriculum = _service.getCurriculum();
       _events = _service.getEvents();
       _vacanze = _service.getPeriodiFestivi();
+      _achievments = _service.processAchievments();
     });
     await _medieGeneraliFuture;
     await _lastVotiFutureMedie;
@@ -110,6 +116,7 @@ class _MainPageState extends State<MainPage> {
     await _datiCurriculum;
     await _events;
     await _vacanze;
+    await _achievments;
   }
 
   @override
@@ -172,10 +179,61 @@ class _MainPageState extends State<MainPage> {
                           icon: Icon(Icons.info_outline),
                           tooltip: 'Dettagli studente',
                         )
-
-
                       ],
                     );
+                  }
+                  else {
+                    return const Center(child: Text("Nessun risultato"));
+                  }
+                }),
+                const SizedBox(height: 10),
+                FutureBuilder(future: _achievments, builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  else if (snapshot.hasError) {
+                    return Center(child: Text("Errore ${snapshot.error}"));
+                  }
+                  else if (snapshot.hasData && snapshot.data != null) {
+                    List<Achievment> achievments = snapshot.data!;
+                    int negativi = 0;
+                    int positivi = 0;
+                    int positiviNum = 0;
+                    int negativiNum = 0;
+                    for(Achievment x in achievments){
+                      if(x.positivo){
+                        positiviNum ++;
+                      }else{
+                        negativiNum ++;
+                      }
+                      if(x.reached){
+                        if(x.positivo) {
+                          positivi ++;
+                        }else{
+                          negativi ++;
+                        }
+                      }
+                    }
+                    return ElevatedButton(
+                        style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.grey[900])),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Achievmentpage(achievments: achievments)), // Sostituisci con la tua pagina
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            const Icon(Icons.emoji_events, color: Colors.white, size: 23),
+                            const SizedBox(width: 20,),
+                            Text("Trofei", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                            const SizedBox(width: 10,),
+                            Text("Pos: $positivi/$positiviNum - ", style: TextStyle(color: Colors.green, fontSize: 18, fontWeight: FontWeight.bold)),
+                            Text("Neg $negativi/$negativiNum", style: TextStyle(color: Colors.red, fontSize: 18, fontWeight: FontWeight.bold))
+                          ],
+                        )
+                    );
+
                   }
                   else {
                     return const Center(child: Text("Nessun risultato"));
@@ -223,9 +281,9 @@ class _MainPageState extends State<MainPage> {
                                 children: [
                                   // Assicurati che loadedMedie abbia abbastanza elementi
                                   if (!loadedMedie[0].voto.isNaN) VotoSingolo(voto: loadedMedie[0], grandezza: 115, fontSize: 17,),
-                                  SizedBox(width: screenSize.width * 0.05),
+                                  SizedBox(width: 8),
                                   if (!loadedMedie[1].voto.isNaN) VotoSingolo(voto: loadedMedie[1], grandezza: 100, fontSize: 17),
-                                  SizedBox(width: screenSize.width * 0.05),
+                                  SizedBox(width: 8),
                                   if (!loadedMedie[2].voto.isNaN) VotoSingolo(voto: loadedMedie[2], grandezza: 100, fontSize: 17),
                                 ],
                               ),
@@ -263,7 +321,7 @@ class _MainPageState extends State<MainPage> {
                                             },
                                             icon: Icon(Icons.auto_graph_sharp,
                                               color: Colors.white,)),
-                                        SizedBox(width: screenSize.width * 0.19,),
+                                        SizedBox(width: 68,),
                                         IconButton(
                                             onPressed: () {
                                               Navigator.push(
@@ -283,7 +341,7 @@ class _MainPageState extends State<MainPage> {
                                             },
                                             icon: Icon(Icons.auto_graph_sharp,
                                               color: Colors.white,)),
-                                        SizedBox(width: screenSize.width * 0.18,),
+                                        SizedBox(width: 60,),
                                         if (!loadedMedie[2].voto.isNaN)
                                         IconButton(
                                             onPressed: () {
@@ -423,18 +481,18 @@ class _MainPageState extends State<MainPage> {
                           );
                         } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                           final List<Voto> loadedVoti = snapshot.data!;
-                          return passaggio(context, "  Materie            ", "Materie", MateriePag(service: _service, voti: loadedVoti,), Icon(Icons.medical_information_rounded));
+                          return passaggio(context, "  Materie            ", "Materie", MateriePag(service: _service, voti: loadedVoti,), Icon(Icons.medical_information_rounded, size: 25,));
 
                         }else{
                           return Center(child: SizedBox(width: screenSize.width * 0.43, child: Text("        Nessun voto"),));
                         }
                     }),
                     SizedBox(width: 10),
-                    passaggio(context, "  Compiti          ", "Agenda", Agenda(apiService: _service), Icon(Icons.edit_calendar_outlined)),
+                    passaggio(context, "  Compiti          ", "Agenda", Agenda(apiService: _service), Icon(Icons.edit_calendar_outlined, size: 25,)),
                   ],
                 ),
                 SizedBox(
-                  height: 10,
+                  height: 8,
                 ),
                 Row(
                   children: [
@@ -458,7 +516,7 @@ class _MainPageState extends State<MainPage> {
                               variazioniDiClasse: loadedNotizie[2],
                               service: _service,
                             ),
-                            Icon(Icons.calendar_month)
+                            Icon(Icons.calendar_month, size: 25,)
                         );
 
                       }else{
@@ -482,7 +540,7 @@ class _MainPageState extends State<MainPage> {
                             Notepagina(
                               note: loadedNote,
                             ),
-                            Icon(Icons.edit_note_outlined)
+                            Icon(Icons.edit_note_outlined, size: 25,)
                         );
 
                       }else{
@@ -492,7 +550,7 @@ class _MainPageState extends State<MainPage> {
                   ],
                 ),
                 SizedBox(
-                  height: 10,
+                  height: 8,
                 ),
                 Row(
                   children: [
@@ -511,7 +569,7 @@ class _MainPageState extends State<MainPage> {
                             "  Pagelle            ",
                             "Pagelle",
                             Pagellepagina(pagelle: pag),
-                            Icon(Icons.mark_email_read)
+                            Icon(Icons.mark_email_read, size: 25,)
                         );
 
                       }else{
@@ -533,7 +591,7 @@ class _MainPageState extends State<MainPage> {
                             "  Didattica        ",
                             "Didattica",
                             Didatticapagina(didattica: didattica, service: _service),
-                            Icon(Icons.sticky_note_2_outlined)
+                            Icon(Icons.sticky_note_2_outlined, size: 25,)
                         );
 
                       }else{
@@ -545,7 +603,7 @@ class _MainPageState extends State<MainPage> {
                   ],
                 ),
                 SizedBox(
-                  height: 10,
+                  height: 8,
                 ),
                 Row(
                   children: [
@@ -565,7 +623,7 @@ class _MainPageState extends State<MainPage> {
                             Giornipagina(
                               giorni: loadedGiorni,
                             ),
-                            Icon(Icons.watch_later)
+                            Icon(Icons.watch_later, size: 25,)
                         );
 
                       }else{
@@ -589,7 +647,7 @@ class _MainPageState extends State<MainPage> {
                             Pctopage(
                               pctoDataa: pcto,
                             ),
-                            Icon(Icons.book)
+                            Icon(Icons.book, size: 25,)
                         );
 
                       }else{
@@ -599,7 +657,7 @@ class _MainPageState extends State<MainPage> {
                   ],
                 ),
                 SizedBox(
-                  height: 10,
+                  height: 8,
                 ),
                 Row(
                   children: [
@@ -618,7 +676,7 @@ class _MainPageState extends State<MainPage> {
                             "  Giustifiche       ",
                             "Giustifica un evento",
                             Giustifichepagina(events: events, service: _service,),
-                            Icon(Icons.add)
+                            Icon(Icons.add, size: 25,)
                         );
 
                       }else{
@@ -641,7 +699,7 @@ class _MainPageState extends State<MainPage> {
                             "  Vacanze        ",
                             "Periodi di vacanza",
                             Vacanzepage(periodi: vacanze),
-                            Icon(Icons.games_outlined)
+                            Icon(Icons.games_outlined, size: 25,)
                         );
                       }else{
                         return Center(child: SizedBox(width: screenSize.width * 0.43, child: Text("        Nessuna vacanza"),));
@@ -650,7 +708,7 @@ class _MainPageState extends State<MainPage> {
                   ],
                 ),
                 SizedBox(
-                  height: 10,
+                  height: 8,
                 ),
 
                 const Divider(thickness: 1, color: Colors.white,),
@@ -898,7 +956,7 @@ class _MainPageState extends State<MainPage> {
                                               MaterialPageRoute(builder: (context) => Assenzepage(assenze:ass)), // Sostituisci con la tua pagina
                                             );
                                           },
-                                          icon: Icon(Icons.info_outline),
+                                          icon: Icon(Icons.info_outline, size: 25,),
                                           tooltip: "Dettagli assenze",
                                         )
                                       ],
@@ -982,49 +1040,56 @@ class _MainPageState extends State<MainPage> {
 
   Widget passaggio(BuildContext context, String mess, String tooltip, Widget pagina,  Icon icon){
     final screenSize = MediaQuery.of(context).size;
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[900],
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        boxShadow: [
-          BoxShadow(
-            color: Color.fromRGBO(240, 240, 240, 0.2),
-            spreadRadius: 1,
-            blurRadius: 1,
-            offset: Offset(2, 2),
-          ),
-        ],
-      ),
-      height: 40,
+    return SizedBox(
+      height: 43,
       width: screenSize.width * 0.43,
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => pagina), // Sostituisci con la tua pagina
-              );
-            },
-            icon: icon,
-            tooltip: tooltip,
+      child: Tooltip(
+        message: tooltip,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.grey[900],
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(13),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
           ),
-          Text(mess , style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-            shadows: <Shadow>[
-              Shadow(
-                offset: Offset(2.0, 2.0), // Spostamento orizzontale e verticale dell'ombra
-                blurRadius: 3.0,         // Quanto deve essere sfocata l'ombra
-                color: Colors.black.withOpacity(0.5), // Colore dell'ombra con opacità
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => pagina),
+            );
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              icon,
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  mess,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    shadows: <Shadow>[
+                      Shadow(
+                        offset: Offset(2.0, 2.0),
+                        blurRadius: 3.0,
+                        color: Colors.black,
+                      ),
+                    ],
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ]
-          ),)
-        ],
+            ],
+          ),
+        ),
       ),
     );
-
   }
+
+
 
 }
 

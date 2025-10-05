@@ -48,7 +48,7 @@ class _MainPageState extends State<StudentDetail> {
                 children: [
                   const SizedBox(height: 5),
                   const Text(
-                      " Versione 1.7.3 UI changes",
+                      " Versione 1.8.0 TROFEI + cambi grafici, bug fix, tutto simmetrico indipendentemente dal telefono",
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
