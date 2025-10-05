@@ -11,7 +11,7 @@ class Giornipagina extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
+    final screenSize = MediaQuery.of(context).size;
     Giorno lun = giorni[0];
     Giorno mar = giorni[1];
     Giorno mer = giorni[2];
@@ -28,22 +28,22 @@ class Giornipagina extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                displayGiorno(lun, 0),
+                displayGiorno(lun, 0,screenSize.width * 0.172),
                 SizedBox(width: 5,),
-                displayGiorno(mar, 1),
+                displayGiorno(mar, 1,screenSize.width * 0.172),
                 SizedBox(width: 5,),
-                displayGiorno(mer, 2),
+                displayGiorno(mer, 2,screenSize.width * 0.172),
                 SizedBox(width: 5,),
-                displayGiorno(gio, 3),
+                displayGiorno(gio, 3,screenSize.width * 0.172),
                 SizedBox(width: 5,),
-                displayGiorno(ven, 4),
+                displayGiorno(ven, 4,screenSize.width * 0.172),
               ],
             )
           ),
         )
     );
   }
-  Widget displayGiorno(Giorno giorno, int giornod){
+  Widget displayGiorno(Giorno giorno, int giornod, double screenSize){
     List<Color> colori = getColors(giorno, giornod);
     List<String> nomiGiorni = [
       'Lunedì',
@@ -56,7 +56,7 @@ class Giornipagina extends StatelessWidget {
     ];
     return Container(
       height: 650,
-      width: 63,
+      width: screenSize,
       decoration: BoxDecoration(
         color: Colors.grey[900],
         borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -134,11 +134,9 @@ class Giornipagina extends StatelessWidget {
     ],
     [
       ?Colors.blue[300],
-
-      ?Colors.yellow[300],
-      ?Colors.red[300],
       ?Colors.green[300],
-
+      ?Colors.red[300],
+      ?Colors.yellow[300],
       ?Colors.cyan[300],
       ?Colors.red[300],
     ],

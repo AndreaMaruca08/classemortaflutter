@@ -10,6 +10,7 @@ class Vacanzepage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
     DateTime natale = DateTime(DateTime.now().year, 12, 25);
     DateTime fineScuola = periodi[periodi.length - 1].inizio;
     return Scaffold(
@@ -25,8 +26,8 @@ class Vacanzepage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text("    Eventi speciali", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19)),
-                eventoSpeciale(natale, "Natale"),
-                eventoSpeciale(fineScuola, "Fine della scuola"),
+                eventoSpeciale(natale, "Natale", screenSize.width * 0.95),
+                eventoSpeciale(fineScuola, "Fine della scuola", screenSize.width * 0.95),
                 const Text("    Periodi di vacanza (no weekend)", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19)),
                 const SizedBox(height: 10,),
                 ListView.builder(
@@ -126,10 +127,10 @@ class Vacanzepage extends StatelessWidget {
     );
   }
 
-  Widget eventoSpeciale(DateTime time, String title){
+  Widget eventoSpeciale(DateTime time, String title, double size){
     DateTime now = DateTime.now();
     return SizedBox(
-      width: 340,
+      width: size,
       child: Container(
         padding: EdgeInsets.all(10),
         margin: EdgeInsets.all(8),

@@ -60,7 +60,6 @@ class _MainPageState extends State<MainPage> {
   late Future<List<PeriodoFestivo>> _vacanze;
 
   @override
-
   void initState() {
     super.initState();
     _service = widget.apiService;
@@ -120,6 +119,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pagina principale'),
@@ -202,11 +202,11 @@ class _MainPageState extends State<MainPage> {
                     } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                       final List<Voto> loadedMedie = snapshot.data!;
                       return SizedBox(
-                        width: 334,
+                        width: screenSize.width * 0.90,
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.grey[900],
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            borderRadius: BorderRadius.all(Radius.circular(25)),
                             boxShadow: [
                               BoxShadow(
                                 color: Color.fromRGBO(250, 250, 250, 0.2),
@@ -223,9 +223,9 @@ class _MainPageState extends State<MainPage> {
                                 children: [
                                   // Assicurati che loadedMedie abbia abbastanza elementi
                                   if (!loadedMedie[0].voto.isNaN) VotoSingolo(voto: loadedMedie[0], grandezza: 115, fontSize: 17,),
-                                  const SizedBox(width: 7),
+                                  SizedBox(width: screenSize.width * 0.05),
                                   if (!loadedMedie[1].voto.isNaN) VotoSingolo(voto: loadedMedie[1], grandezza: 100, fontSize: 17),
-                                  const SizedBox(width: 7),
+                                  SizedBox(width: screenSize.width * 0.05),
                                   if (!loadedMedie[2].voto.isNaN) VotoSingolo(voto: loadedMedie[2], grandezza: 100, fontSize: 17),
                                 ],
                               ),
@@ -263,7 +263,7 @@ class _MainPageState extends State<MainPage> {
                                             },
                                             icon: Icon(Icons.auto_graph_sharp,
                                               color: Colors.white,)),
-                                        SizedBox(width: 67,),
+                                        SizedBox(width: screenSize.width * 0.19,),
                                         IconButton(
                                             onPressed: () {
                                               Navigator.push(
@@ -283,7 +283,7 @@ class _MainPageState extends State<MainPage> {
                                             },
                                             icon: Icon(Icons.auto_graph_sharp,
                                               color: Colors.white,)),
-                                        SizedBox(width: 60,),
+                                        SizedBox(width: screenSize.width * 0.18,),
                                         if (!loadedMedie[2].voto.isNaN)
                                         IconButton(
                                             onPressed: () {
@@ -364,9 +364,10 @@ class _MainPageState extends State<MainPage> {
                         SizedBox(
                         height: 176,
                         child: Container(
+                          width: screenSize.width * 0.90,
                           decoration: BoxDecoration(
                             color: Colors.grey[900],
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            borderRadius: BorderRadius.all(Radius.circular(25)),
                             boxShadow: [
                               BoxShadow(
                                 color: Color.fromRGBO(240, 240, 240, 0.2),
@@ -404,7 +405,7 @@ class _MainPageState extends State<MainPage> {
                       ],
                     );
                   }else{
-                    return const Text("                               Nessun voto");
+                    return Center(child: SizedBox(width: screenSize.width * 0.43, child: Text("        Nessun voto"),));
                   }
                 }),
                 SizedBox(height: 10),
@@ -425,7 +426,7 @@ class _MainPageState extends State<MainPage> {
                           return passaggio(context, "  Materie            ", "Materie", MateriePag(service: _service, voti: loadedVoti,), Icon(Icons.medical_information_rounded));
 
                         }else{
-                          return const Center(child: SizedBox(width: 175, child: Text("          Nessun voto      "),));
+                          return Center(child: SizedBox(width: screenSize.width * 0.43, child: Text("        Nessun voto"),));
                         }
                     }),
                     SizedBox(width: 10),
@@ -461,10 +462,10 @@ class _MainPageState extends State<MainPage> {
                         );
 
                       }else{
-                        return const Center(child: SizedBox(width: 175, child: Text("Nessuna notizia"),));
+                        return Center(child: SizedBox(width: screenSize.width * 0.43, child: Text("        Nessuna notizia"),));
                       }
                     }),
-                    SizedBox(width: 12),
+                    SizedBox(width: 10),
                     FutureBuilder(future: _note, builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -485,7 +486,7 @@ class _MainPageState extends State<MainPage> {
                         );
 
                       }else{
-                        return const Center(child: SizedBox(width: 175, child: Text("        Nessuna nota"),));
+                        return Center(child: SizedBox(width: screenSize.width * 0.43, child: Text("        Nessuna nota"),));
                       }
                     }),
                   ],
@@ -495,6 +496,7 @@ class _MainPageState extends State<MainPage> {
                 ),
                 Row(
                   children: [
+
                     FutureBuilder(future: _pagelle, builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -513,10 +515,10 @@ class _MainPageState extends State<MainPage> {
                         );
 
                       }else{
-                        return const Center(child: SizedBox(width: 172, child: Text("      Nessuna pagella"),));
+                        return Center(child: SizedBox(width: screenSize.width * 0.43, child: const Text("      Nessuna pagella"),));
                       }
                     }),
-                    SizedBox(width: 13,),
+                    SizedBox(width: 10,),
                     FutureBuilder(future: _didattica, builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -535,7 +537,7 @@ class _MainPageState extends State<MainPage> {
                         );
 
                       }else{
-                        return const Center(child: SizedBox(width: 175, child: Text("Nessun file"),));
+                        return Center(child: SizedBox(width: screenSize.width * 0.43, child: Text("Nessun file"),));
                       }
 
                     }
@@ -567,10 +569,10 @@ class _MainPageState extends State<MainPage> {
                         );
 
                       }else{
-                        return const Center(child: SizedBox(width: 175, child: Text("        Nessun orario"),));
+                        return Center(child: SizedBox(width: screenSize.width * 0.43, child: Text("        Nessun orario"),));
                       }
                     }),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     FutureBuilder(future: _datiCurriculum, builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -591,7 +593,7 @@ class _MainPageState extends State<MainPage> {
                         );
 
                       }else{
-                        return const Center(child: Text("      Nessun dato"));
+                        return Center(child: SizedBox(width: screenSize.width * 0.43, child: Text("        Nessun curriculum"),));
                       }
                     }),
                   ],
@@ -601,7 +603,7 @@ class _MainPageState extends State<MainPage> {
                 ),
                 Row(
                   children: [
-                    if(widget.code?[0] == 'G')
+                    if(widget.code?[0] == 'G')...[
                     FutureBuilder(future: _events, builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -620,10 +622,11 @@ class _MainPageState extends State<MainPage> {
                         );
 
                       }else{
-                        return const Center(child: Text("      Vuoto"));
+                        return Center(child: SizedBox(width: screenSize.width * 0.43, child: Text("        Nessun evento"),));
                       }
                     }),
-                    const SizedBox(width: 12),
+                      const SizedBox(width: 10),
+                    ],
                     FutureBuilder(future: _vacanze, builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -641,7 +644,7 @@ class _MainPageState extends State<MainPage> {
                             Icon(Icons.games_outlined)
                         );
                       }else{
-                        return const Center(child: Text("      Vuoto"));
+                        return Center(child: SizedBox(width: screenSize.width * 0.43, child: Text("        Nessuna vacanza"),));
                       }
                     }),
                   ],
@@ -726,11 +729,11 @@ class _MainPageState extends State<MainPage> {
                   } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                     final List<List<Assenza>> ass = snapshot.data!;
                     return SizedBox(
-                      width: 320,
+                      width: screenSize.width * 0.9,
                       child:  Container(
                         decoration: BoxDecoration(
                           color: Colors.grey[900],
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          borderRadius: BorderRadius.all(Radius.circular(20)),
                           boxShadow: [
                             BoxShadow(
                               color: Color.fromRGBO(240, 240, 240, 0.2),
@@ -749,10 +752,10 @@ class _MainPageState extends State<MainPage> {
                                 Container(
                                   padding: EdgeInsets.all(10),
                                   height: 70,
-                                  width: 150,
+                                  width: screenSize.width * 0.43,
                                   decoration: BoxDecoration(
                                     color: Color.fromRGBO(255, 0, 0, 0.6),
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                    borderRadius: BorderRadius.all(Radius.circular(25)),
                                     boxShadow: [
                                       BoxShadow(
                                         color: Color.fromRGBO(10, 10, 10, 0.4),
@@ -780,12 +783,12 @@ class _MainPageState extends State<MainPage> {
                                 ),
                                 SizedBox(width: 10,),
                                 Container(
-                                  width: 150,
+                                  width: screenSize.width * 0.43,
                                   padding: EdgeInsets.all(10),
                                   height: 70,
                                   decoration: BoxDecoration(
                                     color: Color.fromRGBO(255, 255, 0, 0.6),
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                    borderRadius: BorderRadius.all(Radius.circular(25)),
                                     boxShadow: [
                                       BoxShadow(
                                         color: Color.fromRGBO(10, 10, 10, 0.4),
@@ -796,7 +799,7 @@ class _MainPageState extends State<MainPage> {
                                     ],
                                   ),
                                   child: SizedBox(
-                                    width: 150,
+                                    width:  screenSize.width * 0.43,
                                     height: 10,
                                     child: Text(
                                       "   Uscite ${ass[1].length}   ",
@@ -825,10 +828,10 @@ class _MainPageState extends State<MainPage> {
                                 Container(
                                   padding: EdgeInsets.all(10),
                                   height: 75,
-                                  width: 150,
+                                  width:  screenSize.width * 0.43,
                                   decoration: BoxDecoration(
                                     color: Color.fromRGBO(0, 0, 255, 0.6),
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                    borderRadius: BorderRadius.all(Radius.circular(25)),
                                     boxShadow: [
                                       BoxShadow(
                                         color: Color.fromRGBO(10, 10, 10, 0.4),
@@ -858,10 +861,10 @@ class _MainPageState extends State<MainPage> {
                                 Container(
                                     padding: EdgeInsets.all(10),
                                     height: 75,
-                                    width: 150,
+                                    width:  screenSize.width * 0.43,
                                     decoration: BoxDecoration(
                                       color: Color.fromRGBO(0, 0, 0, 0.6),
-                                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                                      borderRadius: BorderRadius.all(Radius.circular(25)),
                                       boxShadow: [
                                         BoxShadow(
                                           color: Color.fromRGBO(10, 10, 10, 0.4),
@@ -978,6 +981,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   Widget passaggio(BuildContext context, String mess, String tooltip, Widget pagina,  Icon icon){
+    final screenSize = MediaQuery.of(context).size;
     return Container(
       decoration: BoxDecoration(
         color: Colors.grey[900],
@@ -992,6 +996,7 @@ class _MainPageState extends State<MainPage> {
         ],
       ),
       height: 40,
+      width: screenSize.width * 0.43,
       child: Row(
         children: [
           IconButton(

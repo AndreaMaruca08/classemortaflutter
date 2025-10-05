@@ -38,7 +38,7 @@ class VotoSingolo extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "${!voto.tipo.contains("Scritto") && !voto.tipo.contains("Orale") && !voto.tipo.contains("Pratico") ? "${voto.codiceMateria} " : ""} ${voto.displayValue}",
+                "${voto.tipo.contains("media") ? "${voto.codiceMateria} " : ""} ${voto.displayValue}",
                 textAlign: TextAlign.center, // Utile se il testo va a capo
                 style: TextStyle(fontSize: !voto.tipo.contains("Scritto") && !voto.tipo.contains("Orale") && !voto.tipo.contains("Pratico") ?  fontSize : fontSize + 5,
                     shadows: <Shadow>[

@@ -246,7 +246,7 @@ class Apiservice {
 
         cancellato: false,
         nomeProf: "Media Totale",
-        tipo: "Totale"
+        tipo: "media"
     ));
     //primo periodo
     medie.add(Voto(
@@ -261,7 +261,7 @@ class Apiservice {
         periodo: 1,
         cancellato: false,
         nomeProf: "Media 1° periodo",
-        tipo: "1° periodo"
+        tipo: "media"
     ));
     //secondo periodo
     medie.add(Voto(
@@ -276,7 +276,7 @@ class Apiservice {
         periodo: 2,
         cancellato: false,
         nomeProf: "Media 2° periodo",
-        tipo: "2° periodo"
+        tipo: "media"
     ));
 
     return medie;
@@ -325,7 +325,7 @@ class Apiservice {
           periodo: 3,
           cancellato: false,
           nomeProf: "Media Totale",
-          tipo: "Totale"
+          tipo: "media"
       ));
 
       //primo periodo
@@ -341,7 +341,7 @@ class Apiservice {
           periodo: 1,
           cancellato: false,
           nomeProf: "Media 1° periodo",
-          tipo: "1° periodo"
+          tipo: "media"
       ));
       //secondo periodo
       medie.add(Voto(
@@ -356,7 +356,7 @@ class Apiservice {
           periodo: 2,
           cancellato: false,
           nomeProf: "Media 2° periodo",
-          tipo: "2° periodo"
+          tipo: "media"
       ));
       return medie;
     }
