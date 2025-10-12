@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:classemorta/models/Achievment.dart';
+import 'package:classemorta/models/InfoReturn.dart';
 import 'package:mime/mime.dart';
 import 'package:classemorta/models/Assenza.dart';
 import 'package:classemorta/models/Giorno.dart';
@@ -405,7 +406,7 @@ class Apiservice {
     }
   }
 
-  Future<List<List<Info>>> getInfo() async {
+  Future<InfoReturn> getInfo() async {
     DateTime now = DateTime.now();
 
     String fromDate = "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}";
@@ -444,46 +445,44 @@ class Apiservice {
               var notizieFiltrate = Info.fromJsonListAgenda(jsonMapList);
               var verificheFiltrate = Info.fromJsonListVerifiche(jsonMapList);
               var resto = Info.fromJsonAltro(jsonMapList);
-
-
-              return [
+              var perDomani = Info.fromJsonPerDomani(jsonMapList);
+              return InfoReturn(info:  [
                 compitiFiltrati,
                 notizieFiltrate,
                 verificheFiltrate,
-                resto
-              ];
+                resto,
+                perDomani
+              ], times: Info.getTimes(jsonMapList));
             } else {
               print("Errore: Il campo 'agenda' nel JSON non è una lista.");
-              return [];
+              return InfoReturn(info: [], times: []);
             }
           } else {
             print(
                 "Errore: il JSON decodificato per i compiti non è una mappa o non contiene la chiave 'agenda'.");
             print("JSON ricevuto: $decodedJson"); // Stampa il JSON per debug
-            return [];
+            return InfoReturn(info: [], times: []);
           }
         } else {
           print("Errore: Il campo 'agenda' nel JSON non è una lista.");
-          return [];
+          return InfoReturn(info: [], times: []);
         }
       } else {
         print(
             "Errore: il JSON decodificato per i compiti non è una mappa o non contiene la chiave 'agenda'.");
         print("JSON ricevuto: $decodedJson"); // Stampa il JSON per debug
-        return [];
+        return InfoReturn(info: [], times: []);
       }
     } else {
       print("Errore HTTP durante il recupero dei compiti: ${response
           .statusCode}");
       print("Corpo della risposta (errore): ${response.body}");
-      return [];
+      return InfoReturn(info: [], times: []);
     }
   }
 
   List<Materia> getMaterieFromVoti(List<Voto> voti) {
     List<Materia> materie = [];
-
-
 
     String codeMateria = "";
     String nomeProf = "";
@@ -730,7 +729,7 @@ class Apiservice {
           final mimeType = contentTypeHeader.split(';').first.trim(); // Estrai il tipo MIME principale
 
           // Utilizza la funzione dal pacchetto mime e assegna a una variabile con nome diverso
-          final String determinedExtension = extensionFromMime(mimeType); // << CORREZIONE QUI
+          final String? determinedExtension = extensionFromMime(mimeType); // << CORREZIONE QUI
 
           fileExtension = '.$determinedExtension';
                   print('Content-Type: $mimeType, Estensione derivata: $fileExtension');
@@ -923,7 +922,7 @@ class Apiservice {
   Future<List<Achievment>> processAchievments() async{
 
     final response = await http.get(
-      Uri.parse("$overview${getDate()}"),
+      Uri.parse("$overview${getDate(anniIndietro : precedente? 2 : 0)}"),
       headers: otherHeaders,
     );
     if(response.statusCode == 200){
@@ -945,18 +944,21 @@ class Apiservice {
 
     return [];
   }
-  String getDate(){
+
+  String getDate({int anniIndietro = 0}) {
     DateTime now = DateTime.now();
-    int year = now.year;
+    int year = now.year - anniIndietro;
     int month = now.month;
-    int day = now.day;
     int yearStart = year;
-    if(month <= 6){
+
+    if (month < 9) {
       yearStart--;
     }
-    year++;
-    return "${yearStart}0909/${year}0610";
+
+    int yearEnd = yearStart + 1;
+    return "${yearStart}0901/${yearEnd}0831";
   }
+
 
 
 

@@ -153,13 +153,12 @@ class InfoSingola extends StatelessWidget {
       DateTime today = DateTime.now(); // Considera di usare DateTime.now() per la data corrente reale
       DateTime scadenzaFine = DateTime.parse(dataFine.substring(0, 19));
       DateTime scadenzaGen = DateTime.parse(dataFine.substring(0, 10));
-      Duration differenza = scadenzaFine.difference(today);
       Duration differenzaGen = scadenzaGen.difference(today);
       if (scadenzaFine.isBefore(today) ) {
         return today.hour < scadenzaFine.hour ? Colors.red : Colors.grey;
       }
       if (differenzaGen.inDays == 0) {
-        return Colors.red[400];
+        return Color.fromRGBO(255, 100,100, 0.5);
       }
       if (differenzaGen.inDays == 1) {
         return Colors.orange[700];
@@ -226,9 +225,8 @@ class InfoSingola extends StatelessWidget {
         scadenza.day,
       );
       Duration differenza = scadenzaDateOnly.difference(today);
-      print(differenza.inHours);
       if(differenza.inHours < -14){
-        return "Oggi";
+        return "Oggi passato";
       }
       if (scadenzaDateOnly.isBefore(today)) {
         return "PER OGGI !!!";

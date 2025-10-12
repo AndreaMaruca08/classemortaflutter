@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/Achievment.dart';
+import '../models/enums/AchievementRarity.dart';
 
 class Achievmentpage extends StatelessWidget {
   final List<Achievment> achievments;
@@ -27,13 +28,19 @@ class Achievmentpage extends StatelessWidget {
               children: [
                 const Text("Scritta rossa = non raggiunto, verde = raggiunto",
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 10,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const Text("Sfondo verde = positivo, rosso = negativo",
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text("\nArancione = Bronzo - ottenuti: ${achievments.where((elemnt) => elemnt.rarity == AchievementRarity.BRONZO && elemnt.reached).length}\nGrigio chiaro = argento - ottenuti: ${achievments.where((elemnt) => elemnt.rarity == AchievementRarity.ARGENTO && elemnt.reached).length}\nGiallo = Oro - ottenuti: ${achievments.where((elemnt) => elemnt.rarity == AchievementRarity.ORO && elemnt.reached).length}\nGrigio scuro = Platino - ottenuti: ${achievments.where((elemnt) => elemnt.rarity == AchievementRarity.PLATINO && elemnt.reached).length}\nBlu = Legendario - ottenuti: ${achievments.where((elemnt) => elemnt.rarity == AchievementRarity.LEGGENDARIO && elemnt.reached).length}",
+                  style: const TextStyle(
+                    fontSize: 10,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -181,7 +188,7 @@ class Achievmentpage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.emoji_events, size: 50, color: achievment.positivo ? Colors.green[800] : Colors.red[800],),
+          Icon(Icons.emoji_events, size: 50, color: getColorByRarity(achievment.rarity),),
           const SizedBox(height: 5),
           SizedBox(
             height: 35,
@@ -200,6 +207,15 @@ class Achievmentpage extends StatelessWidget {
         ],
       ),
     );
+  }
+  Color getColorByRarity(AchievementRarity rarity) {
+    return switch(rarity) {
+      AchievementRarity.ARGENTO => Colors.grey[500]!,
+      AchievementRarity.BRONZO => Colors.orange[900]!,
+      AchievementRarity.ORO => Colors.yellow,
+      AchievementRarity.PLATINO => Colors.blueGrey[800]!,
+      AchievementRarity.LEGGENDARIO => Colors.blue,
+    };
   }
 
 

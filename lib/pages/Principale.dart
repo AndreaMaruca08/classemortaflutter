@@ -1,4 +1,5 @@
 import 'dart:async'; // Aggiunto per Future
+import 'package:classemorta/main.dart';
 import 'package:classemorta/models/Achievment.dart';
 import 'package:classemorta/models/Materia.dart';
 import 'package:classemorta/models/PeriodoFestivo.dart';
@@ -61,6 +62,7 @@ class _MainPageState extends State<MainPage> {
   late Future<List<SchoolEvent>> _events;
   late Future<List<PeriodoFestivo>> _vacanze;
   late Future<List<Achievment>> _achievments;
+  late Future<StudentCard?> _card;
 
 
   @override
@@ -82,6 +84,7 @@ class _MainPageState extends State<MainPage> {
     _events = _service.getEvents();
     _vacanze = _service.getPeriodiFestivi();
     _achievments = _service.processAchievments();
+    _card = _service.getCard();
   }
 
   Future<void> _handleRefresh() async {
@@ -101,6 +104,7 @@ class _MainPageState extends State<MainPage> {
       _events = _service.getEvents();
       _vacanze = _service.getPeriodiFestivi();
       _achievments = _service.processAchievments();
+      _card = _service.getCard();
     });
     await _medieGeneraliFuture;
     await _lastVotiFutureMedie;
@@ -143,7 +147,7 @@ class _MainPageState extends State<MainPage> {
                 //CARTA STUDENTE
                 if(_service.precedente)
                   Text("ANNO PRECEDENTE : ${_service.getYear()}", style: TextStyle(color: Colors.red[800]),),
-                FutureBuilder(future: _service.getCard(), builder: (context, snapshot) {
+                FutureBuilder(future: _card, builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   }
@@ -173,7 +177,7 @@ class _MainPageState extends State<MainPage> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => StudentDetail(card: card)),
+                              CustomPageRoute(builder: (context) => StudentDetail(card: card)),
                             );
                           },
                           icon: Icon(Icons.info_outline),
@@ -219,7 +223,7 @@ class _MainPageState extends State<MainPage> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => Achievmentpage(achievments: achievments)), // Sostituisci con la tua pagina
+                            CustomPageRoute(builder: (context) => Achievmentpage(achievments: achievments)), // Sostituisci con la tua pagina
                           );
                         },
                         child: Row(
@@ -306,7 +310,7 @@ class _MainPageState extends State<MainPage> {
                                             onPressed: () {
                                               Navigator.push(
                                                   context,
-                                                  MaterialPageRoute(
+                                                  CustomPageRoute(
                                                       builder: (context) =>
                                                           Dettaglimateria(materia: Materia(
                                                               codiceMateria: "Anno intero",
@@ -326,7 +330,7 @@ class _MainPageState extends State<MainPage> {
                                             onPressed: () {
                                               Navigator.push(
                                                   context,
-                                                  MaterialPageRoute(
+                                                  CustomPageRoute(
                                                       builder: (context) =>
                                                           Dettaglimateria(materia: Materia(
                                                               codiceMateria: "1° quadrimestre",
@@ -347,7 +351,7 @@ class _MainPageState extends State<MainPage> {
                                             onPressed: () {
                                               Navigator.push(
                                                   context,
-                                                  MaterialPageRoute(
+                                                  CustomPageRoute(
                                                       builder: (context) =>
                                                           Dettaglimateria(materia: Materia(
                                                               codiceMateria: "2° quadrimestre",
@@ -953,7 +957,7 @@ class _MainPageState extends State<MainPage> {
                                           onPressed: (){
                                             Navigator.push(
                                               context,
-                                              MaterialPageRoute(builder: (context) => Assenzepage(assenze:ass)), // Sostituisci con la tua pagina
+                                              CustomPageRoute(builder: (context) => Assenzepage(assenze:ass)), // Sostituisci con la tua pagina
                                             );
                                           },
                                           icon: Icon(Icons.info_outline, size: 25,),
@@ -1013,7 +1017,7 @@ class _MainPageState extends State<MainPage> {
               onPressed: (){
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => AuthWrapper(precedente: precedente)), // Sostituisci con la tua pagina
+                  CustomPageRoute(builder: (context) => AuthWrapper(precedente: precedente)), // Sostituisci con la tua pagina
                 );
               },
               icon: Icon(precedente? Icons.arrow_back_ios: Icons.arrow_forward_ios, color: Colors.white),
@@ -1057,7 +1061,7 @@ class _MainPageState extends State<MainPage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => pagina),
+              CustomPageRoute(builder: (context) => pagina),
             );
           },
           child: Row(

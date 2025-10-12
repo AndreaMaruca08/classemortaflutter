@@ -9,6 +9,36 @@ import 'models/Login.dart';
 void main() {
   runApp(const Login());
 }
+// Builder personalizzato per una transizione in dissolvenza (Fade)
+class FadeTransitionsBuilder extends PageTransitionsBuilder {
+  const FadeTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+      PageRoute<T> route,
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      Widget child,
+      ) {
+    // Usa il widget FadeTransition
+    return FadeTransition(opacity: animation, child: child);
+  }
+}
+// Aggiungi questa classe sotto FadeTransitionsBuilder
+class CustomPageRoute<T> extends MaterialPageRoute<T> {
+  CustomPageRoute({
+    required super.builder,
+    super.settings,
+  });
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 100);
+
+  @override
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 100); // Durata per tornare indietro
+}
+
 
 class Login extends StatelessWidget {
   const Login({super.key});
@@ -16,10 +46,21 @@ class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'ClasseMorta',
+      title: 'Classe Morta',
       // Forza l'uso del tema scuro
       themeMode: ThemeMode.dark,
+
       darkTheme: ThemeData(
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            // Usa la dissolvenza per Android e iOS
+            TargetPlatform.android: FadeTransitionsBuilder(),
+            TargetPlatform.iOS: FadeTransitionsBuilder(),
+          },
+        ),
+
+
+
         // Fondamentale per indicare che è un tema scuro
         brightness: Brightness.dark,
 

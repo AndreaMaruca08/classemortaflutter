@@ -19,6 +19,13 @@ class Materiawidget extends StatelessWidget {
     // Definizione del colore del testo per leggibilità
     Color textColor = Colors.white; // o Theme.of(context).colorScheme.onSurface se usi un tema più complesso
     List<Voto>? voti = service.getMedieMateria(materia);
+    List<Voto> votiMat = materia.voti;
+    Voto? ultimo;
+    Voto? penultimo;
+    if(votiMat.length > 1){
+       ultimo = votiMat.last;
+       penultimo = votiMat[votiMat.length - 2];
+    }
     return Container(
       padding: const EdgeInsets.all(12.0), // Aggiungi padding interno per non far toccare il testo ai bordi
       decoration: BoxDecoration(
@@ -178,9 +185,36 @@ class Materiawidget extends StatelessWidget {
                     },
                     icon: Icon(Icons.auto_graph_sharp, color: Colors.white,)),
               ],
+            ),
+
+          if(votiMat.length > 1 && ultimo != null && penultimo != null)...[
+            Divider(
+              thickness: 1,
+              color: Colors.white,
+            ),
+            Row(
+              children: [
+                ultimo.voto> penultimo.voto?
+                Icon(
+                  Icons.arrow_upward,
+                  color: Colors.green,
+                  size: 25,
+
+                ):
+                Icon(
+                  Icons.arrow_downward,
+                  color: Colors.red,
+                  size: 25,
+                ),
+                SizedBox(width: 150, child: Text("${ultimo.voto > penultimo.voto ? "Aumento di" : "Calo di"}: ${ultimo.voto - penultimo.voto} "),),
+
+
+                SizedBox(width: 130, child: Text("Ultimo voto: ${ultimo.voto}", style: TextStyle(color: ultimo.voto >= 6 ? Colors.green : ultimo.voto < 5 ? Colors.red : Colors.yellow, fontSize: 15),),),
+
+              ],
             )
 
-
+          ]
         ],
       ),
     );

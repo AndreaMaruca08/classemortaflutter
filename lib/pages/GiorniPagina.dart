@@ -88,7 +88,7 @@ class Giornipagina extends StatelessWidget {
                           color: colori[index],
                         ),
                         SizedBox(height: 5,),
-                        Text("${ora.materia.substring(0, 4) == "TECN" ? "TPSI" : ora.materia.substring(0, 4)} | ${ora.ora}" , style: TextStyle(
+                        Text("${ora.materia.substring(0, 4) == "TECN" ? "TPSI" : ora.materia == "LINGUA E LETTERATURA ITALIANA" ? "ITAL" : ora.materia.substring(0, 4)} | ${ora.ora}" , style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                             color: colori[index],
