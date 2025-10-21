@@ -43,7 +43,7 @@ class Info {
       DateTime dataScadenza = DateTime.tryParse(i.dataFine.substring(0,10)) ?? DateTime(2100);
       DateTime today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
       int differenza = dataScadenza.difference(today).inDays;
-      if(differenza == 0  && dataScadenza.isAfter(today)){
+      if(dataScadenza.difference(today).inDays == 1 && dataScadenza.isAfter(today)){
         contaD ++;
       }else if(differenza == 2){
         contaDD ++;

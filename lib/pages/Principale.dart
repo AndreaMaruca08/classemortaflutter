@@ -18,6 +18,8 @@ import 'package:classemorta/pages/Materie.dart';
 import 'package:classemorta/pages/NotePagina.dart';
 import 'package:classemorta/pages/Notizie.dart';
 import 'package:classemorta/pages/PagellePagina.dart';
+import 'package:classemorta/service/NotificheService.dart';
+import 'package:classemorta/service/SharedPreferencesService.dart';
 import 'package:classemorta/widgets/GestioneAccesso.dart';
 import 'package:classemorta/widgets/SingoloVotoWid.dart';
 import 'package:classemorta/widgets/VotoDisplay.dart';
@@ -86,6 +88,7 @@ class _MainPageState extends State<MainPage> {
     _vacanze = _service.getPeriodiFestivi();
     _achievments = _service.processAchievments();
     _card = _service.getCard();
+
   }
 
   Future<void> _handleRefresh() async {
@@ -131,6 +134,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
@@ -303,20 +307,44 @@ class _MainPageState extends State<MainPage> {
                                 ],
                               ),
                               const SizedBox(height: 10),
+                              // Sostituisci il vecchio FutureBuilder con questo
                               FutureBuilder<List<Voto>?>(
-                                future: _lastVotiFutureMedie, // Usa il Future esistente per i voti
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState == ConnectionState.waiting) {
-                                    return const Center(child: CircularProgressIndicator());
+                                future: _lastVotiFutureMedie,
+                                builder: (context, snapshotVoti) {
+                                  // STATO DI CARICAMENTO
+                                  if (snapshotVoti.connectionState == ConnectionState.waiting) {
+                                    return const SizedBox(
+                                      height: 48, // Mantieni l'altezza della riga dei bottoni
+                                      child: Center(child: CircularProgressIndicator()),
+                                    );
                                   }
-                                  else if (snapshot.hasError) {
-                                    return const Center(child: Text("Errore"));
+
+                                  // STATO DI ERRORE
+                                  if (snapshotVoti.hasError) {
+                                    return const SizedBox(
+                                      height: 48,
+                                      child: Center(child: Text("Errore nel caricare i voti")),
+                                    );
                                   }
-                                  else if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) {
-                                    List<Voto> voti = snapshot.data!;
+
+                                  // STATO CON DATI VALIDI
+                                  if (snapshotVoti.hasData && snapshotVoti.data!.isNotEmpty) {
+                                    final voti = snapshotVoti.data!;
+
+                                    // La logica per le notifiche rimane separata e sicura
+                                    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+                                      if(!_service.precedente) {
+                                        notificheVoti(voti);
+                                      }
+                                    });
+
+
+
+                                    // Ripristino la tua Row originale con la spaziatura corretta
                                     return Row(
                                       children: [
-                                        SizedBox(width: 36,),
+                                        const SizedBox(width: 36,), // Tua spaziatura originale
                                         IconButton(
                                             onPressed: () {
                                               Navigator.push(
@@ -335,9 +363,9 @@ class _MainPageState extends State<MainPage> {
                                                           )
                                                   ));
                                             },
-                                            icon: Icon(Icons.auto_graph_sharp,
+                                            icon: const Icon(Icons.auto_graph_sharp,
                                               color: Colors.white,)),
-                                        SizedBox(width: 68,),
+                                        const SizedBox(width: 68,), // Tua spaziatura originale
                                         IconButton(
                                             onPressed: () {
                                               Navigator.push(
@@ -356,37 +384,44 @@ class _MainPageState extends State<MainPage> {
                                                           )
                                                   ));
                                             },
-                                            icon: Icon(Icons.auto_graph_sharp,
+                                            icon: const Icon(Icons.auto_graph_sharp,
                                               color: Colors.white,)),
-                                        SizedBox(width: 60,),
+                                        const SizedBox(width: 60,), // Tua spaziatura originale
                                         if (!loadedMedie[2].voto.isNaN)
-                                        IconButton(
-                                            onPressed: () {
-                                              Navigator.push(
-                                                  context,
-                                                  CustomPageRoute(
-                                                      builder: (context) =>
-                                                          Dettaglimateria(materia: Materia(
-                                                              codiceMateria: "2° quadrimestre",
-                                                              nomeInteroMateria: "2° quadrimestre",
-                                                              nomeProf: "Sistema",
-                                                              voti: voti
-                                                          ),
-                                                            periodo: 2,
-                                                            dotted: false,
-                                                            msAnimazione: _service.impostazioni.msAnimazioneVoto,
-                                                          )
-                                                  ));
-                                            },
-                                            icon: Icon(Icons.auto_graph_sharp,
-                                              color: Colors.white,)),
+                                          IconButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                    context,
+                                                    CustomPageRoute(
+                                                        builder: (context) =>
+                                                            Dettaglimateria(materia: Materia(
+                                                                codiceMateria: "2° quadrimestre",
+                                                                nomeInteroMateria: "2° quadrimestre",
+                                                                nomeProf: "Sistema",
+                                                                voti: voti
+                                                            ),
+                                                              periodo: 2,
+                                                              dotted: false,
+                                                              msAnimazione: _service.impostazioni.msAnimazioneVoto,
+                                                            )
+                                                    ));
+                                              },
+                                              icon: const Icon(Icons.auto_graph_sharp,
+                                                color: Colors.white,)),
                                       ],
                                     );
-                                  }else{
-                                    return const Center(child: Text("Nessun voto"));
+                                  }
+                                  // STATO SENZA DATI
+                                  else {
+                                    return const SizedBox(
+                                      height: 48,
+                                      child: Center(child: Text("Nessun voto da mostrare")),
+                                    );
                                   }
                                 },
                               ),
+
+
                             ],
 
                           ),
@@ -524,6 +559,12 @@ class _MainPageState extends State<MainPage> {
                         );
                       } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                         final List<List<Notizia>?> loadedNotizie = snapshot.data!;
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+
+                          if(!_service.precedente && loadedNotizie[1] != null) {
+                            notificheAssenzeProf(loadedNotizie[1]!);
+                          }
+                        });
                         return passaggio(
                             context,
                             "  Notizie             ",
@@ -1108,6 +1149,81 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
+  Future<void> notificheAssenzeProf(List<Notizia> notizie) async {
+    // Controlla se il widget è ancora "attivo" prima di procedere
+    if (!mounted) return;
+
+    // 1. Carica in modo sicuro il conteggio precedente dei voti dalle SharedPreferences
+    final String? conteggioSalvato = await SharedPreferencesService.load("NumeroAssenze");
+
+    // 2. Converti in modo sicuro il valore caricato in un numero. Se non esiste, usa 0.
+    final int vecchiVoti = int.tryParse(conteggioSalvato ?? '0') ?? 0;
+    final int votiAttuali = notizie.length;
+
+    // 3. Confronta e determina se ci sono effettivamente nuovi voti
+    if (votiAttuali > vecchiVoti) {
+      final int numeroNuoviVoti = votiAttuali - vecchiVoti;
+
+      // 4. Prendi solo la lista dei nuovi voti
+      // Il metodo skip() salta i primi `vecchiVoti` elementi, che già conoscevamo
+      final nuoviVoti = notizie.skip(vecchiVoti).toList();
+
+      // 5. Invia una notifica PER OGNI nuovo voto
+      for (int i = 0; i < nuoviVoti.length; i++) {
+        final Notizia not = nuoviVoti[i];
+
+
+      await NotificheService().showNotification(not.title, i + 100, "Variazione di orario");
+      }
+
+      // 6. Salva il nuovo conteggio totale SOLO DOPO che la logica è completata
+      final sh = SharedPreferencesService(
+        name: "NumeroAssenze",
+        value: votiAttuali.toString(),
+      );
+      await sh.save();
+    }
+  }
+
+  // Aggiungi questa funzione DENTRO la classe _MainPageState, ma FUORI dal metodo build.
+  Future<void> notificheVoti(List<Voto> votiRecenti) async {
+    // Controlla se il widget è ancora "attivo" prima di procedere
+    if (!mounted) return;
+
+    // 1. Carica in modo sicuro il conteggio precedente dei voti dalle SharedPreferences
+    final String? conteggioSalvato = await SharedPreferencesService.load("NumeroVoti");
+
+    // 2. Converti in modo sicuro il valore caricato in un numero. Se non esiste, usa 0.
+    final int vecchiVoti = int.tryParse(conteggioSalvato ?? '0') ?? 0;
+    final int votiAttuali = votiRecenti.length;
+
+    // 3. Confronta e determina se ci sono effettivamente nuovi voti
+    if (votiAttuali > vecchiVoti) {
+      final int numeroNuoviVoti = votiAttuali - vecchiVoti;
+      print("INFO: Trovati $numeroNuoviVoti nuovi voti.");
+
+      // 4. Prendi solo la lista dei nuovi voti
+      // Il metodo skip() salta i primi `vecchiVoti` elementi, che già conoscevamo
+      final nuoviVoti = votiRecenti.skip(vecchiVoti).toList();
+
+      // 5. Invia una notifica PER OGNI nuovo voto
+      for (int i = 0; i < nuoviVoti.length; i++) {
+        final Voto nuovoVoto = nuoviVoti[i];
+
+
+        await NotificheService().showNotification("   ${nuovoVoto.codiceMateria}   ${nuovoVoto.displayValue}     | desc: ${nuovoVoto.descrizione} | prof: ${nuovoVoto.nomeProf}", i + 1, "Nuovo voto");
+      }
+
+      // 6. Salva il nuovo conteggio totale SOLO DOPO che la logica è completata
+      final sh = SharedPreferencesService(
+        name: "NumeroVoti",
+        value: votiAttuali.toString(),
+      );
+      await sh.save();
+    } else {
+      print("INFO: Nessun nuovo voto trovato.");
+    }
+  }
 
 
 }

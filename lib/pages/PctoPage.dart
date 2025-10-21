@@ -25,16 +25,24 @@ class Pctopage extends StatelessWidget {
                   children: [
                     const SizedBox(width: 10,),
                     const Text('Ore Previste: ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
-                    Text(pctoData.orePrevisteRaw ?? 'N/A', style: const TextStyle(fontSize: 20)),
+                    Text(pctoData.orePrevisteRaw, style: const TextStyle(fontSize: 20)),
                   ],
                 ),
                 Row(
                   children: [
                     const SizedBox(width: 10,),
                     const Text('Ore Presenze Totali: ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
-                    Text(pctoData.orePresenzeTotaliRaw, style: TextStyle(fontSize: 20, color: double.parse((pctoData.orePresenzeTotali).toString().substring(0, 3)) < double.parse((pctoData.orePreviste).toString().substring(0, 3)) ? Colors.red : Colors.green)),
+                    Text(
+                        pctoData.orePresenzeTotaliRaw, // Mostra la stringa grezza come prima
+                        style: TextStyle(
+                          fontSize: 20,
+                          // --- CORREZIONE: Confronta direttamente i numeri interi ---
+                          color: pctoData.orePresenzeTotali < pctoData.orePreviste ? Colors.red : Colors.green,
+                        )
+                    ),
                   ],
                 ),
+
                 const SizedBox(height: 20),
                 Divider(color: Colors.grey[200], thickness: 2),
                 const SizedBox(height: 20),

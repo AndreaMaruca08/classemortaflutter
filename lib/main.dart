@@ -1,12 +1,19 @@
 
 import 'package:classemorta/pages/Principale.dart';
 import 'package:classemorta/service/AccessService.dart';
+import 'package:classemorta/service/NotificheService.dart';
 import 'package:classemorta/widgets/GestioneAccesso.dart';
 import 'package:flutter/material.dart';
 import '../service/ApiService.dart';
 import 'models/Login.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Crea un'istanza del tuo servizio
+  final NotificheService notificheService = NotificheService();
+
+  // Chiama il metodo di inizializzazione e attendi che finisca
+  await notificheService.initialize();
   runApp(const Login());
 }
 // Builder personalizzato per una transizione in dissolvenza (Fade)
