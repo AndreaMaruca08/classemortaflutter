@@ -12,7 +12,8 @@ class Dettaglimateria extends StatefulWidget {
   final Materia materia;
   final int periodo;
   final bool dotted;
-  const Dettaglimateria({super.key, required this.materia, required this.periodo, required this.dotted});
+  final int msAnimazione;
+  const Dettaglimateria({super.key, required this.materia, required this.periodo, required this.dotted, required this.msAnimazione});
 
   @override
   State<Dettaglimateria> createState() => _DettaglimateriaState();
@@ -516,7 +517,7 @@ class _DettaglimateriaState extends State<Dettaglimateria> {
                 itemBuilder: (BuildContext context, int index) {
                   final voto = votiDisplay[index];
                   return Row(
-                    children: [const SizedBox(width: 10), VotoSingolo(voto: voto, grandezza: 85, fontSize: 25)],
+                    children: [const SizedBox(width: 10), VotoSingolo(voto: voto, grandezza: 85, fontSize: 25, ms: widget.msAnimazione)],
                   );
                 },
               ),
@@ -595,7 +596,7 @@ class _DettaglimateriaState extends State<Dettaglimateria> {
             const SizedBox(height: 10),
             SizedBox(
               width: 300,
-              child: Ipotetiche(voti: voti),
+              child: Ipotetiche(voti: voti, ms: widget.msAnimazione),
             ),
             const SizedBox(height: 100),
           ],

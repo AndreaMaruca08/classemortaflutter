@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:classemorta/models/Achievment.dart';
 import 'package:classemorta/models/InfoReturn.dart';
+import 'package:classemorta/models/Settings.dart';
 import 'package:mime/mime.dart';
 import 'package:classemorta/models/Assenza.dart';
 import 'package:classemorta/models/Giorno.dart';
@@ -110,6 +111,8 @@ class Apiservice {
   late String phpSessId;
   late String pass;
 
+  late Settings impostazioni;
+
   late String code;
   late String codiceStudent;
   late String card;
@@ -147,6 +150,9 @@ class Apiservice {
     login = "${base}auth/login";
     fullCode = codiceStudente;
     code = codiceStudente.replaceAll(RegExp(r'[a-zA-Z]'), "");
+
+    impostazioni = Settings(msAnimazioneVoto: 1500);
+    impostazioni.caricaImpostazioni();
 
     token = '';
     card = "${base}students/$code/card";
@@ -777,6 +783,20 @@ class Apiservice {
     await OpenFile.open(file.path);
   }
 
+  Future<Map<String, dynamic>> getGiornoJson(DateTime giorno) async{
+    final response = await http.get(
+      Uri.parse(getLessonsForDateUrl("${giorno.year}${giorno.month.toString().padLeft(2, '0')}${giorno.day.toString().padLeft(2, '0')}")),
+      headers: otherHeaders,
+    );
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      return json;
+    } else {
+      return {};
+    }
+
+  }
+
   Future<List<Giorno>> getOrari() async {
 
     DateTime oggi = DateTime.now();
@@ -796,7 +816,7 @@ class Apiservice {
       );
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
-        final Giorno giorno = Giorno.fromJson(json);
+        final Giorno giorno = await Giorno.fromJson(json, i, lunediScorso, this);
         giorni.add(giorno);
       } else {
         return [];

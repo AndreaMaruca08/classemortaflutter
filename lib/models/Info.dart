@@ -41,22 +41,21 @@ class Info {
     int contaD = 0, contaDD = 0, conta3 = 0, conta4_7 = 0, conta8_15 = 0, conta15piu = 0;
     for(Info i in info){
       DateTime dataScadenza = DateTime.tryParse(i.dataFine.substring(0,10)) ?? DateTime(2100);
-      DateTime today = DateTime.now();
+      DateTime today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
       int differenza = dataScadenza.difference(today).inDays;
-      if(differenza == 0){
+      if(differenza == 0  && dataScadenza.isAfter(today)){
         contaD ++;
-      }else if(differenza == 1){
-        contaDD ++;
       }else if(differenza == 2){
+        contaDD ++;
+      }else if(differenza == 3){
         conta3 ++;
-      }else if(differenza >= 3 && differenza <= 6){
+      }else if(differenza > 3 && differenza <= 6){
         conta4_7 ++;
       }else if(differenza >= 7 && differenza <= 14){
         conta8_15 ++;
       }else{
         conta15piu ++;
       }
-      print("differenza: $differenza");
     }
     return [contaD, contaDD, conta3, conta4_7, conta8_15, conta15piu];
   }
@@ -168,7 +167,7 @@ class Info {
       if (data == null) return false;
       DateTime dataScadenza = DateTime.tryParse(data.toString().substring(0,10)) ?? DateTime(2100);
       DateTime today = DateTime.now();
-      return dataScadenza.difference(today).inDays == 0;
+      return dataScadenza.difference(today).inDays == 0 && dataScadenza.isAfter(today);
     });
     List<Info> compitiFiltrati =
     perDomani.map<Info>((jsonMap) => Info.fromJson(jsonMap)).toList();

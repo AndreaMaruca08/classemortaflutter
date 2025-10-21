@@ -5,7 +5,8 @@ import '../../models/Voto.dart';
 class Dettaglivoto extends StatelessWidget {
   final Voto voto;
   final Voto? prec;
-  const  Dettaglivoto({super.key, required this.voto, this.prec});
+  final int ms;
+  const  Dettaglivoto({super.key, required this.voto, this.prec, required this.ms});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +16,7 @@ class Dettaglivoto extends StatelessWidget {
       ),
       body: Column(
         children: [
-          VotoSingolo(voto: voto, grandezza: 120, fontSize: 20),
+          VotoSingolo(voto: voto, grandezza: 120, fontSize: 20, ms: ms,),
           Divider(thickness: 2, color: getcoloreVoto(voto.voto)),
           Row(
             children: [

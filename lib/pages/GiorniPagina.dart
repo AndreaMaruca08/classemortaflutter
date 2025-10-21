@@ -55,7 +55,7 @@ class Giornipagina extends StatelessWidget {
       'Domenica',
     ];
     return Container(
-      height: 650,
+      height: 750,
       width: screenSize,
       decoration: BoxDecoration(
         color: Colors.grey[900],
@@ -79,7 +79,7 @@ class Giornipagina extends StatelessWidget {
                 itemBuilder: (context, index) {
                   Ora ora = giorno.orari[index];
                   return SizedBox(
-                    height: 85,
+                    height: 90,
                     child: Column(
                       children: [
                         SizedBox(height: 5,),
@@ -88,8 +88,17 @@ class Giornipagina extends StatelessWidget {
                           color: colori[index],
                         ),
                         SizedBox(height: 5,),
-                        Text("${ora.materia.substring(0, 4) == "TECN" ? "TPSI" : ora.materia == "LINGUA E LETTERATURA ITALIANA" ? "ITAL" : ora.materia.substring(0, 4)} | ${ora.ora}" , style: TextStyle(
-                            fontSize: 12,
+                        Text(
+                          "${ora.materia.substring(0, 4) == "TECN"
+                              ? "TPSI"
+                              : ora.materia == "LINGUA E LETTERATURA ITALIANA"
+                              ? "ITAL"
+                              : ora.materia.substring(0, 4)}${ora.prof.length == 2 ? " ★" : ""} | ${ora.ora}",
+                          style: TextStyle(
+                            //... il resto dello stile
+
+
+                          fontSize: 11.5,
                             fontWeight: FontWeight.bold,
                             color: colori[index],
                             shadows: <Shadow>[
@@ -100,8 +109,8 @@ class Giornipagina extends StatelessWidget {
                               ),
                             ]
                         ),),
-                        Text(ora.prof[0], textAlign: TextAlign.center ,style: TextStyle(
-                            fontSize: 9,
+                        Text("${ora.prof[0]} \n${ora.prof.length> 1 ? "--------- \n${ora.prof[1]}": ""}", textAlign: TextAlign.center ,style: TextStyle(
+                            fontSize: ora.prof.length> 1 ? 6.5:8,
                             color: colori[index],
                             shadows: <Shadow>[
                               Shadow(

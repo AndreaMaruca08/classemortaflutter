@@ -1,3 +1,5 @@
+import 'package:classemorta/service/ApiService.dart';
+
 import 'Ora.dart';
 /*
   {
@@ -19,36 +21,82 @@ import 'Ora.dart';
  ]
 }
  */
-class Giorno{
+class Giorno {
   List<Ora> orari;
 
   Giorno({
     required this.orari,
   });
 
-  factory Giorno.fromJson(Map<String, dynamic> json) {
+  static Future<Giorno> fromJson(Map<String, dynamic> json, int giornoInt,
+      DateTime lunediScorso, Apiservice service) async {
     List<Ora> l = Ora.fromJsonList(json);
     List<Ora> giorno = [];
-    int ora = l[0].ora;
+    int oraCorrente = 1;
+    l.sort((a, b) => a.ora.compareTo(b.ora));
 
-    if(ora > 1){
-      for(int i = 1; i < ora; i++){
-        giorno.add(Ora(materia: "ASSENZA PROF", ora: i, prof: ["ASSENZA"]));
+    String nomeSostegno = "";
+    for(Ora o in l){
+      if(o.materia.toUpperCase() == "SOSTEGNO") {
+        nomeSostegno = o.prof[0];
       }
     }
 
-    for (Ora o in l) {
-      //non si conta sostegno siccome servono gli orari
-      if (o.materia.toUpperCase() == "SOSTEGNO") {
-        continue;
-      }
-      if(ora > o.ora){
+    for (int j = 0; j < l.length; j++) {
+      Ora o = l[j];
+
+      // Non si conta sostegno siccome servono gli orari
+      if (o.materia.toUpperCase() == "SOSTEGNO" || o.prof[0] == nomeSostegno) {
         continue;
       }
 
+
+      if (o.ora > oraCorrente) {
+        int diff = o.ora - oraCorrente;
+
+        List<Ora> oreSettimanaPrecedente = Ora.fromJsonList(
+            await service.getGiornoJson(
+                lunediScorso.subtract(Duration(days: 7)).add(
+                    Duration(days: giornoInt))));
+
+        for (int i = 0; i < diff; i++) {
+          if ((oraCorrente - 1) < oreSettimanaPrecedente.length) {
+            giorno.add(oreSettimanaPrecedente[oraCorrente - 1]);
+          }
+          oraCorrente++;
+        }
+        j--;
+        continue;
+      }
+
+      if (o.ora < oraCorrente) {
+        Ora? oraPrecedente;
+        try {
+          oraPrecedente = giorno.lastWhere((ora) => ora.ora == o.ora &&  o.prof[0] != nomeSostegno);
+        } catch (e) {
+          oraPrecedente = null;
+        }
+
+        // Se abbiamo trovato un'ora corrispondente...
+        if (oraPrecedente != null) {
+          // ...e la materia è la stessa e il professore non è già presente...
+          if (oraPrecedente.materia == o.materia &&
+              !oraPrecedente.prof.contains(o.prof[0])) {
+            // ...allora aggiungiamo il nuovo professore alla lista dei professori dell'ora esistente.
+            oraPrecedente.prof.add(o.prof[0]);
+          }
+        }
+
+        // In ogni caso, saltiamo l'elaborazione ulteriore di questa ora 'doppiona'.
+        continue;
+      }
+
+
+      // --- Aggiunta di un'ora normale ---
       giorno.add(o);
-      ora++;
+      oraCorrente++;
     }
+
     return Giorno(
       orari: giorno,
     );

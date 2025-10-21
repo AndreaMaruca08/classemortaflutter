@@ -5,15 +5,16 @@ import 'SingoloVotoWid.dart';
 class Votodisplay extends StatelessWidget {
   final Voto voto;
   final Voto? precedente;
+  final int ms;
   final double grandezza;
-  const  Votodisplay({super.key, required this.voto,  this.precedente,  required this.grandezza});
+  const  Votodisplay({super.key, required this.voto,  this.precedente,  required this.grandezza, required this.ms});
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Row(
         children: [
-          VotoSingolo(voto: voto, prec: precedente, grandezza: grandezza, fontSize: 21),
+          VotoSingolo(voto: voto, prec: precedente, grandezza: grandezza, fontSize: 21, ms: ms,),
           const SizedBox(width: 10),
 
           Column(

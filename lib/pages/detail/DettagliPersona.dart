@@ -48,7 +48,7 @@ class _MainPageState extends State<StudentDetail> {
                 children: [
                   const SizedBox(height: 5),
                   const Text(
-                      " Versione 2.0",
+                      " Versione 2.2 Orari perfetti, Impostazioni e logout",
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,

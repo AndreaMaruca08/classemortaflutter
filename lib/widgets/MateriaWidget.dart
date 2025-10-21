@@ -133,17 +133,17 @@ class Materiawidget extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.start, // O come preferisci allineare
               children: [
-                VotoSingolo(voto: voti[0], grandezza: 100, fontSize: 15),
+                VotoSingolo(voto: voti[0], grandezza: 100, fontSize: 15, ms: service.impostazioni.msAnimazioneVoto),
 
                 if (voti.length > 1)
                   SizedBox(width: 12),
                 if (voti.length > 1)
-                  VotoSingolo(voto: voti[1], grandezza: 90, fontSize: 16),
+                  VotoSingolo(voto: voti[1], grandezza: 90, fontSize: 16, ms: service.impostazioni.msAnimazioneVoto),
 
                 if (voti.length > 2 && !voti[2].voto.isNaN)
                   SizedBox(width: 10),
                 if (voti.length > 2 && !voti[2].voto.isNaN)
-                  VotoSingolo(voto: voti[2], grandezza: 90, fontSize: 16),
+                  VotoSingolo(voto: voti[2], grandezza: 90, fontSize: 16, ms: service.impostazioni.msAnimazioneVoto),
               ],
             )
           else
@@ -161,7 +161,7 @@ class Materiawidget extends StatelessWidget {
                   onPressed: (){
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Dettaglimateria(materia: materia, periodo: 3, dotted: true,)),
+                      MaterialPageRoute(builder: (context) => Dettaglimateria(materia: materia, periodo: 3, dotted: true, msAnimazione: service.impostazioni.msAnimazioneVoto,)),
                     );
                   },
                   icon: Icon(Icons.auto_graph_sharp, color: Colors.white,)),
@@ -170,7 +170,7 @@ class Materiawidget extends StatelessWidget {
                     onPressed: (){
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Dettaglimateria(materia: materia, periodo: 1, dotted: true)),
+                        MaterialPageRoute(builder: (context) => Dettaglimateria(materia: materia, periodo: 1, dotted: true, msAnimazione: service.impostazioni.msAnimazioneVoto)),
                       );
                     },
                     icon: Icon(Icons.auto_graph_sharp, color: Colors.white,)),
@@ -180,7 +180,7 @@ class Materiawidget extends StatelessWidget {
                     onPressed: (){
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Dettaglimateria(materia: materia, periodo: 2, dotted: true)),
+                        MaterialPageRoute(builder: (context) => Dettaglimateria(materia: materia, periodo: 2, dotted: true, msAnimazione: service.impostazioni.msAnimazioneVoto)),
                       );
                     },
                     icon: Icon(Icons.auto_graph_sharp, color: Colors.white,)),

@@ -4,9 +4,11 @@ import '../models/Voto.dart';
 
 class Ipotetiche extends StatelessWidget {
   final List<Voto> voti;
+  final int ms;
   const Ipotetiche({
     super.key,
     required this.voti,
+    required this.ms,
   });
 
   @override
@@ -95,7 +97,7 @@ class Ipotetiche extends StatelessWidget {
                   ),
                 ),
                 VotoSingolo(
-                    voto: votoPerDisplayMedia, grandezza: 70, fontSize: 17),
+                    voto: votoPerDisplayMedia, grandezza: 70, fontSize: 17, ms: ms,),
               ],
             ),
           ),

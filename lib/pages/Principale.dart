@@ -1,4 +1,4 @@
-import 'dart:async'; // Aggiunto per Future
+import 'dart:async';
 import 'package:classemorta/main.dart';
 import 'package:classemorta/models/Achievment.dart';
 import 'package:classemorta/models/Materia.dart';
@@ -8,6 +8,7 @@ import 'package:classemorta/models/Voto.dart';
 import 'package:classemorta/pages/AchievmentPage.dart';
 import 'package:classemorta/pages/GiorniPagina.dart';
 import 'package:classemorta/pages/GiustifichePagina.dart';
+import 'package:classemorta/pages/ImpostazioniPage.dart';
 import 'package:classemorta/pages/PctoPage.dart';
 import 'package:classemorta/pages/VacanzePage.dart';
 import 'package:classemorta/pages/detail/Agenda.dart';
@@ -133,7 +134,17 @@ class _MainPageState extends State<MainPage> {
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pagina principale'),
+        title: Row(
+          children: [
+            const Text('Pagina principale'),
+            SizedBox(width: screenSize.width * 0.15,),
+            IconButton(onPressed: (){
+              Navigator.push(
+                context,
+                CustomPageRoute(builder: (context) => Impostazionipage(service: _service,)));
+            }, icon: Icon(Icons.settings))
+          ],
+        ),
       ),
       body: RefreshIndicator(
         onRefresh: _handleRefresh, // Usa la nuova funzione di refresh
@@ -284,11 +295,11 @@ class _MainPageState extends State<MainPage> {
                               Row(
                                 children: [
                                   // Assicurati che loadedMedie abbia abbastanza elementi
-                                  if (!loadedMedie[0].voto.isNaN) VotoSingolo(voto: loadedMedie[0], grandezza: 115, fontSize: 17,),
+                                  if (!loadedMedie[0].voto.isNaN) VotoSingolo(voto: loadedMedie[0], grandezza: 115, fontSize: 17, ms: _service.impostazioni.msAnimazioneVoto,),
                                   SizedBox(width: 8),
-                                  if (!loadedMedie[1].voto.isNaN) VotoSingolo(voto: loadedMedie[1], grandezza: 100, fontSize: 17),
+                                  if (!loadedMedie[1].voto.isNaN) VotoSingolo(voto: loadedMedie[1], grandezza: 100, fontSize: 17, ms: _service.impostazioni.msAnimazioneVoto),
                                   SizedBox(width: 8),
-                                  if (!loadedMedie[2].voto.isNaN) VotoSingolo(voto: loadedMedie[2], grandezza: 100, fontSize: 17),
+                                  if (!loadedMedie[2].voto.isNaN) VotoSingolo(voto: loadedMedie[2], grandezza: 100, fontSize: 17, ms: _service.impostazioni.msAnimazioneVoto),
                                 ],
                               ),
                               const SizedBox(height: 10),
@@ -320,6 +331,7 @@ class _MainPageState extends State<MainPage> {
                                                           ),
                                                             periodo: 3,
                                                             dotted: false,
+                                                            msAnimazione: _service.impostazioni.msAnimazioneVoto,
                                                           )
                                                   ));
                                             },
@@ -340,6 +352,7 @@ class _MainPageState extends State<MainPage> {
                                                           ),
                                                             periodo: 1,
                                                             dotted: false,
+                                                            msAnimazione: _service.impostazioni.msAnimazioneVoto,
                                                           )
                                                   ));
                                             },
@@ -361,6 +374,7 @@ class _MainPageState extends State<MainPage> {
                                                           ),
                                                             periodo: 2,
                                                             dotted: false,
+                                                            msAnimazione: _service.impostazioni.msAnimazioneVoto,
                                                           )
                                                   ));
                                             },
@@ -459,6 +473,7 @@ class _MainPageState extends State<MainPage> {
                                   voto: votoCorrente, // Il voto più recente (es. MAT 7.5)
                                   precedente: precedenteCronologico, // Il voto di MAT che è venuto prima del 7.5
                                   grandezza: 88,
+                                  ms: _service.impostazioni.msAnimazioneVoto,
                                 );
                               }
                           ),

@@ -178,27 +178,30 @@ class _AgendaState extends State<Agenda> {
 
   Widget displayInfos(String title, Future<List<Info>?> infoFuture, String notFoundText){
     return Column(
+
       children: [
         const Divider(height: 10, thickness: 1, color: Colors.white, indent: 20, endIndent: 20),
-        SizedBox(
-          height: 40,
-          width: 400,
-          child: Text(
-            title,
-            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-          ),
-        ),
-        const SizedBox(height: 10),
         FutureBuilder<List<Info>?>( // Inner FutureBuilder for the "Compiti" list
-          future: infoFuture, // Use the extracted list (wrapped in a Future)
-          builder: (context, snapshotCompiti) {
-            if (snapshotCompiti.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshotCompiti.hasError) {
-              return Center(child: Text("Errore caricamento dati: ${snapshotCompiti.error}"));
-            } else if (snapshotCompiti.hasData && snapshotCompiti.data!.isNotEmpty) {
-              List<Info> loadedCompiti = snapshotCompiti.data!;
-              return SizedBox(
+        future: infoFuture, // Use the extracted list (wrapped in a Future)
+        builder: (context, snapshotCompiti) {
+          if (snapshotCompiti.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshotCompiti.hasError) {
+            return Center(child: Text("Errore caricamento dati: ${snapshotCompiti.error}"));
+          } else if (snapshotCompiti.hasData && snapshotCompiti.data!.isNotEmpty) {
+            List<Info> loadedCompiti = snapshotCompiti.data!;
+            return Column(
+              children: [
+                SizedBox(
+                  height: 40,
+                  width: 400,
+                  child: Text(
+                    "$title (${loadedCompiti.length})",
+                    style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 15),
+                SizedBox(
                 height: 210,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
@@ -213,15 +216,29 @@ class _AgendaState extends State<Agenda> {
                     );
                   },
                 ),
-              );
-            } else {
-              return SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child:  Center(child: Text(notFoundText)),
-              );
-            }
-          },
-        ),
+              )
+              ],
+            );
+          } else {
+            return SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child:  Column(
+                children: [
+                  SizedBox(
+                    height: 40,
+                    width: 400,
+                    child: Text(
+                      title,
+                      style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Center(child: Text(notFoundText))
+                ],
+              ),
+            );
+          }
+        },
+      ),
       ],
     );
   }
