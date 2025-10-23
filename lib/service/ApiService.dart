@@ -151,7 +151,11 @@ class Apiservice {
     fullCode = codiceStudente;
     code = codiceStudente.replaceAll(RegExp(r'[a-zA-Z]'), "");
 
-    impostazioni = Settings(msAnimazioneVoto: 1500);
+    impostazioni = Settings(
+        msAnimazioneVoto: 1500,
+        msAnimazioneGraficoAndamento: 1500,
+        msAnimazioneGraficoNumeri: 1200
+    );
     impostazioni.caricaImpostazioni();
 
     token = '';

@@ -1,5 +1,9 @@
+import 'dart:math' as Math;
+
 import 'package:classemorta/models/Streak.dart';
 import 'package:classemorta/models/Voto.dart';
+import 'package:classemorta/service/ApiService.dart';
+import 'package:classemorta/service/SharedPreferencesService.dart';
 import 'package:classemorta/widgets/SingoloVotoWid.dart';
 import 'package:classemorta/widgets/torta.dart';
 import 'package:flutter/material.dart';
@@ -13,13 +17,15 @@ class Dettaglimateria extends StatefulWidget {
   final int periodo;
   final bool dotted;
   final int msAnimazione;
-  const Dettaglimateria({super.key, required this.materia, required this.periodo, required this.dotted, required this.msAnimazione});
+  final Apiservice service;
+  const Dettaglimateria({super.key, required this.materia, required this.periodo, required this.dotted, required this.msAnimazione, required this.service});
 
   @override
   State<Dettaglimateria> createState() => _DettaglimateriaState();
 }
 
 class _DettaglimateriaState extends State<Dettaglimateria> {
+
   // Variabili di stato della UI
   late int periodo = widget.periodo;
   final PageController _pageController = PageController();
@@ -31,10 +37,14 @@ class _DettaglimateriaState extends State<Dettaglimateria> {
   List<FlSpot> chartSpots = [];
   List<BarChartGroupData> chartBarGroups = [];
   bool _isDataReady = false;
+  late int durataAnimazioneGrMedia;
+  late int durataAnimazioneGrNumVoti;
 
   @override
   void initState() {
     super.initState();
+    durataAnimazioneGrMedia = widget.service.impostazioni.msAnimazioneGraficoAndamento;
+    durataAnimazioneGrNumVoti = widget.service.impostazioni.msAnimazioneGraficoNumeri;
     _pageController.addListener(() {
       if (mounted) {
         setState(() {
@@ -54,8 +64,6 @@ class _DettaglimateriaState extends State<Dettaglimateria> {
       chartSpots = [];
       chartBarGroups = [];
     });
-
-    await Future.delayed(const Duration(milliseconds: 200));
 
     // Step 2: calcolo dei dati
     List<Voto> voti = widget.materia.voti.where((voto) => voto.periodo == periodo).toList();
@@ -153,7 +161,7 @@ class _DettaglimateriaState extends State<Dettaglimateria> {
                       child: _isDataReady
                           ? TweenAnimationBuilder<double>(
                         tween: Tween<double>(begin: 0, end: 1),
-                        duration: const Duration(milliseconds: 1500),
+                        duration: Duration(milliseconds: durataAnimazioneGrMedia),
                         curve: Curves.easeInOutCubic,
                         builder: (context, value, child) {
                           // Calcola i punti animati
@@ -361,7 +369,7 @@ class _DettaglimateriaState extends State<Dettaglimateria> {
                       child: _isDataReady
                           ? TweenAnimationBuilder<double>(
                         tween: Tween<double>(begin: 0, end: 1),
-                        duration: const Duration(milliseconds: 1500),
+                        duration: Duration(milliseconds: durataAnimazioneGrNumVoti),
                         curve: Curves.easeInOutCubic,
                         builder: (context, value, child) {
                           // Animiamo ogni BarChartGroupData scalando il toY dei suoi rod
@@ -585,6 +593,17 @@ class _DettaglimateriaState extends State<Dettaglimateria> {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                        const SizedBox(width: 10),
+                        const Text(
+                            "Costanza: ",
+                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          "${getCostanza(media, voti).toStringAsFixed(2)}%",
+                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold,
+                            color: getColor(media)
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -604,6 +623,28 @@ class _DettaglimateriaState extends State<Dettaglimateria> {
       ),
     );
   }
+  double getCostanza(double media, List<Voto> voti) {
+    if (voti.isEmpty) return 0;
+
+    // Calcolo della deviazione standard
+    double sommaQuadrati = 0;
+    for (var v in voti) {
+      sommaQuadrati += (v.voto - media) * (v.voto - media);
+    }
+
+    double varianza = sommaQuadrati / voti.length;
+    double deviazioneStandard = Math.sqrt(varianza);
+
+    // Formula della costanza: più la deviazione è piccola, più la costanza è alta
+    double costanza = 100 - ((deviazioneStandard / media) * 100);
+
+    // Limita il risultato tra 0 e 100
+    if (costanza < 0) costanza = 0;
+    if (costanza > 100) costanza = 100;
+
+    return costanza;
+  }
+
 
   // --- Funzioni Helper ---
   List<Color> getColors(List<Voto> voti) {

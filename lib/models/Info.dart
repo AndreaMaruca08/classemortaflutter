@@ -105,16 +105,8 @@ class Info {
       String descrizione = notesValue.toString().toLowerCase();
       bool con1 = descrizione.contains("port");
       bool con2 = descrizione.contains("entrambi");
-      bool con3 = !descrizione.contains("interroga");
-      bool con4 = !descrizione.contains("compito in classe");
-      bool con5 = !descrizione.contains("verific");
-      bool con6 = !descrizione.contains("recuper");
-      bool con7 = !descrizione.contains("writ");
-      bool con8 = !descrizione.contains("speak");
-      bool con9 = !descrizione.contains("liste");
-      bool con10 = !descrizione.contains("test");
 
-      return (con1 || con2) && con3 && con4 && con5 && con6 && con7 && con8 && con9 && con10;
+      return (con1 || con2) ;
     });
 
     List<Info> compitiFiltrati =
@@ -145,8 +137,10 @@ class Info {
       bool con8 = descrizione.contains("test");
       bool con9 = descrizione.contains("presentazion");
       bool con10 = descrizione.contains("tema");
+      bool con11 = !descrizione.contains("port");
+      bool con12 = !descrizione.contains("entrambi");
 
-      return con1 || con2 || con3 || con4 || con5 || con6 || con7 || con8 || con9 || con10;
+      return (con1 || con2 || con3 || con4 || con5 || con6 || con7 || con8 || con9 || con10) && con11 && con12;
     });
 
     List<Info> compitiFiltrati =

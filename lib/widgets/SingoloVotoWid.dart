@@ -29,7 +29,6 @@ class _VotoSingoloState extends State<VotoSingolo>
   late Animation<double> _animation;
   late int _ms;
 
-
   @override
   void initState() {
     super.initState();
@@ -59,8 +58,11 @@ class _VotoSingoloState extends State<VotoSingolo>
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    Dettaglivoto(voto: widget.voto, prec: widget.prec, ms: _ms,)),
+                builder: (context) => Dettaglivoto(
+                  voto: widget.voto,
+                  prec: widget.prec,
+                  ms: _ms,
+                )),
           );
         },
         splashColor: widget.voto.voto >= 6
@@ -73,10 +75,17 @@ class _VotoSingoloState extends State<VotoSingolo>
         child: AnimatedBuilder(
           animation: _animation,
           builder: (context, child) {
+            final Color finalColor = widget.voto.voto >= 6
+                ? Colors.green
+                : widget.voto.voto >= 5
+                ? Colors.yellow[700]!
+                : Colors.red;
+
             return CircularProgressBar(
               currentValue: _animation.value,
               maxValue: 10,
               size: widget.grandezza,
+              color: finalColor,
               child: child,
             );
           },

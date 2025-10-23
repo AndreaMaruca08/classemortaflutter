@@ -342,32 +342,36 @@ class _MainPageState extends State<MainPage> {
 
 
                                     // Ripristino la tua Row originale con la spaziatura corretta
+                                    // Ripristino la tua Row originale con la spaziatura corretta
                                     return Row(
-                                      children: [
-                                        const SizedBox(width: 36,), // Tua spaziatura originale
-                                        IconButton(
-                                            onPressed: () {
-                                              Navigator.push(
-                                                  context,
-                                                  CustomPageRoute(
-                                                      builder: (context) =>
-                                                          Dettaglimateria(materia: Materia(
-                                                              codiceMateria: "Anno intero",
-                                                              nomeInteroMateria: "Anno",
-                                                              nomeProf: "Sistema",
-                                                              voti: voti
-                                                          ),
-                                                            periodo: 3,
-                                                            dotted: false,
-                                                            msAnimazione: _service.impostazioni.msAnimazioneVoto,
-                                                          )
-                                                  ));
-                                            },
-                                            icon: const Icon(Icons.auto_graph_sharp,
-                                              color: Colors.white,)),
-                                        const SizedBox(width: 68,), // Tua spaziatura originale
-                                        IconButton(
-                                            onPressed: () {
+                                        children: [
+                                          const SizedBox(width: 2,), // Tua spaziatura originale
+                                          if (!loadedMedie[0].voto.isNaN)
+                                            ElevatedButton(
+                                                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.grey[900])),
+                                                onPressed: () {
+                                                  Navigator.push(
+                                                      context,
+                                                      CustomPageRoute(
+                                                          builder: (context) =>
+                                                              Dettaglimateria(materia: Materia(
+                                                                  codiceMateria: "Anno intero",
+                                                                  nomeInteroMateria: "Anno",
+                                                                  nomeProf: "Sistema",
+                                                                  voti: voti
+                                                              ),
+                                                                periodo: 3,
+                                                                service: _service,
+                                                                dotted: false,
+                                                                msAnimazione: _service.impostazioni.msAnimazioneVoto,
+                                                              )
+                                                      ));
+                                                },
+                                                child: const SizedBox(width: 70, child: Icon(Icons.auto_graph_sharp, color: Colors.white, size: 30,))
+                                            ),
+                                          const SizedBox(width: 5,),
+                                          if (!loadedMedie[1].voto.isNaN)
+                                            ElevatedButton(style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.grey[900])), onPressed: () {
                                               Navigator.push(
                                                   context,
                                                   CustomPageRoute(
@@ -379,38 +383,39 @@ class _MainPageState extends State<MainPage> {
                                                               voti: voti
                                                           ),
                                                             periodo: 1,
+                                                            service: _service,
                                                             dotted: false,
                                                             msAnimazione: _service.impostazioni.msAnimazioneVoto,
                                                           )
                                                   ));
-                                            },
-                                            icon: const Icon(Icons.auto_graph_sharp,
-                                              color: Colors.white,)),
-                                        const SizedBox(width: 60,), // Tua spaziatura originale
-                                        if (!loadedMedie[2].voto.isNaN)
-                                          IconButton(
-                                              onPressed: () {
-                                                Navigator.push(
-                                                    context,
-                                                    CustomPageRoute(
-                                                        builder: (context) =>
-                                                            Dettaglimateria(materia: Materia(
+                                            }, child:const SizedBox(width: 65 , child: Icon(Icons.auto_graph_sharp, color: Colors.white, size: 30,),)
+                                            ),
+                                          const SizedBox(width: 2,), // Tua spaziatura originale
+                                          if (!loadedMedie[2].voto.isNaN)
+                                            ElevatedButton(
+                                                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.grey[900])),
+                                                onPressed: () {
+                                                  Navigator.push(
+                                                      context,
+                                                      CustomPageRoute(
+                                                          builder: (context) =>
+                                                              Dettaglimateria(materia: Materia(
                                                                 codiceMateria: "2° quadrimestre",
                                                                 nomeInteroMateria: "2° quadrimestre",
                                                                 nomeProf: "Sistema",
-                                                                voti: voti
-                                                            ),
-                                                              periodo: 2,
-                                                              dotted: false,
-                                                              msAnimazione: _service.impostazioni.msAnimazioneVoto,
-                                                            )
-                                                    ));
-                                              },
-                                              icon: const Icon(Icons.auto_graph_sharp,
-                                                color: Colors.white,)),
-                                      ],
-                                    );
-                                  }
+                                                                voti: voti,
+                                                              ),
+                                                                periodo: 2,
+                                                                dotted: false,
+                                                                service: _service,
+                                                                msAnimazione: _service.impostazioni.msAnimazioneVoto,
+                                                              )
+                                                      ));
+                                                },
+                                                child: const SizedBox(width: 60, child: Icon(Icons.auto_graph_sharp, color: Colors.white, size: 30,))
+                                            ),
+                                        ]);
+                                        }
                                   // STATO SENZA DATI
                                   else {
                                     return const SizedBox(
@@ -1202,16 +1207,19 @@ class _MainPageState extends State<MainPage> {
       final int numeroNuoviVoti = votiAttuali - vecchiVoti;
       print("INFO: Trovati $numeroNuoviVoti nuovi voti.");
 
+      final votiInvertiti = votiRecenti.reversed.toList();
+
       // 4. Prendi solo la lista dei nuovi voti
       // Il metodo skip() salta i primi `vecchiVoti` elementi, che già conoscevamo
-      final nuoviVoti = votiRecenti.skip(vecchiVoti).toList();
+      final nuoviVoti = votiInvertiti.skip(vecchiVoti).toList();
+      print("INFO: numero voti nuovi : ${nuoviVoti.length}");
 
+      int i = 0;
       // 5. Invia una notifica PER OGNI nuovo voto
-      for (int i = 0; i < nuoviVoti.length; i++) {
-        final Voto nuovoVoto = nuoviVoti[i];
-
-
+      for (Voto nuovoVoto in nuoviVoti) {
+        print(nuovoVoto.descrizione);
         await NotificheService().showNotification("   ${nuovoVoto.codiceMateria}   ${nuovoVoto.displayValue}     | desc: ${nuovoVoto.descrizione} | prof: ${nuovoVoto.nomeProf}", i + 1, "Nuovo voto");
+        i++;
       }
 
       // 6. Salva il nuovo conteggio totale SOLO DOPO che la logica è completata

@@ -1,5 +1,6 @@
 import 'package:classemorta/models/Info.dart';
 import 'package:classemorta/models/InfoReturn.dart';
+import 'package:classemorta/service/NotificheService.dart';
 import 'package:classemorta/widgets/CompitoWidget.dart';
 import 'package:flutter/material.dart';
 import '../../service/ApiService.dart';
@@ -178,11 +179,10 @@ class _AgendaState extends State<Agenda> {
 
   Widget displayInfos(String title, Future<List<Info>?> infoFuture, String notFoundText){
     return Column(
-
       children: [
         const Divider(height: 10, thickness: 1, color: Colors.white, indent: 20, endIndent: 20),
-        FutureBuilder<List<Info>?>( // Inner FutureBuilder for the "Compiti" list
-        future: infoFuture, // Use the extracted list (wrapped in a Future)
+        FutureBuilder<List<Info>?>(
+        future: infoFuture,
         builder: (context, snapshotCompiti) {
           if (snapshotCompiti.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -190,6 +190,7 @@ class _AgendaState extends State<Agenda> {
             return Center(child: Text("Errore caricamento dati: ${snapshotCompiti.error}"));
           } else if (snapshotCompiti.hasData && snapshotCompiti.data!.isNotEmpty) {
             List<Info> loadedCompiti = snapshotCompiti.data!;
+
             return Column(
               children: [
                 SizedBox(
@@ -221,7 +222,7 @@ class _AgendaState extends State<Agenda> {
             );
           } else {
             return SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               child:  Column(
                 children: [
                   SizedBox(
