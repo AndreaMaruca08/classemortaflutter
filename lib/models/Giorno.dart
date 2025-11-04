@@ -28,12 +28,19 @@ class Giorno {
     required this.orari,
   });
 
-  static Future<Giorno> fromJson(Map<String, dynamic> json, int giornoInt,
-      DateTime lunediScorso, Apiservice service) async {
+  static Future<Giorno> fromJson(Map<String, dynamic> json, int giornoInt, DateTime lunediScorso, Apiservice service) async {
     List<Ora> l = Ora.fromJsonList(json);
     List<Ora> giorno = [];
     int oraCorrente = 1;
     l.sort((a, b) => a.ora.compareTo(b.ora));
+
+    if(l.isEmpty){
+      List<Ora> oreSettimanaPrecedente = Ora.fromJsonList(
+          await service.getGiornoJson(
+              lunediScorso.subtract(Duration(days: 7)).add(
+                  Duration(days: giornoInt))));
+      l = oreSettimanaPrecedente;
+    }
 
     String nomeSostegno = "";
     for(Ora o in l){

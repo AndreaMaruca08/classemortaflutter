@@ -49,9 +49,9 @@ class Info {
         contaDD ++;
       }else if(differenza == 3){
         conta3 ++;
-      }else if(differenza > 3 && differenza <= 6){
+      }else if(differenza > 3 && differenza <= 7){
         conta4_7 ++;
-      }else if(differenza >= 7 && differenza <= 14){
+      }else if(differenza >= 8 && differenza <= 14){
         conta8_15 ++;
       }else{
         conta15piu ++;

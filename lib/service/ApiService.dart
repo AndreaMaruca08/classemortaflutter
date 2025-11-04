@@ -188,7 +188,7 @@ class Apiservice {
     return "${base}students/$code/lessons/$date";
   }
 
-  Future<List<Voto>?> getAllVoti() async {
+  Future<List<Voto>?> getAllVoti(bool ordinati) async {
     if(token.isEmpty) {
       return null;
     }
@@ -205,14 +205,32 @@ class Apiservice {
           finalVoti.add(voto);
         }
       }
-      return finalVoti;
+      List<Voto> votiOrdinabili = List<Voto>.from(finalVoti);
+
+      votiOrdinabili.sort((a, b) {
+        bool aIsValid = a.dataVoto.length == 10; // Adattato per "AAAA-MM-GG"
+        bool bIsValid = b.dataVoto.length == 10; // Adattato per "AAAA-MM-GG"
+        if (aIsValid && !bIsValid)
+          return -1; // 'a' valida, 'b' no -> 'a' (più recente) viene prima
+        if (!aIsValid && bIsValid)
+          return 1; // 'b' valida, 'a' no -> 'b' (più recente) viene prima
+        if (!aIsValid && !bIsValid)
+          return 0; // Entrambe non valide per lunghezza, ordine invariato
+        return b.dataVoto.compareTo(a.dataVoto);
+      });
+      if(ordinati) {
+        return votiOrdinabili;
+      }
+      else{
+        return finalVoti;
+      }
     } else {
       throw Exception('Failed to load grades');
     }
   }
 
   Future<List<Voto>?> getMedieGenerali() async {
-    final voti = await getAllVoti();
+    final voti = await getAllVoti(true);
 
     if (voti == null) {
       return null;
@@ -375,30 +393,16 @@ class Apiservice {
     }
 
   Future<List<Voto>?> getLastVoti(int numberOfVotes) async {
-    final tuttiIVoti = await getAllVoti();
+    final tuttiIVoti = await getAllVoti(true);
 
     if (tuttiIVoti == null || tuttiIVoti.isEmpty) {
       return null;
     }
 
-    List<Voto> votiOrdinabili = List<Voto>.from(tuttiIVoti);
-
-    votiOrdinabili.sort((a, b) {
-      bool aIsValid = a.dataVoto.length == 10; // Adattato per "AAAA-MM-GG"
-      bool bIsValid = b.dataVoto.length == 10; // Adattato per "AAAA-MM-GG"
-      if (aIsValid && !bIsValid)
-        return -1; // 'a' valida, 'b' no -> 'a' (più recente) viene prima
-      if (!aIsValid && bIsValid)
-        return 1; // 'b' valida, 'a' no -> 'b' (più recente) viene prima
-      if (!aIsValid && !bIsValid)
-        return 0; // Entrambe non valide per lunghezza, ordine invariato
-      return b.dataVoto.compareTo(a.dataVoto);
-    });
-
-    if (votiOrdinabili.length > numberOfVotes) {
-      return votiOrdinabili.sublist(0, numberOfVotes);
+    if (tuttiIVoti.length > numberOfVotes) {
+      return tuttiIVoti.sublist(0, numberOfVotes);
     } else {
-      return votiOrdinabili;
+      return tuttiIVoti;
     }
   }
 
@@ -628,6 +632,9 @@ class Apiservice {
       final List<Assenza> assenze = Assenza.fromJsonList(json, "ABA0");
       final List<Assenza> uscite = Assenza.fromJsonList(json, "ABU0");
       final List<Assenza> ritardi = Assenza.fromJsonList(json, "ABR0");
+      final List<Assenza> ritardiBrevi = Assenza.fromJsonList(json, "ABR1");
+
+      assenze.addAll(ritardiBrevi);
 
       final List<List<Assenza>> ass = [assenze, uscite, ritardi];
       return ass;
@@ -801,34 +808,71 @@ class Apiservice {
 
   }
 
-  Future<List<Giorno>> getOrari() async {
+  Future<List<List<Giorno>>> getOrari() async {
+    try {
+      DateTime oggi = DateTime.now();
+      int giornoSettimana = oggi.weekday;
+      DateTime lunediQuesto = oggi.subtract(Duration(days: giornoSettimana - 1));
+      DateTime lunediScorso = lunediQuesto.subtract(Duration(days: 7));
+      DateTime lunediPrecedente = lunediScorso.subtract(Duration(days: 7)); // Nome più chiaro
 
-    DateTime oggi = DateTime.now();
-    int giornoSettimana = oggi.weekday;
-    DateTime lunediQuesto = oggi.subtract(Duration(days: giornoSettimana - 1));
-    DateTime lunediScorso = lunediQuesto.subtract(Duration(days: 7));
+      List<Future<Giorno?>> futuresSettimanaScorsa = [];
+      List<Future<Giorno?>> futuresSettimanaPrecedente = [];
 
+      // Prepara tutte le chiamate di rete senza attenderle (await)
+      for (int i = 0; i < 5; i++) {
+        // Aggiunge i Future alla lista per la settimana scorsa
+        futuresSettimanaScorsa.add(_fetchGiorno(lunediScorso.add(Duration(days: i)), i, lunediScorso));
 
-    List<Giorno> giorni = [];
-    for(int i = 0; i < 5; i++){
-      DateTime data = lunediScorso.add(Duration(days: i));
+        // Aggiunge i Future alla lista per la settimana precedente
+        futuresSettimanaPrecedente.add(_fetchGiorno(lunediPrecedente.add(Duration(days: i)), i, lunediPrecedente));
+      }
+
+      // Esegue tutte le chiamate in parallelo e attende il loro completamento
+      final List<Giorno?> giorniScorsi = await Future.wait(futuresSettimanaScorsa);
+      final List<Giorno?> giorniPrecedenti = await Future.wait(futuresSettimanaPrecedente);
+
+      // Controlla se ci sono stati errori (null) e gestiscili se necessario
+      if (giorniScorsi.any((g) => g == null) || giorniPrecedenti.any((g) => g == null)) {
+        // Puoi decidere di lanciare un'eccezione o restituire liste vuote
+        print("Errore durante il recupero di alcuni orari.");
+        return [[], []];
+      }
+
+      // Poiché non ci sono null, possiamo tranquillamente fare il cast
+      return [
+        giorniScorsi.cast<Giorno>(),
+        giorniPrecedenti.cast<Giorno>()
+      ];
+
+    } catch (e) {
+      print("Errore in getOrari: $e");
+      return [[], []]; // Restituisce un valore di default in caso di errore
+    }
+  }
+
+// Funzione helper per evitare la duplicazione del codice
+  Future<Giorno?> _fetchGiorno(DateTime data, int indice, DateTime lunediRiferimento) async {
+    try {
       String fromDate = "${data.year}${data.month.toString().padLeft(2, '0')}${data.day.toString().padLeft(2, '0')}";
-
       final response = await http.get(
         Uri.parse(getLessonsForDateUrl(fromDate)),
         headers: otherHeaders,
       );
+
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
-        final Giorno giorno = await Giorno.fromJson(json, i, lunediScorso, this);
-        giorni.add(giorno);
+        // Pass 'this' (ApiService) se Giorno.fromJson lo richiede
+        return await Giorno.fromJson(json, indice, lunediRiferimento, this);
       } else {
-        return [];
+        return null; // Restituisce null in caso di fallimento della singola chiamata
       }
-
+    } catch (e) {
+      print("Errore nel recupero del giorno $data: $e");
+      return null; // Restituisce null anche in caso di eccezione
     }
-    return giorni;
   }
+
 
   Future<String> ottieniPhpsessid() async {
     final uri = Uri.parse(
@@ -957,10 +1001,11 @@ class Apiservice {
         List<Nota> disciplinari = note[0];
         List<Assenza> assenze = Assenza.perAchievment(json["events"], "ABA0");
         List<Assenza> ritardi = Assenza.perAchievment(json["events"], "ABUO");
+        List<Assenza> ritardiBrevi = Assenza.perAchievment(json["events"], "ABR1");
         List<Assenza> uscite = Assenza.perAchievment(json["events"], "ABRO");
         List<Voto> voti = Voto.perAchievmentVoto(json["grades"]);
         return Achievment.getAchievments(
-            disciplinari, annotazioni, voti, assenze, ritardi, uscite);
+            disciplinari, annotazioni, voti, assenze, ritardi, ritardiBrevi, uscite);
       }catch(e){
         print(e);
       }

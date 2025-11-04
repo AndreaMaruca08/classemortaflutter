@@ -60,7 +60,7 @@ class _MainPageState extends State<MainPage> {
   late Future<List<List<Assenza>>> _assenze;
   late Future<List<Lezione>> _lessonsToday;
   late Future<List<Didattica>> _didattica;
-  late Future<List<Giorno>> _giorni;
+  late Future<List<List<Giorno>>> _giorni;
   late Future<PctoData> _datiCurriculum;
   late Future<List<SchoolEvent>> _events;
   late Future<List<PeriodoFestivo>> _vacanze;
@@ -74,7 +74,7 @@ class _MainPageState extends State<MainPage> {
     _service = widget.apiService;
     _medieGeneraliFuture = _service.getMedieGenerali() ; // Caricamento iniziale
     _lastVotiFutureMedie = _service.getLastVoti(200);
-    _voti = _service.getAllVoti();
+    _voti = _service.getAllVoti(false);
     _lastVotiFuture = _service.getLastVoti(200);
     _notizie = _service.getNotizie();
     _pagelle = _service.getPagelle() as Future<List<Pagella>?>;
@@ -95,7 +95,7 @@ class _MainPageState extends State<MainPage> {
     setState(() {
       _medieGeneraliFuture = (_service.getMedieGenerali());
       _lastVotiFutureMedie = (_service.getLastVoti(200));
-      _voti = _service.getAllVoti();
+      _voti = _service.getAllVoti(false);
       _lastVotiFuture = _service.getLastVoti(200);
       _notizie = _service.getNotizie();
       _note = _service.getNote();
@@ -680,13 +680,13 @@ class _MainPageState extends State<MainPage> {
                           child: Text('Orari mancanti'),
                         );
                       } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                        final List<Giorno> loadedGiorni = snapshot.data!;
+                        final List<List<Giorno>> loadedGiorni = snapshot.data!;
                         return passaggio(
                             context,
                             "  Orari                 ",
                             "orari settimanali",
                             Giornipagina(
-                              giorni: loadedGiorni,
+                              giorniLista: loadedGiorni,
                             ),
                             Icon(Icons.watch_later, size: 25,)
                         );

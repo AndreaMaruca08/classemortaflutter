@@ -48,7 +48,7 @@ class _MainPageState extends State<StudentDetail> {
                 children: [
                   const SizedBox(height: 5),
                   const Text(
-                      " Versione 2.4.0 : fix cose da portare, fix notifiche, animazione voto inizia dal colore finale, percentuale costanza ",
+                      " Versione 2.4.2 : bug fix agli orari, miglioramento grafico nell'agenda",
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,

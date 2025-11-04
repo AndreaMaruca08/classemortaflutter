@@ -51,32 +51,6 @@ class InfoSingola extends StatelessWidget {
             Row(
               children: [
                 Icon(
-                  Icons.calendar_month_outlined,
-                  size: 16,
-                  color: textColor.withOpacity(0.8),
-                ),
-                SizedBox(width: 6),
-                Text(
-                  getData(info.data),
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: textColor.withOpacity(0.9),
-                  ),
-                ),
-                Text(
-                  " - ${getDistanza(info.data)}",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: textColor.withOpacity(0.9),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Icon(
                   Icons.watch_later_outlined,
                   size: 16,
                   color: textColor.withOpacity(0.8),
@@ -175,72 +149,5 @@ class InfoSingola extends StatelessWidget {
     }
   }
 
-  String getData(String dataString){
-    List<String> nomiGiorni = [
-      'Lunedì',
-      'Martedì',
-      'Mercoledì',
-      'Giovedì',
-      'Venerdì',
-      'Sabato',
-      'Domenica',
-    ];
-    List<String> nomiMesi = [
-      'Gennaio',
-      'Febbraio',
-      'Marzo',
-      'Aprile',
-      'Maggio',
-      'Giugno',
-      'Luglio',
-      'Agosto',
-      'Settembre',
-      'Ottobre',
-      'Novembre',
-      'Dicembre',
-    ];
-    DateTime scadenza = DateTime.parse(dataString.substring(0, 10));
-    DateTime scadenzaDateOnly = DateTime(
-      scadenza.year,
-      scadenza.month,
-      scadenza.day,
-    );
 
-    String data = "${nomiGiorni[scadenzaDateOnly.weekday - 1].substring(0, 3)} "
-                  "${scadenzaDateOnly.day} ${nomiMesi[scadenzaDateOnly.month - 1].substring(0, 3)} "
-                  "${scadenzaDateOnly.year}";
-
-
-    return data;
-  }
-
-  String getDistanza(String dataString) {
-
-    try {
-      DateTime today = DateTime.now(); // Considera di usare DateTime.now() per la data corrente reale
-      DateTime scadenza = DateTime.parse(dataString.substring(0, 10));
-      DateTime scadenzaDateOnly = DateTime(
-        scadenza.year,
-        scadenza.month,
-        scadenza.day,
-      );
-      Duration differenza = scadenzaDateOnly.difference(today);
-      if(differenza.inHours < -14){
-        return "Oggi passato";
-      }
-      if (scadenzaDateOnly.isBefore(today)) {
-        return "PER OGGI !!!";
-      }
-      if (differenza.inDays == 0) {
-        return "DOMANI !!!";
-      }
-      if (differenza.inDays == 1) {
-        return "Dopo domani";
-      }
-      return "${(differenza.inDays + 1).toString()} giorni";
-
-    } catch (e) {
-      return "Errore";
-    }
-  }
 }

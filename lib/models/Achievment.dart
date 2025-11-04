@@ -33,8 +33,12 @@ class Achievment{
 
 
 
-  static List<Achievment> getAchievments(List<Nota> disc, List<Nota> annotazioni,List<Voto> grades, List<Assenza> assenze, List<Assenza> ritardi, List<Assenza> uscite){
+  static List<Achievment> getAchievments(List<Nota> disc, List<Nota> annotazioni,List<Voto> grades, List<Assenza> assenze, List<Assenza> ritardi,  List<Assenza> ritardiBrevi, List<Assenza> uscite){
+
     List<Achievment> achievments = [];
+    for(Assenza x in ritardiBrevi){
+      ritardi.add(x);
+    }
     for(Achievment x in allAchievments()){
       x.reached = isReached(x, disc, annotazioni, grades, assenze, ritardi, uscite);
       achievments.add(x);
@@ -129,19 +133,19 @@ class Achievment{
     for (Voto voto in votiDaControllare) {
       bool condizioneSoddisfatta = false;
 
+
       if (trofeo.positivo) {
         condizioneSoddisfatta = (voto.voto >= trofeo.valueToReach);
       } else { // Trofeo negativo
         condizioneSoddisfatta = (voto.voto < trofeo.valueToReach);
       }
-
       if (condizioneSoddisfatta) {
         count++;
       } else {
         count = 0;
       }
       if (count == trofeo.count) {
-        return true; // Obiettivo raggiunto!
+        return true;
       }
     }
 

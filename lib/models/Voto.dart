@@ -77,6 +77,20 @@ class Voto{
   }
 
   static List<Voto> perAchievmentVoto(List<dynamic> votiList) {
-    return votiList.map<Voto>((jsonMap) => Voto.fromJson(jsonMap)).toList();
+    var a =  votiList.map<Voto>((jsonMap) => Voto.fromJson(jsonMap)).toList();
+    List<Voto> votiOrdinabili = List<Voto>.from(a);
+
+    votiOrdinabili.sort((a, b) {
+      bool aIsValid = a.dataVoto.length == 10; // Adattato per "AAAA-MM-GG"
+      bool bIsValid = b.dataVoto.length == 10; // Adattato per "AAAA-MM-GG"
+      if (aIsValid && !bIsValid)
+        return -1; // 'a' valida, 'b' no -> 'a' (più recente) viene prima
+      if (!aIsValid && bIsValid)
+        return 1; // 'b' valida, 'a' no -> 'b' (più recente) viene prima
+      if (!aIsValid && !bIsValid)
+        return 0; // Entrambe non valide per lunghezza, ordine invariato
+      return b.dataVoto.compareTo(a.dataVoto);
+    });
+    return votiOrdinabili;
   }
 }
