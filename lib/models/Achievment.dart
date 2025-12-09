@@ -80,14 +80,16 @@ class Achievment{
 
 
   static bool checkVoti(Achievment trofeo, List<Voto> voti){
+
       for(Voto voto in voti){
+
         if(trofeo.materia == "null") {
           if (voto.voto >= trofeo.valueToReach && trofeo.positivo) {
             return true;
           }else if (voto.voto < trofeo.valueToReach && !trofeo.positivo){
             return true;
           }
-        }else if(voto.codiceMateria == trofeo.materia){
+        }else if(trofeo.materia.contains(voto.codiceMateria)){
           if (voto.voto >= trofeo.valueToReach && trofeo.positivo) {
             return true;
           }else if (voto.voto < trofeo.valueToReach && !trofeo.positivo){
@@ -101,13 +103,14 @@ class Achievment{
   static bool checkVotinumerati(Achievment trofeo, List<Voto> voti){
       int count = 0;
       for(Voto voto in voti){
+
         if(trofeo.materia == "null") {
           if (voto.voto >= trofeo.valueToReach && trofeo.positivo) {
             count++;
           }else if (voto.voto < trofeo.valueToReach && !trofeo.positivo){
             count++;
           }
-        }else if(voto.codiceMateria == trofeo.materia){
+        }else if(trofeo.materia.contains(voto.codiceMateria)){
           if (voto.voto >= trofeo.valueToReach && trofeo.positivo) {
             count++;
           }else if (voto.voto < trofeo.valueToReach && !trofeo.positivo){
@@ -128,9 +131,14 @@ class Achievment{
     if (trofeo.materia == "null") {
       votiDaControllare = voti;
     } else {
-      votiDaControllare = voti.where((voto) => voto.codiceMateria == trofeo.materia).toList();
+      votiDaControllare = voti.where((voto) => trofeo.materia.contains(voto.codiceMateria)).toList();
     }
     for (Voto voto in votiDaControllare) {
+
+      if(voto.displayValue == "n.c. " || voto.cancellato || voto.voto == 0) {
+        continue;
+      }
+
       bool condizioneSoddisfatta = false;
 
 
@@ -158,7 +166,7 @@ class Achievment{
     if(trofeo.positivo) {
       return trofeo.count >= assenze.length;
     }else{
-      return trofeo.count < assenze.length;
+      return trofeo.count <= assenze.length;
     }
   }
 
@@ -169,13 +177,13 @@ class Achievment{
       if(trofeo.materia == "telefono") {
         bool nota = false;
         for(Nota x in disc){
-          if(x.messaggio.toLowerCase() == "telefono" || x.messaggio.toLowerCase() == "cellulare"){
+          if(x.messaggio.toLowerCase().contains("telefono") || x.messaggio.toLowerCase().contains("cellulare")){
             nota = true;
           }
         }
         return nota;
       }else{
-        return trofeo.count < disc.length;
+        return trofeo.count <= disc.length;
       }
     }
   }
@@ -258,7 +266,7 @@ class Achievment{
         rarity: AchievementRarity.LEGGENDARIO));
 
     achievments.add(Achievment(
-        valueToReach: 4,
+        valueToReach: 5,
         count: 4,
         reached: false,
         display: Icon(Icons.workspace_premium_outlined, color: getColorByRarity(AchievementRarity.PLATINO), size: sizeIcon),
@@ -300,7 +308,7 @@ class Achievment{
         display: Icon(Icons.grass, color: getColorByRarity(AchievementRarity.ARGENTO), size: sizeIcon),
         title: "Programmatore",
         description: "Ottieni 10 di informatica",
-        materia: "INF",
+        materia: "INF STI",
         positivo: true,
         type: AchievmenType.VOTI,
         rarity: AchievementRarity.ARGENTO));
@@ -312,7 +320,7 @@ class Achievment{
         display: Icon(Icons.grass, color: getColorByRarity(AchievementRarity.ORO), size: sizeIcon),
         title: "Esci di casa",
         description: "Ottieni 3 volte di fila 8 o più di informatica",
-        materia: "INF",
+        materia: "INF STI",
         positivo: true,
         type: AchievmenType.VOTI_CONSECUTIVI,
         rarity: AchievementRarity.ORO));
@@ -443,7 +451,7 @@ class Achievment{
         reached: false,
         display: Icon(Icons.shield_moon, color: getColorByRarity(AchievementRarity.ARGENTO), size: sizeIcon),
         title: "La prima",
-        description: "Si spera non di molte               (1 insufficienza)",
+        description: "Si spera non di molte (1 insufficienza)",
         materia: "null",
         positivo: false,
         type: AchievmenType.VOTI,

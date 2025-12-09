@@ -1,9 +1,9 @@
 import 'dart:math' as Math;
 
+import 'package:classemorta/main.dart';
 import 'package:classemorta/models/Streak.dart';
 import 'package:classemorta/models/Voto.dart';
 import 'package:classemorta/service/ApiService.dart';
-import 'package:classemorta/service/SharedPreferencesService.dart';
 import 'package:classemorta/widgets/SingoloVotoWid.dart';
 import 'package:classemorta/widgets/torta.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +11,7 @@ import '../../models/Materia.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 import '../../widgets/MedieIpotetiche.dart';
+import '../IpotetichePage.dart';
 
 class Dettaglimateria extends StatefulWidget {
   final Materia materia;
@@ -18,14 +19,19 @@ class Dettaglimateria extends StatefulWidget {
   final bool dotted;
   final int msAnimazione;
   final Apiservice service;
-  const Dettaglimateria({super.key, required this.materia, required this.periodo, required this.dotted, required this.msAnimazione, required this.service});
+  const Dettaglimateria(
+      {super.key,
+        required this.materia,
+        required this.periodo,
+        required this.dotted,
+        required this.msAnimazione,
+        required this.service});
 
   @override
   State<Dettaglimateria> createState() => _DettaglimateriaState();
 }
 
 class _DettaglimateriaState extends State<Dettaglimateria> {
-
   // Variabili di stato della UI
   late int periodo = widget.periodo;
   final PageController _pageController = PageController();
@@ -35,6 +41,7 @@ class _DettaglimateriaState extends State<Dettaglimateria> {
 
   // Variabili di stato per i dati dei grafici (per l'animazione)
   List<FlSpot> chartSpots = [];
+  List<FlSpot> averageChartSpots = []; // <-- NUOVA VARIABILE
   List<BarChartGroupData> chartBarGroups = [];
   bool _isDataReady = false;
   late int durataAnimazioneGrMedia;
@@ -58,53 +65,80 @@ class _DettaglimateriaState extends State<Dettaglimateria> {
   }
 
   void _prepareChartData() async {
-    // Step 1: mostra grafico vuoto
+    // Step 1: resetta tutto
     setState(() {
       _isDataReady = false;
       chartSpots = [];
+      averageChartSpots = []; // Resetta anche la nuova variabile
       chartBarGroups = [];
-    });
-
-    // Step 2: calcolo dei dati
+    });  // Step 2: calcolo dei dati
     List<Voto> voti = widget.materia.voti.where((voto) => voto.periodo == periodo).toList();
     if (periodo == 3) voti = widget.materia.voti;
     voti.sort((a, b) => a.dataVoto.compareTo(b.dataVoto));
 
+    // Filtra i voti validi per i calcoli
+    final votiValidi = voti.where((v) => !v.cancellato).toList();
+
+    // Calcolo delle medie progressive
+    var medie = widget.service.getMediePerOgniVoto(votiValidi);
+
+    // --- POPOLA LE LISTE DI SPOTS PER I GRAFICI A LINEE ---
     final localSpots = <FlSpot>[];
+    final localAverageSpots = <FlSpot>[];
+
+    // Punti per il grafico dei voti singoli
     for (int i = 0; i < voti.length; i++) {
       localSpots.add(FlSpot(i.toDouble(), voti[i].voto));
     }
 
+    // Punti per il grafico delle medie progressive
+    for (int i = 0; i < medie.length; i++) {
+      localAverageSpots.add(FlSpot(i.toDouble(), medie[i].voto));
+    }
+
+    // --- POPOLA I DATI PER IL GRAFICO A BARRE ---
     final localBarGroups = <BarChartGroupData>[];
     final Map<double, int> frequenzaVoti = {};
-    final votiValidi = voti.where((v) => !v.cancellato).toList();
+
+    // Calcola la frequenza di ogni voto
     for (var voto in votiValidi) {
       frequenzaVoti[voto.voto] = (frequenzaVoti[voto.voto] ?? 0) + 1;
     }
+
+    // Crea i dati per le barre del grafico, da 0 a 10 con step di 0.5
     for (double i = 0.0; i <= 10.0; i += 0.5) {
       localBarGroups.add(
         BarChartGroupData(
-          x: (i * 10).toInt(),
+          x: (i * 10).toInt(), // Usiamo un intero per l'asse X (es. 6.5 diventa 65)
           barRods: [
             BarChartRodData(
-              toY: (frequenzaVoti[i] ?? 0).toDouble(),
-              color: getColor(i),
+              toY: (frequenzaVoti[i] ?? 0).toDouble(), // L'altezza della barra è la frequenza
+              color: getColor(i), // Colora la barra in base al valore del voto
               width: 8,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(2),
+                topRight: Radius.circular(2),
+              ),
             ),
           ],
         ),
       );
     }
 
-    // Step 3: imposta i dati veri e lascia fl_chart animare
+    // Aggiungiamo un piccolo ritardo per dare il tempo alla UI di mostrare il CircularProgressIndicator
+    await Future.delayed(const Duration(milliseconds: 50));
+
+    // Step 3: imposta TUTTI i dati veri e aggiorna la UI
     if (mounted) {
       setState(() {
         chartSpots = localSpots;
+        averageChartSpots = localAverageSpots;
         chartBarGroups = localBarGroups;
         _isDataReady = true;
       });
     }
   }
+
 
 
   @override
@@ -124,378 +158,67 @@ class _DettaglimateriaState extends State<Dettaglimateria> {
     voti.sort((a, b) => a.dataVoto.compareTo(b.dataVoto));
     List<Voto> votiDisplay = voti.reversed.toList();
     double media = getMedia(voti);
-    List<Color> colori = getColors(voti);
     Streak streak = Streak().getStreak(voti);
     var ratio = Materia.ratio(voti);
     final votiValidi = voti.where((v) => !v.cancellato).toList();
+
+    var medie = widget.service.getMediePerOgniVoto(votiValidi);
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Dettagli materia ${materia.codiceMateria}'),
       ),
       body: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(),
         child: Column(
           children: [
             Text(
               _currentPage == 0
                   ? (widget.periodo == 3 ? "Grafico andamento anno" : "Grafico andamento ${voti.isNotEmpty ? voti[0].periodo : ''}° quadrimestre")
-                  : "Distribuzione dei Voti",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                  : _currentPage == 1 ? "Grafico medie progressive" : "Grafico distribuzione voti",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
             ),
             const SizedBox(height: 10),
-            // Sostituisci il tuo SizedBox(height: 330, child: PageView(...)) con questo
             SizedBox(
               height: 330,
               child: PageView(
                 controller: _pageController,
-                allowImplicitScrolling: false, // Per versioni più recenti
-                physics: _isDataReady ? const PageScrollPhysics() : const NeverScrollableScrollPhysics(), // Disabilita lo scroll durante il caricamento
-
+                physics: _isDataReady ? const PageScrollPhysics() : const NeverScrollableScrollPhysics(),
                 children: [
                   if (!_isDataReady)
                     const Center(child: CircularProgressIndicator())
                   else
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 50, 16, 0),
-                      child: _isDataReady
-                          ? TweenAnimationBuilder<double>(
-                        tween: Tween<double>(begin: 0, end: 1),
-                        duration: Duration(milliseconds: durataAnimazioneGrMedia),
-                        curve: Curves.easeInOutCubic,
-                        builder: (context, value, child) {
-                          // Calcola i punti animati
-                          final animatedSpots = chartSpots.map((spot) {
-                            return FlSpot(spot.x, spot.y * value);
-                          }).toList();
-
-                          return LineChart(
-                            LineChartData(
-                              gridData: FlGridData(
-                                show: true,
-                                drawVerticalLine: true,
-                                getDrawingHorizontalLine: (val) => FlLine(
-                                  color: getColor(media).withOpacity(0.2),
-                                  strokeWidth: 0.8,
-                                ),
-                                getDrawingVerticalLine: (val) => FlLine(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  strokeWidth: 0.8,
-                                ),
-                              ),
-                              titlesData: FlTitlesData(
-                                leftTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: true,
-                                    reservedSize: 30,
-                                    interval: 1,
-                                    getTitlesWidget: (value, meta) => Text(
-                                      value.toInt().toString(),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                bottomTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: true,
-                                    reservedSize: 35,
-                                    interval: chartSpots.length > 12
-                                        ? (chartSpots.length / 6).roundToDouble()
-                                        : 1,
-                                    getTitlesWidget: (value, meta) {
-                                      final index = value.toInt();
-                                      if (index >= 0 && index < voti.length) {
-                                        String dataLabel = voti[index].dataVoto;
-                                        if (dataLabel.contains("-")) {
-                                          var parts = dataLabel.split('-');
-                                          if (parts.length > 2) {
-                                            dataLabel = "${parts[2]}/${parts[1]}";
-                                          } else if (parts.length == 2) {
-                                            dataLabel = "${parts[1]}/${parts[0]}";
-                                          }
-                                        } else if (dataLabel.length > 5) {
-                                          dataLabel =
-                                              dataLabel.substring(dataLabel.length - 5);
-                                        }
-                                        return SideTitleWidget(
-                                          space: 8.0,
-                                          meta: meta,
-                                          child: Text(
-                                            dataLabel,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 10,
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                      return const Text('');
-                                    },
-                                  ),
-                                ),
-                                topTitles: AxisTitles(
-                                    sideTitles: SideTitles(showTitles: false)),
-                                rightTitles: AxisTitles(
-                                    sideTitles: SideTitles(showTitles: false)),
-                              ),
-                              borderData: FlBorderData(
-                                show: true,
-                                border: Border.all(
-                                  color: getColor(media).withOpacity(0.8),
-                                  width: 1.5,
-                                ),
-                              ),
-                              minX: 0,
-                              maxX: chartSpots.isEmpty
-                                  ? 1
-                                  : chartSpots.length.toDouble() - 1,
-                              minY: 0,
-                              maxY: 10,
-                              lineBarsData: [
-                                LineChartBarData(
-                                  spots: animatedSpots,
-                                  isCurved: true,
-                                  gradient: LinearGradient(
-                                    colors: colori,
-                                    begin: Alignment.bottomCenter,
-                                    end: Alignment.topCenter,
-                                  ),
-                                  barWidth: 3,
-                                  isStrokeCapRound: true,
-                                  dotData: FlDotData(
-                                    show: dotted
-                                        ? true
-                                        : votiValidi.length > 12
-                                        ? false
-                                        : true,
-                                    getDotPainter:
-                                        (spot, percent, barData, index) =>
-                                        FlDotCirclePainter(
-                                          radius: 4,
-                                          color: barData.gradient?.colors.first
-                                              .withOpacity(0.9) ??
-                                              getColor(media),
-                                          strokeWidth: 1.5,
-                                          strokeColor: Colors.white,
-                                        ),
-                                  ),
-                                  belowBarData: BarAreaData(
-                                    show: true,
-                                    gradient: LinearGradient(
-                                      colors: colori
-                                          .map((color) => color.withOpacity(0.3))
-                                          .toList(),
-                                      begin: Alignment.bottomCenter,
-                                      end: Alignment.topCenter,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                              extraLinesData: ExtraLinesData(
-                                horizontalLines: [
-                                  HorizontalLine(
-                                    y: 6,
-                                    color: Colors.white.withOpacity(0.5),
-                                    strokeWidth: 2,
-                                    dashArray: [5, 5],
-                                    label: HorizontalLineLabel(
-                                      show: true,
-                                      alignment: Alignment.topRight,
-                                      padding: const EdgeInsets.only(right: 5, bottom: 2),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                      ),
-                                      labelResolver: (line) => '6',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              lineTouchData: LineTouchData(
-                                enabled: true,
-                                handleBuiltInTouches: true,
-                                touchTooltipData: LineTouchTooltipData(
-                                  tooltipBorder:
-                                  const BorderSide(color: Colors.white, width: 1),
-                                  getTooltipItems:
-                                      (List<LineBarSpot> touchedBarSpots) {
-                                    return touchedBarSpots.map((barSpot) {
-                                      final flSpot = barSpot;
-                                      if (flSpot.spotIndex < 0 ||
-                                          flSpot.spotIndex >= voti.length) return null;
-                                      String dataTooltip =
-                                          voti[flSpot.spotIndex].dataVoto;
-                                      return LineTooltipItem(
-                                        'Voto: ${flSpot.y.toStringAsFixed(1)}\n',
-                                        const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                        ),
-                                        children: [
-                                          TextSpan(
-                                            text: dataTooltip,
-                                            style: TextStyle(
-                                              color: Colors.white.withOpacity(0.8),
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    }).whereType<LineTooltipItem>().toList();
-                                  },
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      )
-                          : const Center(child: CircularProgressIndicator()),
+                      child: _buildLineChart(
+                        voti: voti,
+                        spots: chartSpots,
+                        media: media,
+                        showDots: dotted || votiValidi.length <= 24,
+                      ),
                     ),
-
-
-                  // --- Grafico a Barre ---
+                  if (!_isDataReady)
+                    const Center(child: CircularProgressIndicator())
+                  else
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 50, 16, 0),
+                      child: _buildLineChart(
+                        voti: medie,
+                        spots: averageChartSpots,
+                        media: media,
+                        showDots: dotted || votiValidi.length <= 24,
+                      ),
+                    ),
                   if (!_isDataReady)
                     const Center(child: CircularProgressIndicator())
                   else
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 25, 16, 8),
-                      child: _isDataReady
-                          ? TweenAnimationBuilder<double>(
-                        tween: Tween<double>(begin: 0, end: 1),
-                        duration: Duration(milliseconds: durataAnimazioneGrNumVoti),
-                        curve: Curves.easeInOutCubic,
-                        builder: (context, value, child) {
-                          // Animiamo ogni BarChartGroupData scalando il toY dei suoi rod
-                          final animatedGroups = chartBarGroups.map((group) {
-                            return BarChartGroupData(
-                              x: group.x,
-                              barRods: group.barRods.map((rod) {
-                                return BarChartRodData(
-                                  // toY animato (da 0 -> rod.toY)
-                                  toY: rod.toY * value,
-                                  // manteniamo gli altri attributi (colore/gradiente/width/...) così com'erano
-                                  color: rod.color,
-                                  width: rod.width,
-                                  borderRadius: rod.borderRadius,
-                                  gradient: rod.gradient,
-                                  borderSide: rod.borderSide,
-                                  backDrawRodData: rod.backDrawRodData,
-                                );
-                              }).toList(),
-                              // se usavi showingTooltipIndicators su group, puoi copiarlo qui (opzionale)
-                              showingTooltipIndicators: group.showingTooltipIndicators,
-                            );
-                          }).toList();
-
-                          return BarChart(
-                            BarChartData(
-                              alignment: BarChartAlignment.spaceAround,
-                              // manteniamo la stessa logica di maxY che avevi
-                              maxY: (votiValidi.isEmpty ? 5 : (votiValidi.length / 5) + 4),
-                              gridData: FlGridData(
-                                show: true,
-                                drawVerticalLine: false,
-                                getDrawingHorizontalLine: (value) => FlLine(
-                                  color: Colors.white.withOpacity(0.1),
-                                  strokeWidth: 1,
-                                ),
-                              ),
-                              borderData: FlBorderData(show: false),
-                              titlesData: FlTitlesData(
-                                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                leftTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: true,
-                                    reservedSize: 28,
-                                    interval: votiValidi.length > 12 ? 2 : 1,
-                                    getTitlesWidget: (value, meta) {
-                                      if (value == 0 || value > meta.max) return Container();
-                                      return Text(value.toInt().toString(), style: TextStyle(color: Colors.white70, fontSize: 10));
-                                    },
-                                  ),
-                                ),
-                                bottomTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: true,
-                                    reservedSize: 38,
-                                    interval: 10,
-                                    getTitlesWidget: (value, meta) {
-                                      // value è la x: noi avevamo usato x = (i * 10) per i voti (es. 65 -> 6.5)
-                                      final votoReale = value / 10;
-                                      // mostriamo solo le etichette in corrispondenza dell'intervallo applicato
-                                      if (value.toInt() % meta.appliedInterval.toInt() != 0) {
-                                        return Container();
-                                      }
-                                      return SideTitleWidget(
-                                        space: 4,
-                                        meta: meta,
-                                        child: Text(
-                                          // se è un intero mostro senza decimali, altrimenti 1 decimale
-                                          votoReale.truncateToDouble() == votoReale
-                                              ? votoReale.toInt().toString()
-                                              : votoReale.toStringAsFixed(1),
-                                          style: TextStyle(
-                                            color: getColor(votoReale),
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                              barGroups: animatedGroups,
-                              barTouchData: BarTouchData(
-                                touchTooltipData: BarTouchTooltipData(
-                                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                                    // group.x è (voto * 10). Esempio: 65 => 6.5
-                                    final votoReale = group.x / 10.0;
-                                    // la frequenza reale è il valore finale (non quello animato),
-                                    // quindi leggiamo la prima barRod dal group originale (chartBarGroups)
-                                    int freq = 0;
-                                    final originalGroup = chartBarGroups.firstWhere(
-                                          (g) => g.x == group.x,
-                                      orElse: () => group,
-                                    );
-                                    if (originalGroup.barRods.isNotEmpty) {
-                                      freq = originalGroup.barRods[0].toY.toInt();
-                                    }
-
-                                    final votoLabel = votoReale.truncateToDouble() == votoReale
-                                        ? votoReale.toInt().toString()
-                                        : votoReale.toStringAsFixed(1);
-
-                                    return BarTooltipItem(
-                                      'Voto $votoLabel\n',
-                                      const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                                      children: <TextSpan>[
-                                        TextSpan(
-                                          text: "Preso $freq volte",
-                                          style: const TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w500),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                            duration: const Duration(milliseconds: 1000),
-                            curve: Curves.easeOut,
-                          );
-                        },
-                      )
-                          : const Center(child: CircularProgressIndicator()),
+                      child: _buildBarChart(
+                        barGroups: chartBarGroups,
+                        votiValidi: votiValidi,
+                      ),
                     ),
-
                 ],
               ),
             ),
@@ -514,7 +237,7 @@ class _DettaglimateriaState extends State<Dettaglimateria> {
               }),
             ),
             const SizedBox(height: 3),
-            const Text('Nuovi             Voti             Vecchi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
+            Text('Nuovi          Voti |${votiValidi.length}|      Vecchi', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
             Container(
               padding: const EdgeInsets.all(10.0),
               height: 100,
@@ -595,14 +318,12 @@ class _DettaglimateriaState extends State<Dettaglimateria> {
                         ),
                         const SizedBox(width: 10),
                         const Text(
-                            "Costanza: ",
+                          "Costanza: ",
                           style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                         ),
                         Text(
                           "${getCostanza(media, voti).toStringAsFixed(2)}%",
-                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold,
-                            color: getColor(media)
-                          ),
+                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: getColor(media)),
                         ),
                       ],
                     ),
@@ -611,7 +332,21 @@ class _DettaglimateriaState extends State<Dettaglimateria> {
               ),
             ),
             Divider(indent: 30, endIndent: 30, thickness: 2, color: getColor(media)),
-            const Text("Medie ipotetiche", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text("Medie ipotetiche", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
+                const SizedBox(width: 10,),
+                ElevatedButton(onPressed: (){
+                  Navigator.push(
+                    context,
+                    CustomPageRoute(
+                      builder: (context) => IpotetichePage(voti: voti),
+                    )
+                  );
+                }, child: const Text("Più voti", style: TextStyle(color: Colors.white),))
+              ],
+            ),
             const SizedBox(height: 10),
             SizedBox(
               width: 300,
@@ -623,38 +358,240 @@ class _DettaglimateriaState extends State<Dettaglimateria> {
       ),
     );
   }
+
+  // --- WIDGET HELPER PER I GRAFICI ---
+
+  /// Costruisce il grafico a linee dell'andamento dei voti.
+  Widget _buildLineChart({
+    required List<Voto> voti,
+    required List<FlSpot> spots,
+    required double media,
+    required bool showDots,
+  }) {
+    final List<Color> colori = getColors(voti);
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: Duration(milliseconds: durataAnimazioneGrMedia),
+      curve: Curves.easeInOutCubic,
+      builder: (context, value, child) {
+        final animatedSpots = spots.map((spot) => FlSpot(spot.x, spot.y * value)).toList();
+
+        return LineChart(
+          LineChartData(
+            gridData: FlGridData(
+              show: true,
+              drawVerticalLine: true,
+              getDrawingHorizontalLine: (val) => FlLine(color: getColor(media).withOpacity(0.2), strokeWidth: 0.8),
+              getDrawingVerticalLine: (val) => FlLine(color: Colors.grey.withOpacity(0.2), strokeWidth: 0.8),
+            ),
+            titlesData: FlTitlesData(
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 30,
+                  interval: 1,
+                  getTitlesWidget: (value, meta) => Text(value.toInt().toString(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                ),
+              ),
+              bottomTitles: AxisTitles(
+              ),
+              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            ),
+            borderData: FlBorderData(show: true, border: Border.all(color: getColor(media).withOpacity(0.8), width: 1.5)),
+            minX: 0,
+            maxX: spots.isEmpty ? 1 : spots.length.toDouble() - 1,
+            minY: 0,
+            maxY: 10,
+            lineBarsData: [
+              LineChartBarData(
+                spots: animatedSpots,
+                isCurved: true,
+                gradient: LinearGradient(colors: colori, begin: Alignment.bottomCenter, end: Alignment.topCenter),
+                barWidth: 3,
+                isStrokeCapRound: true,
+                dotData: FlDotData(
+                  show: showDots,
+                  getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
+                    radius: 4,
+                    color: barData.gradient?.colors.first.withOpacity(0.9) ?? getColor(media),
+                    strokeWidth: 1.5,
+                    strokeColor: Colors.white,
+                  ),
+                ),
+                belowBarData: BarAreaData(
+                  show: true,
+                  gradient: LinearGradient(colors: colori.map((color) => color.withOpacity(0.3)).toList(), begin: Alignment.bottomCenter, end: Alignment.topCenter),
+                ),
+              ),
+            ],
+            extraLinesData: ExtraLinesData(
+              horizontalLines: [
+                HorizontalLine(
+                  y: 6,
+                  color: Colors.white.withOpacity(0.5),
+                  strokeWidth: 2,
+                  dashArray: [5, 5],
+                  label: HorizontalLineLabel(
+                    show: true,
+                    alignment: Alignment.topRight,
+                    padding: const EdgeInsets.only(right: 5, bottom: 2),
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                    labelResolver: (line) => '6',
+                  ),
+                ),
+              ],
+            ),
+            lineTouchData: LineTouchData(
+              enabled: true,
+              handleBuiltInTouches: true,
+              touchTooltipData: LineTouchTooltipData(
+                tooltipBorder: const BorderSide(color: Colors.white, width: 1),
+                getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+                  return touchedBarSpots.map((barSpot) {
+                    final flSpot = barSpot;
+                    if (flSpot.spotIndex < 0 || flSpot.spotIndex >= voti.length) return null;
+                    return LineTooltipItem(
+                      'Voto: ${flSpot.y.toStringAsFixed(1)}\n',
+                      const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                      children: [
+                        TextSpan(
+                          text: voti[flSpot.spotIndex].dataVoto,
+                          style: TextStyle(color: Colors.white.withOpacity(0.8), fontWeight: FontWeight.normal, fontSize: 12),
+                        ),
+                      ],
+                    );
+                  }).whereType<LineTooltipItem>().toList();
+                },
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Costruisce il grafico a barre della distribuzione dei voti.
+  Widget _buildBarChart({
+    required List<BarChartGroupData> barGroups,
+    required List<Voto> votiValidi,
+  }) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: Duration(milliseconds: durataAnimazioneGrNumVoti),
+      curve: Curves.easeInOutCubic,
+      builder: (context, value, child) {
+        final animatedGroups = barGroups.map((group) {
+          return BarChartGroupData(
+            x: group.x,
+            barRods: group.barRods.map((rod) {
+              return BarChartRodData(
+                toY: rod.toY * value,
+                color: rod.color,
+                width: rod.width,
+              );
+            }).toList(),
+          );
+        }).toList();
+
+        return BarChart(
+          BarChartData(
+            alignment: BarChartAlignment.spaceAround,
+            maxY: (votiValidi.isEmpty ? 5 : (votiValidi.length / 5) + 4),
+            gridData: FlGridData(
+              show: true,
+              drawVerticalLine: false,
+              getDrawingHorizontalLine: (value) => FlLine(color: Colors.white.withOpacity(0.1), strokeWidth: 1),
+            ),
+            borderData: FlBorderData(show: false),
+            titlesData: FlTitlesData(
+              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 28,
+                  interval: votiValidi.length > 12 ? 2 : 1,
+                  getTitlesWidget: (value, meta) {
+                    if (value == 0 || value > meta.max) return Container();
+                    return Text(value.toInt().toString(), style: const TextStyle(color: Colors.white70, fontSize: 10));
+                  },
+                ),
+              ),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 38,
+                  interval: 10,
+                  getTitlesWidget: (value, meta) {
+                    final votoReale = value / 10;
+                    if (value.toInt() % meta.appliedInterval.toInt() != 0) return Container();
+                    return SideTitleWidget(
+                      space: 4,
+                      meta: meta,
+                      child: Text(
+                        votoReale.truncateToDouble() == votoReale ? votoReale.toInt().toString() : votoReale.toStringAsFixed(1),
+                        style: TextStyle(color: getColor(votoReale), fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            barGroups: animatedGroups,
+            barTouchData: BarTouchData(
+              touchTooltipData: BarTouchTooltipData(
+                getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                  final votoReale = group.x / 10.0;
+                  int freq = 0;
+                  final originalGroup = barGroups.firstWhere((g) => g.x == group.x, orElse: () => group);
+                  if (originalGroup.barRods.isNotEmpty) {
+                    freq = originalGroup.barRods[0].toY.toInt();
+                  }
+                  final votoLabel = votoReale.truncateToDouble() == votoReale ? votoReale.toInt().toString() : votoReale.toStringAsFixed(1);
+                  return BarTooltipItem(
+                    'Voto $votoLabel\n',
+                    const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: "Preso $freq volte",
+                        style: const TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // --- FUNZIONI HELPER PER I DATI ---
   double getCostanza(double media, List<Voto> voti) {
     if (voti.isEmpty) return 0;
-
-    // Calcolo della deviazione standard
     double sommaQuadrati = 0;
     for (var v in voti) {
       sommaQuadrati += (v.voto - media) * (v.voto - media);
     }
-
     double varianza = sommaQuadrati / voti.length;
     double deviazioneStandard = Math.sqrt(varianza);
-
-    // Formula della costanza: più la deviazione è piccola, più la costanza è alta
     double costanza = 100 - ((deviazioneStandard / media) * 100);
-
-    // Limita il risultato tra 0 e 100
     if (costanza < 0) costanza = 0;
     if (costanza > 100) costanza = 100;
-
     return costanza;
   }
 
-
-  // --- Funzioni Helper ---
   List<Color> getColors(List<Voto> voti) {
     double media = getMedia(voti);
     if (media >= 6.0) {
-      return [Colors.green, Color.fromRGBO(30, 100, 30, 1)];
+      return [Colors.green, const Color.fromRGBO(30, 100, 30, 1)];
     } else if (media >= 5.0) {
-      return [Colors.yellow, Color.fromRGBO(100, 100, 30, 1)];
+      return [Colors.yellow, const Color.fromRGBO(100, 100, 30, 1)];
     } else {
-      return [Colors.red, Color.fromRGBO(100, 30, 30, 1)];
+      return [Colors.red, const Color.fromRGBO(100, 30, 30, 1)];
     }
   }
 

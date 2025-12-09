@@ -159,19 +159,19 @@ class Giornipagina extends StatelessWidget {
   List<Color?> getColors(Giorno giorno, int index){
     List<List<Color?>> colors = [
       [
-        Colors.red[300], Colors.yellow[300], Colors.cyan[300], Colors.green[300], Colors.blue[300], Colors.red[300],
+        Colors.red[300], Colors.yellow[300], Colors.cyan[300], Colors.green[300], Colors.blue[300], Colors.red[300], Colors.red[300], Colors.yellow[300],
       ],
       [
-        Colors.blue[300], Colors.green[300], Colors.red[300], Colors.yellow[300], Colors.cyan[300], Colors.red[300],
+        Colors.blue[300], Colors.green[300], Colors.red[300], Colors.yellow[300], Colors.cyan[300], Colors.red[300],Colors.blue[300], Colors.green[300]
       ],
       [
-        Colors.green[300], Colors.blue[300], Colors.yellow[300], Colors.cyan[300], Colors.red[300], Colors.green[300],
+        Colors.green[300], Colors.blue[300], Colors.yellow[300], Colors.cyan[300], Colors.red[300], Colors.green[300],Colors.yellow[300], Colors.blue[300]
       ],
       [
-        Colors.yellow[300], Colors.cyan[300], Colors.green[300], Colors.blue[300], Colors.orange[300], Colors.red[300],
+        Colors.yellow[300], Colors.cyan[300], Colors.green[300], Colors.blue[300], Colors.orange[300], Colors.red[300],Colors.yellow[300], Colors.cyan[300]
       ],
       [
-        Colors.cyan[300], Colors.red[300], Colors.orange[300], Colors.yellow[300], Colors.blue[300], Colors.green[300],
+        Colors.cyan[300], Colors.red[300], Colors.orange[300], Colors.yellow[300], Colors.blue[300], Colors.green[300],Colors.cyan[300], Colors.red[300]
       ]
     ];
     List<Color?> scelti = [];

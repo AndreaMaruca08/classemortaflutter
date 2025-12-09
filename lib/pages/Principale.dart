@@ -18,6 +18,8 @@ import 'package:classemorta/pages/Materie.dart';
 import 'package:classemorta/pages/NotePagina.dart';
 import 'package:classemorta/pages/Notizie.dart';
 import 'package:classemorta/pages/PagellePagina.dart';
+import 'package:classemorta/pages/detail/DettagliStreak.dart';
+import 'package:classemorta/pages/detail/DettagliTuttiIVoti.dart';
 import 'package:classemorta/service/NotificheService.dart';
 import 'package:classemorta/service/SharedPreferencesService.dart';
 import 'package:classemorta/widgets/GestioneAccesso.dart';
@@ -339,10 +341,6 @@ class _MainPageState extends State<MainPage> {
                                       }
                                     });
 
-
-
-                                    // Ripristino la tua Row originale con la spaziatura corretta
-                                    // Ripristino la tua Row originale con la spaziatura corretta
                                     return Row(
                                         children: [
                                           const SizedBox(width: 2,), // Tua spaziatura originale
@@ -456,23 +454,47 @@ class _MainPageState extends State<MainPage> {
                       children: [
                          Row(
                           children: [
-                            const SizedBox(width: 1),
-                            const Text("Tutti i voti", style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold)),
-                            const SizedBox(width: 15),
-                            const Text("-   Streak: ", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                            Icon(
-                              streak.isGoated(loadedVoti) ? Icons.star: streak.votiBuoni >= 10 ? Icons.local_fire_department: Icons.local_fire_department_outlined,
-                              color: streak.isGoated(loadedVoti)? Colors.yellow : streak.getStreakColor(),
-                              size: 40,
+                            SizedBox(
+                              width : screenSize.width * 0.43,
+                              child: ElevatedButton(onPressed: (){
+                                Navigator.push(
+                                  context,
+                                  CustomPageRoute(builder: (context) => Dettaglituttiivoti(voti: loadedVoti, service: _service,)),
+                                );
+                              }, style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.grey[900])), child: Row(
+                                children: [
+                                  const SizedBox(width: 1),
+                                  const Text("Tutti i voti", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                                  const SizedBox(width: 5),
+                                ],
+                              )),
                             ),
-                            Text(
-                              " ${streak.isGoated(loadedVoti) ? "GOAT" : streak.votiBuoni}",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                            SizedBox(
+                            width : screenSize.width * 0.45,
+                            child:  ElevatedButton(onPressed: (){
+                              Navigator.push(
+                                context,
+                                CustomPageRoute(builder: (context) => DettagliStreakPag(voti: loadedVoti)),
+                              );
+                            }, style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.grey[900])), child: Row(
+                              children: [
+                                const Text("Streak: ", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                                Icon(
+                                  streak.isGoated(loadedVoti) ? Icons.star: streak.votiBuoni >= 10 ? Icons.local_fire_department: Icons.local_fire_department_outlined,
                                   color: streak.isGoated(loadedVoti)? Colors.yellow : streak.getStreakColor(),
+                                  size: 30,
+                                ),
+                                Text(
+                                  " ${streak.isGoated(loadedVoti) ? "GOAT" : streak.votiBuoni}",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize:  streak.isGoated(loadedVoti) ? 13 : 20,
+                                    color: streak.isGoated(loadedVoti)? Colors.yellow : streak.getStreakColor(),
 
-                              ),
+                                  ),
+                                )
+                              ],
+                            ),)
                             )
                           ],
                         ),
@@ -680,13 +702,13 @@ class _MainPageState extends State<MainPage> {
                           child: Text('Orari mancanti'),
                         );
                       } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                        final List<List<Giorno>> loadedGiorni = snapshot.data!;
+                        final List<List<Giorno>> loadedGiorni = snapshot.data ?? [];
                         return passaggio(
                             context,
                             "  Orari                 ",
                             "orari settimanali",
                             Giornipagina(
-                              giorniLista: loadedGiorni,
+                              giorniLista: loadedGiorni ,
                             ),
                             Icon(Icons.watch_later, size: 25,)
                         );
@@ -944,7 +966,6 @@ class _MainPageState extends State<MainPage> {
                               ],
                             ),
                             const SizedBox(height: 20),
-
                             Row(
                               children: [
                                 SizedBox(width: 5,),

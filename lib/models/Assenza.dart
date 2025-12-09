@@ -16,7 +16,6 @@
         //ABUO = uscita
         //ABRO = ritardo
  */
-import 'dart:ffi';
 
 class Assenza{
   String data;

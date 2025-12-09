@@ -211,7 +211,7 @@ class _AgendaState extends State<Agenda> {
                     padding: const EdgeInsets.only(left: 8.0),
                     child: SizedBox(
                       height: 40,
-                      width: 400,
+                      width: 350,
                       child: Text(
                         "$title (${loadedInfos.length})",
                         style: const TextStyle(
@@ -245,7 +245,7 @@ class _AgendaState extends State<Agenda> {
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 8.0),
                                 child: Text(
-                                  "${getData(dateKey)} - ${getDistanza(dateKey)}",
+                                  "${getData(dateKey)} - ${getDistanza(dateKey)} (${infosForDate.length})",
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
@@ -259,6 +259,7 @@ class _AgendaState extends State<Agenda> {
                                     .map((info) => Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 4.0),
                                   child: SizedBox(
+                                    width: 290,
                                     height: 220,
                                     child: InfoSingola(info: info),
                                   ),
@@ -300,7 +301,7 @@ class _AgendaState extends State<Agenda> {
 
   Color? getColor(String dataFine) {
     try {
-      DateTime today = DateTime.now(); // Considera di usare DateTime.now() per la data corrente reale
+      DateTime today = DateTime.now();
       DateTime scadenzaFine = DateTime.parse(dataFine.substring(0, 19));
       DateTime scadenzaGen = DateTime.parse(dataFine.substring(0, 10));
       Duration differenzaGen = scadenzaGen.difference(today);
@@ -308,7 +309,7 @@ class _AgendaState extends State<Agenda> {
       double opacita = 0.2;
 
       if (scadenzaFine.isBefore(today) ) {
-        return today.hour < scadenzaFine.hour ? Colors.red : Colors.grey;
+        return today.hour < scadenzaFine.hour ? Colors.red : Colors.grey[900];
       }
       if (differenzaGen.inDays == 0) {
         return Color.fromRGBO(255, 100,100, 0.5).withOpacity(opacita);

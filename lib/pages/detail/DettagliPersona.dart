@@ -48,7 +48,7 @@ class _MainPageState extends State<StudentDetail> {
                 children: [
                   const SizedBox(height: 5),
                   const Text(
-                      " Versione 2.4.2 : bug fix agli orari, miglioramento grafico nell'agenda",
+                      " Versione 2.5.1 : più medie ipotetiche, aggiunta del grafico delle medie progressive",
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,

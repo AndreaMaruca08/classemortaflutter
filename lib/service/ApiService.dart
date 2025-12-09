@@ -501,7 +501,12 @@ class Apiservice {
     String codeMateria = "";
     String nomeProf = "";
     String nomeMateria = "";
-    Materia materiaAttuale;
+    Materia materiaAttuale = Materia(
+        codiceMateria: codeMateria,
+        nomeInteroMateria: nomeMateria,
+        nomeProf: nomeProf,
+        voti: []
+    );;
     List<Voto> votiMateriaAttuale = [];
     for (Voto v in voti) {
       if(v.cancellato || v.voto == 0){
@@ -509,6 +514,7 @@ class Apiservice {
       }
       else if(v.codiceMateria == codeMateria){
         votiMateriaAttuale.add(v);
+
       }
       else {
         materiaAttuale = Materia(
@@ -517,10 +523,12 @@ class Apiservice {
             nomeProf: nomeProf,
             voti: votiMateriaAttuale
         );
+
         codeMateria = v.codiceMateria;
         nomeMateria = v.nomeInteroMateria;
         nomeProf = v.nomeProf;
         materie.add(materiaAttuale);
+
         votiMateriaAttuale = [];
         votiMateriaAttuale.add(v);
 
@@ -531,11 +539,25 @@ class Apiservice {
               nomeProf: nomeProf,
               voti: votiMateriaAttuale
           );
+
           materie.add(materiaAttuale);
         }
+
       }
 
+
     }
+    if(codeMateria != materiaAttuale.codiceMateria && voti.isNotEmpty){
+      materiaAttuale = Materia(
+          codiceMateria: codeMateria,
+          nomeInteroMateria: nomeMateria,
+          nomeProf: nomeProf,
+          voti: votiMateriaAttuale
+      );
+      materie.add(materiaAttuale);
+    }
+
+
     materie.remove(materie[0]);
 
     return materie;
@@ -634,7 +656,7 @@ class Apiservice {
       final List<Assenza> ritardi = Assenza.fromJsonList(json, "ABR0");
       final List<Assenza> ritardiBrevi = Assenza.fromJsonList(json, "ABR1");
 
-      assenze.addAll(ritardiBrevi);
+      ritardi.addAll(ritardiBrevi);
 
       final List<List<Assenza>> ass = [assenze, uscite, ritardi];
       return ass;
@@ -1062,10 +1084,39 @@ class Apiservice {
           'Z-Auth-Token': token,
           'X-Requested-With': 'XMLHttpRequest'
         };
-        return new LoginResponse.fromJson(json);
+        return LoginResponse.fromJson(json);
       } else {
         return null;
       }
+    }
+
+    List<Voto> getMediePerOgniVoto(List<Voto> voti){
+
+      double media;
+      double somma = 0;
+      int numVoti = 0;
+      List<Voto> medie = [];
+      for(Voto v in voti) {
+        somma += v.voto;
+        numVoti++;
+        media = somma / numVoti;
+
+        Voto mediaVoto = Voto(
+            codiceMateria: v.codiceMateria,
+            dataVoto: v.dataVoto,
+            voto: media,
+            displayValue: media.toString(),
+            descrizione: v.descrizione,
+            periodo: v.periodo,
+            tipo: v.tipo,
+            cancellato: v.cancellato,
+            nomeProf: v.nomeProf,
+            nomeInteroMateria: v.nomeInteroMateria
+        );
+        medie.add(mediaVoto);
+      }
+
+      return medie;
     }
 
 }
