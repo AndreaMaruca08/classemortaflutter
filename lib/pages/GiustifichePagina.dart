@@ -22,7 +22,7 @@ class Giustifichepagina extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Giustifiche'),
       ),
-      body: SingleChildScrollView( // Questo permette all'intero Column di essere scorrevole
+      body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -31,7 +31,7 @@ class Giustifichepagina extends StatelessWidget {
               IconButton(onPressed: (){
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => NuovaGiustificazionePage(service: service,)), // Sostituisci con la tua pagina
+                  MaterialPageRoute(builder: (context) => NuovaGiustificazionePage(service: service,)),
                 );
               }, icon: Icon(Icons.add)),
 

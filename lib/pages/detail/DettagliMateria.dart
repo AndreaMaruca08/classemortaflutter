@@ -39,9 +39,8 @@ class _DettaglimateriaState extends State<Dettaglimateria> {
   late Materia materia = widget.materia;
   late bool dotted = widget.dotted;
 
-  // Variabili di stato per i dati dei grafici (per l'animazione)
   List<FlSpot> chartSpots = [];
-  List<FlSpot> averageChartSpots = []; // <-- NUOVA VARIABILE
+  List<FlSpot> averageChartSpots = [];
   List<BarChartGroupData> chartBarGroups = [];
   bool _isDataReady = false;
   late int durataAnimazioneGrMedia;
@@ -125,7 +124,6 @@ class _DettaglimateriaState extends State<Dettaglimateria> {
       );
     }
 
-    // Aggiungiamo un piccolo ritardo per dare il tempo alla UI di mostrare il CircularProgressIndicator
     await Future.delayed(const Duration(milliseconds: 50));
 
     // Step 3: imposta TUTTI i dati veri e aggiorna la UI

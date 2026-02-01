@@ -1,8 +1,8 @@
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart';
 
-// --- I TUOI MODELLI (PctoData, Esperienza) RIMANGONO INVARIATI ---
 class PctoData {
+  final String phpSessId;
   final String orePrevisteRaw;
   final String orePresenzeTotaliRaw;
   final List<Esperienza> esperienze;
@@ -10,8 +10,10 @@ class PctoData {
   int get orePreviste => _parseHours(orePrevisteRaw);
   int get orePresenzeTotali => _parseHours(orePresenzeTotaliRaw);
 
-  PctoData({
-    required this.orePrevisteRaw,
+  PctoData(
+    {
+      required this.phpSessId,
+      required this.orePrevisteRaw,
     required this.orePresenzeTotaliRaw,
     required this.esperienze,
   });
@@ -53,29 +55,20 @@ class Esperienza {
     return 'Nome Posto: $nomePosto, Ore Esperienza: $oreEsperienzaRaw (${oreEsperienza}h), Ore Presenza: $orePresenzaEsperienzaRaw (${orePresenzaEsperienza}h)';
   }
 }
-// --- FINE MODELLI ---
 
-
-// NUOVA VERSIONE DELLA FUNZIONE DI PARSING
-// NUOVA VERSIONE DELLA FUNZIONE DI PARSING - UNIVERSALE
-// VERSIONE FINALE E CORRETTA - SENZA SELETTORI NON SUPPORTATI
-PctoData? parsePctoHtmlIndependent(String htmlContent) {
+PctoData? parsePctoHtmlIndependent(String htmlContent, String phpsessId) {
   try {
     var document = parse(htmlContent);
 
     String orePrevisteStr = 'N/A';
     String orePresenzeTotaliStr = 'N/A';
 
-    // --- CORREZIONE: Estrarre Ore Previste e Ore Presenze Totali ---
-    // Il selettore ':has' non è supportato. Dobbiamo farlo manualmente.
     Element? summaryRow;
-    // 1. Troviamo tutte le righe della tabella.
     final allRows = document.querySelectorAll('table.ele-prog tr');
-    // 2. Iteriamo per trovare quella che contiene il testo desiderato.
     for (var row in allRows) {
       if (row.text.contains('Ore totali previste')) {
         summaryRow = row;
-        break; // Trovata, usciamo dal ciclo.
+        break;
       }
     }
 
@@ -141,6 +134,7 @@ PctoData? parsePctoHtmlIndependent(String htmlContent) {
     }
 
     return PctoData(
+      phpSessId: phpsessId,
       orePrevisteRaw: orePrevisteStr,
       orePresenzeTotaliRaw: orePresenzeTotaliStr,
       esperienze: esperienzeList,

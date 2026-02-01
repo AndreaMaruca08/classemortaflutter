@@ -936,7 +936,7 @@ class Apiservice {
     );
     if (response.statusCode == 200) {
       final htmlContent = response.body;
-      final pctoData = parsePctoHtmlIndependent(htmlContent);
+      final pctoData = parsePctoHtmlIndependent(htmlContent, phpSessId);
       return pctoData!;
     } else {
       throw Exception('Errore durante il recupero del curriculum: ${response.statusCode}');

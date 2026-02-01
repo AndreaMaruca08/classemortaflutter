@@ -48,7 +48,7 @@ class _MainPageState extends State<StudentDetail> {
                 children: [
                   const SizedBox(height: 5),
                   const Text(
-                      " Versione 2.5.1 : più medie ipotetiche, aggiunta del grafico delle medie progressive",
+                      " Versione 2.6 : Classemorta web, aggiunta della spunta per segnare compiti fatti, aggiustamento filtro",
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
