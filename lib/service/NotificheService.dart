@@ -42,14 +42,12 @@ class NotificheService {
   }
 
   Future<void> showNotification(String content, int id, String intestazione) async {
-    // --- 3. AGGIUNGI LO STESSO CONTROLLO ANCHE QUI ---
     if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
       if (!(await Permission.notification.isGranted)) {
         print("Impossibile mostrare la notifica: permesso non concesso.");
         return;
       }
 
-      // ... (tutto il tuo codice per creare i dettagli della notifica)
       const AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
         'timer_channel_id',

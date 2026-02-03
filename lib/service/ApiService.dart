@@ -988,9 +988,6 @@ class Apiservice {
       headers: {'UserAgent' : 'Mozilla/5.0', 'Cookie': 'PHPSESSID=$phpSessId; webrole=gen; webidentity=$codiceStudent', 'Content-Type': 'application/x-www-form-urlencoded'},
       body: body,
     );
-
-    print('Status code: ${resp.statusCode}');
-    print('Response data: ${resp.body.toString()}');
   }
 
   Future<List<PeriodoFestivo>> getPeriodiFestivi () async {
@@ -1022,9 +1019,9 @@ class Apiservice {
         List<Nota> annotazioni = note[1];
         List<Nota> disciplinari = note[0];
         List<Assenza> assenze = Assenza.perAchievment(json["events"], "ABA0");
-        List<Assenza> ritardi = Assenza.perAchievment(json["events"], "ABUO");
+        List<Assenza> ritardi = Assenza.perAchievment(json["events"], "ABR0");
         List<Assenza> ritardiBrevi = Assenza.perAchievment(json["events"], "ABR1");
-        List<Assenza> uscite = Assenza.perAchievment(json["events"], "ABRO");
+        List<Assenza> uscite = Assenza.perAchievment(json["events"], "ABU0");
         List<Voto> voti = Voto.perAchievmentVoto(json["grades"]);
         return Achievment.getAchievments(
             disciplinari, annotazioni, voti, assenze, ritardi, ritardiBrevi, uscite);

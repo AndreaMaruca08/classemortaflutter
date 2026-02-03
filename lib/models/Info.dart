@@ -16,6 +16,8 @@ class Info {
     required this.dataFine,
   });
 
+  String get storageKey => "done_${materia}_${data}_${descrizione.hashCode}";
+
   factory Info.fromJson(Map<String, dynamic> json) {
     final begin = json['evtDatetimeBegin']?.toString() ?? "";
     final end = json['evtDatetimeEnd']?.toString() ?? "";
@@ -128,7 +130,7 @@ class Info {
       final dataStr = item['evtDatetimeEnd']?.toString();
       if (dataStr == null) return false;
       final dataScadenza = DateTime.tryParse(dataStr.substring(0, 10)) ?? DateTime(2100);
-      return dataScadenza.difference(DateTime(today.year, today.month, today.day)).inDays == 0 &&
+      return dataScadenza.difference(DateTime(today.year, today.month, today.day)).inDays == 1 &&
           dataScadenza.isAfter(today);
     }).toList();
     return fromJsonList(filtered);

@@ -48,7 +48,7 @@ class _MainPageState extends State<StudentDetail> {
                 children: [
                   const SizedBox(height: 5),
                   const Text(
-                      " Versione 2.6 : Classemorta web, aggiunta della spunta per segnare compiti fatti, aggiustamento filtro",
+                      " Versione 2.6.1 : Aggiunta possibilità di vedere solo i compiti non fatti, fix ai trofei (uscite e ritardi non funzionavano), fix alle notifiche delle variazioni di orario",
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,

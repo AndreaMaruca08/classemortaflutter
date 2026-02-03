@@ -39,6 +39,10 @@ class Achievment{
     for(Assenza x in ritardiBrevi){
       ritardi.add(x);
     }
+    print(uscite.length);
+    for(Assenza x in uscite){
+      print(x);
+    }
     for(Achievment x in allAchievments()){
       x.reached = isReached(x, disc, annotazioni, grades, assenze, ritardi, uscite);
       achievments.add(x);

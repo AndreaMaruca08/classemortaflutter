@@ -4,7 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class InfoSingola extends StatefulWidget {
   final Info info;
-  const InfoSingola({super.key, required this.info});
+  final VoidCallback? onStatusChanged;
+  const InfoSingola({super.key, required this.info, this.onStatusChanged});
 
   @override
   State<InfoSingola> createState() => _InfoSingolaState();
@@ -17,8 +18,7 @@ class _InfoSingolaState extends State<InfoSingola> {
   @override
   void initState() {
     super.initState();
-    // Crea una chiave univoca basata sui dati dell'info
-    _storageKey = "done_${widget.info.materia}_${widget.info.data}_${widget.info.descrizione.hashCode}";
+    _storageKey = widget.info.storageKey;
     _loadDoneStatus();
   }
 
@@ -39,6 +39,9 @@ class _InfoSingolaState extends State<InfoSingola> {
       setState(() {
         _isDone = value;
       });
+    }
+    if (widget.onStatusChanged != null) {
+      widget.onStatusChanged!();
     }
   }
 
@@ -70,7 +73,7 @@ class _InfoSingolaState extends State<InfoSingola> {
             ],
           ),
           child: SizedBox(
-            width: 300,
+            width: 400,
             child: Opacity(
               opacity: _isDone ? 0.5 : 1.0,
               child: Column(

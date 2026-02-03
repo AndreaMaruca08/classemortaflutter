@@ -732,6 +732,7 @@ class _MainPageState extends State<MainPage> {
 
   Future<void> notificheAssenzeProf(List<Notizia> notizie) async {
     if (!mounted) return;
+    notizie = notizie.reversed.toList();
     final String? conteggioSalvato = await SharedPreferencesService.load("NumeroAssenze");
     final int vecchiVoti = int.tryParse(conteggioSalvato ?? '0') ?? 0;
     final int votiAttuali = notizie.length;
